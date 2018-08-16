@@ -33,4 +33,16 @@ dependencies {
 
     // 吹き出し型のViewを用いるために必要
     implementation 'com.daasuu:BubbleLayout:1.0.0'
+
+    //retrofit利用のためのもの
+    implementation 'io.reactivex:rxandroid:1.2.1'
+    def retrofitVersion = '2.0.2'
+    implementation "com.squareup.retrofit2:retrofit:$retrofitVersion"
+    implementation "com.squareup.retrofit2:adapter-rxjava:$retrofitVersion"
+    implementation "com.squareup.retrofit2:converter-gson:$retrofitVersion"
+
+    //rxlifeycle利用のためのもの
+    def rxlifecycleVersion = '0.6.1'
+    implementation "com.trello:rxlifecycle-kotlin:$rxlifecycleVersion"
+    implementation "com.trello:rxlifecycle-components:$rxlifecycleVersion"
 }
