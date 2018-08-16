@@ -4,6 +4,7 @@ import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.ListView
 import android.content.Intent
+import com.google.gson.GsonBuilder
 
 class MemberActivity : AppCompatActivity() {
 
@@ -27,6 +28,7 @@ class MemberActivity : AppCompatActivity() {
             intent.putExtra(EXTRA_TEXTDATA,member.name)
             startActivity(intent)
         }
+
     }
     private fun dummyMember(name: String): Member = Member(name=name)
 }

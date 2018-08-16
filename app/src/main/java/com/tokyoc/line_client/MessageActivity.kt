@@ -8,7 +8,23 @@ import android.widget.ListView
 import android.widget.TextView
 import android.widget.EditText
 
-class MessageActivity : AppCompatActivity() {
+import com.google.gson.FieldNamingPolicy
+import com.google.gson.Gson
+import com.google.gson.GsonBuilder
+
+import retrofit2.Retrofit
+import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory
+import retrofit2.converter.gson.GsonConverterFactory
+
+import com.trello.rxlifecycle.components.support.RxAppCompatActivity
+import com.trello.rxlifecycle.kotlin.bindToLifecycle
+import rx.android.schedulers.AndroidSchedulers
+import rx.schedulers.Schedulers
+
+import java.util.*
+import android.widget.Toast
+
+class MessageActivity : RxAppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -17,6 +33,17 @@ class MessageActivity : AppCompatActivity() {
         val returnButton = findViewById<Button>(R.id.return_button)
         val sendButton = findViewById<Button>(R.id.send_button)
         val messageEditText = findViewById<EditText>(R.id.message_edit_text)
+
+        val gson = GsonBuilder()
+                .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
+                .create()
+        val retrofit = Retrofit.Builder()
+                .baseUrl("http://localhost:9000") //localhost9000で立ち上げたとき
+                .addConverterFactory(GsonConverterFactory.create(gson))
+                .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
+                .build()
+        val receiverClient = retrofit.create(ReceiverClient::class.java)
+        val senderClient = retrofit.create(SenderClient::class.java)
 
         // ボタンをクリックしたらMember画面に遷移
         returnButton.setOnClickListener {
@@ -30,15 +57,43 @@ class MessageActivity : AppCompatActivity() {
         // 送信ボタン押したらmessagesリストにMessageオブジェクト追加し、ListViewを更新
         sendButton.setOnClickListener {
             if (messageEditText.text != null) {
-                var sendMessage: Message = Message(textmessage=messageEditText.text.toString())
+                val sendMessage: Message = Message(textmessage=messageEditText.text.toString(), sender = 0, date= Date())
                 listAdapter.messages.add(sendMessage)
                 listView.adapter = listAdapter
                 messageEditText.text = null
+
+                val sendergson = Gson()
+                val senderjson: String = sendergson.toJson(sendMessage)
+                senderClient.sendMessage(senderjson)
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe({
+                            //正常
+                        }, {
+                            //error
+                            Toast.makeText(applicationContext, "dead", Toast.LENGTH_LONG)
+                        })
+
+            } else {
+                //サーバからのMessage受け取り。実際は常時スレッドを立てる。
+                //現状ではテキスト空欄で送信ボタンを押したときだけ動作。テスト用。
+                receiverClient.getMessages(1) //実際は相手の識別番号
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe({
+                            val messagesReceived: List<Message> = it
+                            listAdapter.messages.plus(messagesReceived)
+                        }, {
+                            //error処理
+                            Toast.makeText(applicationContext, "dead", Toast.LENGTH_LONG)
+                        })
             }
         }
 
         var sendUser = findViewById<TextView>(R.id.send_user_name_text_view)
         sendUser.text = intent.getStringExtra(MemberActivity.EXTRA_TEXTDATA)
+
+
     }
-    private fun dummyMessage(textmessage: String): Message = Message(textmessage=textmessage)
+    private fun dummyMessage(textmessage: String): Message = Message(textmessage=textmessage, sender = 0, date = Date())
 }
