@@ -1,5 +1,7 @@
 package com.tokyoc.line_client
 
+//retrofitのbaseUrlのIP addressを通信テスト時は変えてください
+
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Button
@@ -39,7 +41,8 @@ class MessageActivity : RxAppCompatActivity() {
                 .setLenient()
                 .create()
         val retrofit = Retrofit.Builder()
-                .baseUrl("http://192.168.56.1:80") //localhost9000で立ち上げたとき
+                .baseUrl("http://192.168.56.1:80") //localhost80で立ち上げたとき
+                //IP addressは各自のものに変えてください。localhostだとつながりません。
                 .addConverterFactory(GsonConverterFactory.create(gson))
                 .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
                 .build()
@@ -47,6 +50,8 @@ class MessageActivity : RxAppCompatActivity() {
         val senderClient = retrofit.create(SenderClient::class.java)
         val testClient = retrofit.create(TestClient::class.java)
         val getClient = retrofit.create(GetClient::class.java)
+
+
 
         // ボタンをクリックしたらMember画面に遷移
         returnButton.setOnClickListener {
@@ -86,16 +91,16 @@ class MessageActivity : RxAppCompatActivity() {
                 val senderjson: String = sendergson.toJson(testMessage)
                 //Toast.makeText(applicationContext, "test, $senderjson", Toast.LENGTH_LONG).show()
 
+
+
                 testClient.postTest(testMessage)
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe({
-                            Toast.makeText(applicationContext, "done, $it", Toast.LENGTH_LONG).show()
+                            //Toast.makeText(applicationContext, "done, $it", Toast.LENGTH_LONG).show()
                         }, {
                             Toast.makeText(applicationContext, "$senderjson, $it", Toast.LENGTH_LONG).show()
                         })
-
-
 
                 getClient.getMessages()
                         .subscribeOn(Schedulers.io())
@@ -106,6 +111,7 @@ class MessageActivity : RxAppCompatActivity() {
                         }, {
                             Toast.makeText(applicationContext, "sorry, $it", Toast.LENGTH_LONG).show()
                         })
+
                 
                 //ここまで通信部分！
 
