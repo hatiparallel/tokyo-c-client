@@ -1,7 +1,5 @@
 package com.tokyoc.line_client
 
-//retrofitのbaseUrlのIP addressを通信テスト時は変えてください
-
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Button
@@ -26,6 +24,9 @@ import rx.schedulers.Schedulers
 import java.util.*
 import android.widget.Toast
 
+//書き換える
+const val baseurl: String = "http://192.168.100.7:80"
+
 class MessageActivity : RxAppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -41,8 +42,7 @@ class MessageActivity : RxAppCompatActivity() {
                 .setLenient()
                 .create()
         val retrofit = Retrofit.Builder()
-                .baseUrl("http://192.168.56.1:80") //localhost80で立ち上げたとき
-                //IP addressは各自のものに変えてください。localhostだとつながりません。
+                .baseUrl(baseurl)
                 .addConverterFactory(GsonConverterFactory.create(gson))
                 .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
                 .build()
