@@ -25,7 +25,7 @@ import java.util.*
 import android.widget.Toast
 
 //書き換える
-const val baseurl: String = "http://192.168.100.7:80"
+const val baseurl: String = "http://192.168.56.1:80"
 
 class MessageActivity : RxAppCompatActivity() {
 
@@ -87,19 +87,15 @@ class MessageActivity : RxAppCompatActivity() {
                         */
                 val testMessage: TestMessage = TestMessage(Text="good night")
 
-                val sendergson = Gson()
-                val senderjson: String = sendergson.toJson(testMessage)
-                //Toast.makeText(applicationContext, "test, $senderjson", Toast.LENGTH_LONG).show()
 
 
-
-                testClient.postTest(testMessage)
+                testClient.postTest(123, testMessage)
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe({
                             //Toast.makeText(applicationContext, "done, $it", Toast.LENGTH_LONG).show()
                         }, {
-                            Toast.makeText(applicationContext, "$senderjson, $it", Toast.LENGTH_LONG).show()
+                            Toast.makeText(applicationContext, "sorry, dead. $it", Toast.LENGTH_LONG).show()
                         })
 
                 getClient.getMessages()
