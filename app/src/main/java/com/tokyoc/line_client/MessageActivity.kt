@@ -38,6 +38,11 @@ class MessageActivity : RxAppCompatActivity() {
         val sendButton = findViewById<Button>(R.id.send_button)
         val messageEditText = findViewById<EditText>(R.id.message_edit_text)
 
+        val groupName = findViewById<TextView>(R.id.send_user_name_text_view)
+        val group: Member = getIntent().getParcelableExtra(MemberActivity.EXTRA_TEXTDATA)
+        groupName.text = group.name
+
+        //通信に使うものたちの定義
         val gson = GsonBuilder()
                 .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
                 .setLenient()
@@ -53,7 +58,6 @@ class MessageActivity : RxAppCompatActivity() {
         val getClient = retrofit.create(GetClient::class.java)
 
 
-
         // ボタンをクリックしたらMember画面に遷移
         returnButton.setOnClickListener {
             val intent = Intent(this, MemberActivity::class.java)
@@ -62,6 +66,7 @@ class MessageActivity : RxAppCompatActivity() {
 
         var listAdapter = MessageListAdapter(applicationContext)
         var listView = findViewById<ListView>(R.id.message_list_view)
+        listView.adapter = listAdapter
 
         // 送信ボタン押したらmessagesリストにMessageオブジェクト追加し、ListViewを更新
         sendButton.setOnClickListener {
@@ -90,7 +95,7 @@ class MessageActivity : RxAppCompatActivity() {
 
 
 
-                testClient.postTest(123, testMessage)
+                testClient.postTest(group.groupId, testMessage)
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe({
@@ -131,11 +136,6 @@ class MessageActivity : RxAppCompatActivity() {
                         */
             }
         }
-
-        var sendUser = findViewById<TextView>(R.id.send_user_name_text_view)
-        sendUser.text = intent.getStringExtra(MemberActivity.EXTRA_TEXTDATA)
-
-
     }
     private fun dummyMessage(textmessage: String): Message = Message(textmessage=textmessage, sender = 0, date = Date())
 }

@@ -5,6 +5,5 @@ import rx.Observable
 
 interface GetClient {
     @GET("/stream/123") //serverの構造依存
-    @Streaming
     fun getMessages(): Observable<TestMessage>
 }
