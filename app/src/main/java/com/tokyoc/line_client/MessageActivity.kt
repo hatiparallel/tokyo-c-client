@@ -4,6 +4,7 @@ import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Button
 import android.content.Intent
+import android.text.Editable
 import android.widget.ListView
 import android.widget.TextView
 import android.widget.EditText
@@ -64,11 +65,11 @@ class MessageActivity : RxAppCompatActivity() {
 
         // 送信ボタン押したらmessagesリストにMessageオブジェクト追加し、ListViewを更新
         sendButton.setOnClickListener {
-            if (messageEditText.text != null) {
+            if (messageEditText.getText().length != 0) {
                 val sendMessage: Message = Message(textmessage=messageEditText.text.toString(), sender = 0, date= Date())
                 listAdapter.messages.add(sendMessage)
                 listView.adapter = listAdapter
-                messageEditText.text = null
+                messageEditText.setText("", TextView.BufferType.NORMAL)
 
                 //ここから通信部分！
 
