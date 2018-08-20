@@ -3,6 +3,7 @@ package com.tokyoc.line_client
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.ListView
+import android.widget.Button
 import android.content.Intent
 import com.google.gson.GsonBuilder
 
@@ -27,6 +28,12 @@ class MemberActivity : AppCompatActivity() {
             val intent = Intent(this, MessageActivity::class.java)
             intent.putExtra(EXTRA_TEXTDATA,member.name)
             startActivity(intent)
+        }
+
+        val signoutButton = findViewById<Button>(R.id.signout_button)
+        signoutButton.setOnClickListener {
+            val intent2 = Intent(this, SigninActivity::class.java)
+            startActivity(intent2)
         }
 
     }
