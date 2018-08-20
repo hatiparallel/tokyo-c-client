@@ -70,7 +70,7 @@ class MessageActivity : RxAppCompatActivity() {
 
         // 送信ボタン押したらmessagesリストにMessageオブジェクト追加し、ListViewを更新
         sendButton.setOnClickListener {
-            if (messageEditText.getText().length != 0) {
+            if (messageEditText.text.isNotEmpty()) {
                 val sendMessage: Message = Message(textmessage=messageEditText.text.toString(), sender = 0, date= Date())
                 listAdapter.messages.add(sendMessage)
                 listView.adapter = listAdapter
