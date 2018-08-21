@@ -26,7 +26,7 @@ class MemberActivity : AppCompatActivity() {
         listView.setOnItemClickListener { adapterView, view, position, id ->
             val member = listAdapter.members[position]
             val intent = Intent(this, MessageActivity::class.java)
-            intent.putExtra(EXTRA_TEXTDATA,member.name)
+            intent.putExtra(EXTRA_TEXTDATA, member)
             startActivity(intent)
         }
 
@@ -37,5 +37,5 @@ class MemberActivity : AppCompatActivity() {
         }
 
     }
-    private fun dummyMember(name: String): Member = Member(name=name)
+    private fun dummyMember(name: String): Member = Member(name=name, id=123, groupId=123)
 }
