@@ -4,4 +4,5 @@
     <string name="receiver_name">送信相手</string>
     <string name="edit_message">メッセージを入力してください</string>
     <string name="button_send">送信</string>
+    <string name="login_mail_adress">メールアドレスを入力してください</string>
 </resources>
