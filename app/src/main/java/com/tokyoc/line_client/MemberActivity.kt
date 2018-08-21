@@ -38,4 +38,8 @@ class MemberActivity : AppCompatActivity() {
 
     }
     private fun dummyMember(name: String): Member = Member(name=name, id=123, groupId=123)
+
+    fun signOut() {
+
+    }
 }
