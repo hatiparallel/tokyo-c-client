@@ -4,6 +4,8 @@ apply plugin: 'kotlin-android'
 
 apply plugin: 'kotlin-android-extensions'
 
+apply plugin: 'realm-android'
+
 android {
     compileSdkVersion 28
     defaultConfig {
@@ -57,3 +59,7 @@ dependencies {
 }
 
 apply plugin: 'com.google.gms.google-services'
+
+realm {
+    syncEnabled = true
+}

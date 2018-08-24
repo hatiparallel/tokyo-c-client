@@ -4,8 +4,11 @@ import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.ListView
 import android.widget.Button
+import android.widget.Toast
 import android.content.Intent
 import com.google.gson.GsonBuilder
+
+import com.google.firebase.auth.FirebaseAuth
 
 class MemberActivity : AppCompatActivity() {
 
@@ -32,6 +35,7 @@ class MemberActivity : AppCompatActivity() {
 
         val signoutButton = findViewById<Button>(R.id.signout_button)
         signoutButton.setOnClickListener {
+            signOut()
             val intent2 = Intent(this, SigninActivity::class.java)
             startActivity(intent2)
         }
@@ -40,6 +44,7 @@ class MemberActivity : AppCompatActivity() {
     private fun dummyMember(name: String): Member = Member(name=name, id=123, groupId=123)
 
     fun signOut() {
-
+        FirebaseAuth.getInstance().signOut()
+        Toast.makeText(applicationContext, "signOut succeeded", Toast.LENGTH_LONG).show()
     }
 }
