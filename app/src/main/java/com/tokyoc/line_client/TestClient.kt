@@ -6,6 +6,6 @@ import rx.Observable
 interface TestClient {
     //send a message
     @Headers("Content-Type:application/json")
-    @POST("/stream/{id}") //serverの構造依存
+    @POST("/streams/{id}") //serverの構造依存
     fun postTest(@Path("id") id: Int, @Body mes:TestMessage): Observable<String>
 }

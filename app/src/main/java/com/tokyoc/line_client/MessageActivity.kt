@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.widget.Button
 import android.content.Intent
 import android.text.Editable
+import android.util.Log
 import android.widget.ListView
 import android.widget.TextView
 import android.widget.EditText
@@ -23,10 +24,8 @@ import rx.android.schedulers.AndroidSchedulers
 import rx.schedulers.Schedulers
 
 import java.util.*
-import android.widget.Toast
-
-//書き換える
-const val baseurl: String = "http://192.168.56.1:80"
+import okhttp3.Interceptor
+import okhttp3.OkHttpClient
 
 class MessageActivity : RxAppCompatActivity() {
 
@@ -47,8 +46,18 @@ class MessageActivity : RxAppCompatActivity() {
                 .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
                 .setLenient()
                 .create()
+        val authenticatedClient = OkHttpClient().newBuilder()
+                .addInterceptor(Interceptor {
+                    chain -> chain.proceed(
+                        chain.request()
+                                .newBuilder()
+                                .header("Authorization", "Bearer")
+                                .build())
+                })
+                .build()
         val retrofit = Retrofit.Builder()
-                .baseUrl(baseurl)
+                .client(authenticatedClient)
+                .baseUrl(BuildConfig.BACKEND_BASEURL)
                 .addConverterFactory(GsonConverterFactory.create(gson))
                 .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
                 .build()
@@ -96,9 +105,9 @@ class MessageActivity : RxAppCompatActivity() {
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe({
-                            //Toast.makeText(applicationContext, "done, $it", Toast.LENGTH_LONG).show()
+                            Log.d("COMM", "post done: $it")
                         }, {
-                            Toast.makeText(applicationContext, "sorry, dead. $it", Toast.LENGTH_LONG).show()
+                            Log.d("COMM", "post failed: $it")
                         })
 
                 getClient.getMessages()
@@ -106,9 +115,9 @@ class MessageActivity : RxAppCompatActivity() {
                         .observeOn(AndroidSchedulers.mainThread())
                         .bindToLifecycle(this)
                         .subscribe({
-                            Toast.makeText(applicationContext, "done, ${it.Text}", Toast.LENGTH_LONG).show()
+                            Log.d("COMM", "get done: $it")
                         }, {
-                            Toast.makeText(applicationContext, "sorry, $it", Toast.LENGTH_LONG).show()
+                            Log.d("COMM", "get failed: $it")
                         })
 
                 
