@@ -31,22 +31,13 @@ class SigninActivity: AppCompatActivity() {
             val address = addressEditText.text.toString()
             val password = passwordEditText.text.toString()
 
-            if (address.length == 27 && password.length == 11) {
-                if (password[0] == 't') {
-                    signUp(address, password.toLowerCase())
-                } else if (password[0] == 'T' && password[1] == 'h') {
-                    signIn(address, password.toLowerCase())
-                } else {
-                    Toast.makeText(applicationContext, "address or password is invalid", Toast.LENGTH_LONG).show()
-                }
-            } else {
+            //空白でなければ一般のサインイン処理
+            if (address.isNotEmpty() && password.isNotEmpty()) {
+                signIn(address, password)
+            } else { //テスト用に空白のままサインインボタンを押したら画面遷移できるようにしています
                 val intent = Intent(this, MemberActivity::class.java)
                 startActivity(intent)
             }
-
-
-            //val intent = Intent(this, MemberActivity::class.java)
-            //startActivity(intent)
         }
 
         val toSignup = findViewById<TextView>(R.id.to_signup)
@@ -56,32 +47,7 @@ class SigninActivity: AppCompatActivity() {
         }
     }
 
-    fun signUp(email: String, password: String) {
-        mAuth.createUserWithEmailAndPassword(email, password)
-                .addOnCompleteListener { task: Task<AuthResult> ->
-                    if (task.isSuccessful) {
-                        val mUser: FirebaseUser? = mAuth.getCurrentUser()
-                        mUser?.getIdToken(true)
-                                ?.addOnCompleteListener { tokenTask: Task<GetTokenResult> ->
-                                    if (tokenTask.isSuccessful) {
-                                        val mToken: String? = tokenTask.getResult().token
-                                        if (mToken != null) {
-                                            Toast.makeText(applicationContext, "signUp succeeded", Toast.LENGTH_LONG).show()
-                                            val intent = Intent(this, MemberActivity::class.java)
-                                            intent.putExtra("token", mToken)
-                                            startActivity(intent)
-                                        } else { //token is null
-                                            Toast.makeText(applicationContext, "token is null", Toast.LENGTH_LONG).show()
-                                        }
-                                    } else { //could register, but could not get token
-                                        Toast.makeText(applicationContext, "sign up token error: ${tokenTask.exception?.message}", Toast.LENGTH_LONG).show()
-                                    }
-                                }
-                    } else { //could not register with email and password
-                        Toast.makeText(applicationContext, "sign up error: ${task.exception?.message}", Toast.LENGTH_LONG).show()
-                    }
-                }
-    }
+
 
     fun signIn(email: String, password: String){
         mAuth.signInWithEmailAndPassword(email, password)
