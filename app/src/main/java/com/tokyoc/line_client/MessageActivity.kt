@@ -46,8 +46,17 @@ class MessageActivity : RxAppCompatActivity() {
                 .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
                 .setLenient()
                 .create()
-
+        val authenticatedClient = OkHttpClient().newBuilder()
+                .addInterceptor(Interceptor {
+                    chain -> chain.proceed(
+                        chain.request()
+                                .newBuilder()
+                                .header("Authorization", "Bearer")
+                                .build())
+                })
+                .build()
         val retrofit = Retrofit.Builder()
+                .client(authenticatedClient)
                 .baseUrl(BuildConfig.BACKEND_BASEURL)
                 .addConverterFactory(GsonConverterFactory.create(gson))
                 .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
