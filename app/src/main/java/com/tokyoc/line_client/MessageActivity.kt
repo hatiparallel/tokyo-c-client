@@ -71,17 +71,14 @@ class MessageActivity : RxAppCompatActivity() {
         // 送信ボタン押したらmessagesリストにMessageオブジェクト追加し、ListViewを更新
         sendButton.setOnClickListener {
             if (messageEditText.text.isNotEmpty()) {
-                val sendMessage: Message = Message(textmessage=messageEditText.text.toString(), sender = 0, date= Date())
+                val sendMessage: Message = Message(content=messageEditText.text.toString())
                 listAdapter.messages.add(sendMessage)
                 listView.adapter = listAdapter
                 messageEditText.setText("", TextView.BufferType.NORMAL)
 
                 //ここから通信部分！
 
-                /*
-                val sendergson = Gson()
-                val senderjson: String = sendergson.toJson(sendMessage)
-                senderClient.sendMessage(senderjson)
+                senderClient.sendMessage(channel=1, message=sendMessage) //channel番号はgetExtraから本来は読み込む
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe({
@@ -90,7 +87,7 @@ class MessageActivity : RxAppCompatActivity() {
                             //error
                             Toast.makeText(applicationContext, "dead", Toast.LENGTH_LONG)
                         })
-                        */
+
                 val testMessage: TestMessage = TestMessage(Text="good night")
 
 
@@ -137,5 +134,4 @@ class MessageActivity : RxAppCompatActivity() {
             }
         }
     }
-    private fun dummyMessage(textmessage: String): Message = Message(textmessage=textmessage, sender = 0, date = Date())
 }
