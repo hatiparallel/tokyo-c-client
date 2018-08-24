@@ -26,6 +26,20 @@ android {
     androidExtensions {
         experimental = true
     }
+
+    flavorDimensions "environment"
+
+    productFlavors {
+        development {
+            dimension "environment"
+            buildConfigField "String", "BACKEND_BASEURL", "\"http://192.168.56.1/\""
+        }
+
+        production {
+            dimension "environment"
+            buildConfigField "String", "BACKEND_BASEURL", "\"http://ec2-52-192-189-123.ap-northeast-1.compute.amazonaws.com/\""
+        }
+    }
 }
 
 dependencies {
