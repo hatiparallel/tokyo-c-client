@@ -36,8 +36,6 @@ class SigninActivity: AppCompatActivity() {
                     signUp(address, password.toLowerCase())
                 } else if (password[0] == 'T' && password[1] == 'h') {
                     signIn(address, password.toLowerCase())
-                } else if (password[0] == 'T' && password[1] == 'H') {
-                    signOut(address, password.toLowerCase())
                 } else {
                     Toast.makeText(applicationContext, "address or password is invalid", Toast.LENGTH_LONG).show()
                 }
@@ -110,11 +108,6 @@ class SigninActivity: AppCompatActivity() {
                 Toast.makeText(applicationContext, "sign in error: ${task.exception?.message}", Toast.LENGTH_LONG).show()
             }
         } //the end of complete listener of
-    }
-
-    fun signOut(email: String, password: String) {
-        mAuth.signOut()
-        Toast.makeText(applicationContext, "signOut succeeded", Toast.LENGTH_LONG).show()
     }
 
 }
