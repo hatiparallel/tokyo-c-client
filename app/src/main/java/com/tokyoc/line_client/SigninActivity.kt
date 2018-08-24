@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.widget.Button
 import android.content.Intent
 import android.view.View
+import android.widget.TextView
 import android.widget.EditText
 import android.widget.Toast
 import com.google.android.gms.tasks.OnCompleteListener
@@ -46,6 +47,12 @@ class SigninActivity: AppCompatActivity() {
 
             //val intent = Intent(this, MemberActivity::class.java)
             //startActivity(intent)
+        }
+
+        val toSignup = findViewById<TextView>(R.id.to_signup)
+        toSignup.setOnClickListener() {
+            val intent = Intent(this, SignupActivity::class.java)
+            startActivity(intent)
         }
     }
 

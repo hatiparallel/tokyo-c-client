@@ -9,40 +9,46 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="200dp"
-        android:text="Sign In"
+        android:text="Sign Up"
         android:textSize="48sp" />
 
     <EditText
-        android:id="@+id/address_edit_text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="12pt"
-        android:layout_marginStart="12pt"
+        android:layout_marginEnd="24dp"
+        android:layout_marginStart="24dp"
+        android:hint="ユーザー名を入力してください" />
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="24dp"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="6dp"
         android:hint="メールアドレスを入力してください" />
 
     <EditText
-        android:id="@+id/password_edit_text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="12pt"
-        android:layout_marginStart="12pt"
-        android:layout_marginTop="6pt"
+        android:layout_marginEnd="24dp"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="6dp"
         android:hint="パスワードを入力してください" />
 
     <Button
-        android:id="@+id/signin_button"
+        android:id="@+id/signup_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="12dp"
-        android:text="sign in" />
+        android:text="sign up" />
 
     <TextView
-        android:id="@+id/to_signup"
+        android:id="@+id/to_signin"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="12dp"
         android:clickable="true"
         android:focusable="true"
         android:textColor="@drawable/text_color"
-        android:text="登録がお済みでない方はこちら" />
+        android:text="すでに登録がお済みの方はこちら" />
 </LinearLayout>
