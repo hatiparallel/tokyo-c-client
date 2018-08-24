@@ -25,6 +25,9 @@
 
         <activity
             android:name=".MemberActivity" />
+
+        <activity
+            android:name=".SignupActivity" />
     </application>
 
 </manifest>
