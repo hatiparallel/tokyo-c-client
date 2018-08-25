@@ -1,17 +1,14 @@
 package com.tokyoc.line_client
 
-import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Button
 import android.content.Intent
-import android.text.Editable
 import android.util.Log
 import android.widget.ListView
 import android.widget.TextView
 import android.widget.EditText
 
 import com.google.gson.FieldNamingPolicy
-import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 
 import retrofit2.Retrofit
@@ -19,7 +16,6 @@ import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
 
 import com.trello.rxlifecycle.components.support.RxAppCompatActivity
-import com.trello.rxlifecycle.kotlin.bindToLifecycle
 import rx.android.schedulers.AndroidSchedulers
 import rx.schedulers.Schedulers
 
@@ -84,53 +80,24 @@ class MessageActivity : RxAppCompatActivity() {
                 return@setOnClickListener
             }
 
-            val sendMessage: Message = Message(textmessage = messageEditText.text.toString(), sender = 0, date = Date())
-
+            val sendMessage: Message = Message(content = messageEditText.text.toString())
             listAdapter.messages.add(sendMessage)
             listView.adapter = listAdapter
             messageEditText.setText("", TextView.BufferType.NORMAL)
 
             //ここから通信部分！
 
-            /*
-            val sendergson = Gson()
-            val senderjson: String = sendergson.toJson(sendMessage)
-            senderClient.sendMessage(senderjson)
+            senderClient.sendMessage(channel = group.groupId, message = sendMessage) //channel番号はgetExtraから本来は読み込む
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe({
                         //正常
                     }, {
                         //error
-                        Toast.makeText(applicationContext, "dead", Toast.LENGTH_LONG)
+                        Log.d("COMM", "post failed")
                     })
-                    */
-
-            val testMessage: TestMessage = TestMessage(Text = "good night")
-
-            testClient.postTest(group.groupId, testMessage)
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe({
-                        Log.d("COMM", "post done: $it")
-                    }, {
-                        Log.d("COMM", "post failed: $it")
-                    })
-
-            getClient.getMessages()
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .bindToLifecycle(this)
-                    .subscribe({
-                        Log.d("COMM", "get done: $it")
-                    }, {
-                        Log.d("COMM", "get failed: $it")
-                    })
-
 
             //ここまで通信部分！
         }
     }
-
-    private fun dummyMessage(textmessage: String): Message = Message(textmessage = textmessage, sender = 0, date = Date())
 }
