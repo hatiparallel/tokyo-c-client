@@ -3,6 +3,7 @@ package com.tokyoc.line_client
 import android.os.Bundle
 import android.widget.Button
 import android.content.Intent
+import android.icu.text.DateFormat
 import android.util.Log
 import android.widget.ListView
 import android.widget.TextView
@@ -16,12 +17,15 @@ import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
 
 import com.trello.rxlifecycle.components.support.RxAppCompatActivity
+import com.trello.rxlifecycle.kotlin.bindToLifecycle
 import rx.android.schedulers.AndroidSchedulers
 import rx.schedulers.Schedulers
 
-import java.util.*
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
+import retrofit2.adapter.rxjava.HttpException
+import java.io.IOException
+import java.util.concurrent.TimeUnit
 
 class MessageActivity : RxAppCompatActivity() {
 
@@ -33,17 +37,22 @@ class MessageActivity : RxAppCompatActivity() {
         val returnButton = findViewById<Button>(R.id.return_button)
         val sendButton = findViewById<Button>(R.id.send_button)
         val messageEditText = findViewById<EditText>(R.id.message_edit_text)
-
+        val listAdapter = MessageListAdapter(applicationContext)
+        val listView = findViewById<ListView>(R.id.message_list_view)
         val groupName = findViewById<TextView>(R.id.send_user_name_text_view)
-        val group: Member = getIntent().getParcelableExtra(MemberActivity.EXTRA_TEXTDATA)
+        val group: Member = intent.getParcelableExtra(MemberActivity.EXTRA_TEXTDATA)
+
+        listView.adapter = listAdapter
         groupName.text = group.name
 
         //通信に使うものたちの定義
         val gson = GsonBuilder()
-                .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
+                .setDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
+                .setFieldNamingPolicy(FieldNamingPolicy.UPPER_CAMEL_CASE)
                 .setLenient()
                 .create()
         val authenticatedClient = OkHttpClient().newBuilder()
+                .readTimeout(0, TimeUnit.SECONDS)
                 .addInterceptor(Interceptor { chain ->
                     chain.proceed(
                             chain.request()
@@ -58,10 +67,39 @@ class MessageActivity : RxAppCompatActivity() {
                 .addConverterFactory(GsonConverterFactory.create(gson))
                 .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
                 .build()
-        val receiverClient = retrofit.create(ReceiverClient::class.java)
         val senderClient = retrofit.create(SenderClient::class.java)
-        val testClient = retrofit.create(TestClient::class.java)
-        val getClient = retrofit.create(GetClient::class.java)
+
+        Log.d("COMM", "token: $token")
+        Log.d("COMM", "listening /streams/${group.groupId}")
+
+        retrofit.create(ReceiverClient::class.java).getMessages(group.groupId)
+                .flatMap {
+                    val source = it.source()
+
+                    rx.Observable.create(rx.Observable.OnSubscribe<Message> {
+                        try {
+                            while (!source.exhausted()) {
+                                it.onNext(gson.fromJson<Message>(source.readUtf8Line(), Message::class.java))
+                            }
+
+                            it.onCompleted()
+                        } catch (e: IOException) {
+                            it.onError(e)
+                        }
+                    })
+                }
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .bindToLifecycle(this)
+                .subscribe(
+                        {
+                            listAdapter.messages.add(it)
+                            listView.adapter = listAdapter
+                            messageEditText.setText("", TextView.BufferType.NORMAL)
+                        },
+                        {
+                            Log.d("COMM", "receive failed: $it")
+                        })
 
         // ボタンをクリックしたらMember画面に遷移
         returnButton.setOnClickListener {
@@ -70,31 +108,23 @@ class MessageActivity : RxAppCompatActivity() {
             startActivity(intent)
         }
 
-        var listAdapter = MessageListAdapter(applicationContext)
-        var listView = findViewById<ListView>(R.id.message_list_view)
-        listView.adapter = listAdapter
-        Log.d("TEST", token)
-        // 送信ボタン押したらmessagesリストにMessageオブジェクト追加し、ListViewを更新
         sendButton.setOnClickListener {
             if (messageEditText.text.isEmpty()) {
                 return@setOnClickListener
             }
 
-            val sendMessage: Message = Message(content = messageEditText.text.toString())
-            listAdapter.messages.add(sendMessage)
-            listView.adapter = listAdapter
-            messageEditText.setText("", TextView.BufferType.NORMAL)
-
+            val message: Message = Message(content = messageEditText.text.toString())
             //ここから通信部分！
 
-            senderClient.sendMessage(channel = group.groupId, message = sendMessage) //channel番号はgetExtraから本来は読み込む
+            Log.d("COMM", gson.toJson(message))
+
+            senderClient.sendMessage(group.groupId, message) //channel番号はgetExtraから本来は読み込む
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe({
-                        //正常
+                        Log.d("COMM", "post done: ${it}")
                     }, {
-                        //error
-                        Log.d("COMM", "post failed")
+                        Log.d("COMM", "post failed: ${it}")
                     })
 
             //ここまで通信部分！
