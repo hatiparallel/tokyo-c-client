@@ -13,7 +13,7 @@
         android:textSize="48sp" />
 
     <EditText
-        android:id="@+id/address_edit_text"
+        android:id="@+id/email_edit_text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginEnd="12pt"

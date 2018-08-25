@@ -33,6 +33,7 @@ class MessageActivity : RxAppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_message)
 
+        val token = intent.getStringExtra("token")
         val returnButton = findViewById<Button>(R.id.return_button)
         val sendButton = findViewById<Button>(R.id.send_button)
         val messageEditText = findViewById<EditText>(R.id.message_edit_text)
@@ -47,12 +48,12 @@ class MessageActivity : RxAppCompatActivity() {
                 .setLenient()
                 .create()
         val authenticatedClient = OkHttpClient().newBuilder()
-                .addInterceptor(Interceptor {
-                    chain -> chain.proceed(
-                        chain.request()
-                                .newBuilder()
-                                .header("Authorization", "Bearer")
-                                .build())
+                .addInterceptor(Interceptor { chain ->
+                    chain.proceed(
+                            chain.request()
+                                    .newBuilder()
+                                    .header("Authorization", "Bearer $token")
+                                    .build())
                 })
                 .build()
         val retrofit = Retrofit.Builder()
@@ -66,85 +67,70 @@ class MessageActivity : RxAppCompatActivity() {
         val testClient = retrofit.create(TestClient::class.java)
         val getClient = retrofit.create(GetClient::class.java)
 
-
         // ボタンをクリックしたらMember画面に遷移
         returnButton.setOnClickListener {
             val intent = Intent(this, MemberActivity::class.java)
+            intent.putExtra("token", token)
             startActivity(intent)
         }
 
         var listAdapter = MessageListAdapter(applicationContext)
         var listView = findViewById<ListView>(R.id.message_list_view)
         listView.adapter = listAdapter
-
+        Log.d("TEST", token)
         // 送信ボタン押したらmessagesリストにMessageオブジェクト追加し、ListViewを更新
         sendButton.setOnClickListener {
-            if (messageEditText.text.isNotEmpty()) {
-                val sendMessage: Message = Message(textmessage=messageEditText.text.toString(), sender = 0, date= Date())
-                listAdapter.messages.add(sendMessage)
-                listView.adapter = listAdapter
-                messageEditText.setText("", TextView.BufferType.NORMAL)
-
-                //ここから通信部分！
-
-                /*
-                val sendergson = Gson()
-                val senderjson: String = sendergson.toJson(sendMessage)
-                senderClient.sendMessage(senderjson)
-                        .subscribeOn(Schedulers.io())
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe({
-                            //正常
-                        }, {
-                            //error
-                            Toast.makeText(applicationContext, "dead", Toast.LENGTH_LONG)
-                        })
-                        */
-                val testMessage: TestMessage = TestMessage(Text="good night")
-
-
-
-                testClient.postTest(group.groupId, testMessage)
-                        .subscribeOn(Schedulers.io())
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe({
-                            Log.d("COMM", "post done: $it")
-                        }, {
-                            Log.d("COMM", "post failed: $it")
-                        })
-
-                getClient.getMessages()
-                        .subscribeOn(Schedulers.io())
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .bindToLifecycle(this)
-                        .subscribe({
-                            Log.d("COMM", "get done: $it")
-                        }, {
-                            Log.d("COMM", "get failed: $it")
-                        })
-
-                
-                //ここまで通信部分！
-
-
-
-            } else {
-                /*
-                //サーバからのMessage受け取り。実際は常時スレッドを立てる。
-                //現状ではテキスト空欄で送信ボタンを押したときだけ動作。テスト用。
-                receiverClient.getMessages(1) //実際は相手の識別番号
-                        .subscribeOn(Schedulers.io())
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe({
-                            val messagesReceived: List<Message> = it
-                            listAdapter.messages.plus(messagesReceived)
-                        }, {
-                            //error処理
-                            Toast.makeText(applicationContext, "dead", Toast.LENGTH_LONG)
-                        })
-                        */
+            if (messageEditText.text.isEmpty()) {
+                return@setOnClickListener
             }
+
+            val sendMessage: Message = Message(textmessage = messageEditText.text.toString(), sender = 0, date = Date())
+
+            listAdapter.messages.add(sendMessage)
+            listView.adapter = listAdapter
+            messageEditText.setText("", TextView.BufferType.NORMAL)
+
+            //ここから通信部分！
+
+            /*
+            val sendergson = Gson()
+            val senderjson: String = sendergson.toJson(sendMessage)
+            senderClient.sendMessage(senderjson)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe({
+                        //正常
+                    }, {
+                        //error
+                        Toast.makeText(applicationContext, "dead", Toast.LENGTH_LONG)
+                    })
+                    */
+
+            val testMessage: TestMessage = TestMessage(Text = "good night")
+
+            testClient.postTest(group.groupId, testMessage)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe({
+                        Log.d("COMM", "post done: $it")
+                    }, {
+                        Log.d("COMM", "post failed: $it")
+                    })
+
+            getClient.getMessages()
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .bindToLifecycle(this)
+                    .subscribe({
+                        Log.d("COMM", "get done: $it")
+                    }, {
+                        Log.d("COMM", "get failed: $it")
+                    })
+
+
+            //ここまで通信部分！
         }
     }
-    private fun dummyMessage(textmessage: String): Message = Message(textmessage=textmessage, sender = 0, date = Date())
+
+    private fun dummyMessage(textmessage: String): Message = Message(textmessage = textmessage, sender = 0, date = Date())
 }
