@@ -50,6 +50,7 @@ class SigninActivity : AppCompatActivity() {
             }
 
             firebase.currentUser?.getIdToken(true)?.addOnCompleteListener { tokenTask: Task<GetTokenResult> ->
+                firebase.currentUser?.displayName
                 if (!tokenTask.isSuccessful) {
                     Toast.makeText(applicationContext, "sign in token error: ${tokenTask.exception?.message}", Toast.LENGTH_LONG).show()
                     return@addOnCompleteListener
