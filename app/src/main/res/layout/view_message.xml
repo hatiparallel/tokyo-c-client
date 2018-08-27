@@ -19,6 +19,7 @@
         android:background="#f00"/>
 
     <com.daasuu.bl.BubbleLayout
+        android:id="@+id/bubble_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="0dp"

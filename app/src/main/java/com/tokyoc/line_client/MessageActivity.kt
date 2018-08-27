@@ -20,6 +20,9 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 import com.trello.rxlifecycle.components.support.RxAppCompatActivity
 import com.trello.rxlifecycle.kotlin.bindToLifecycle
+import io.realm.Realm
+import io.realm.kotlin.createObject
+import io.realm.kotlin.where
 import rx.android.schedulers.AndroidSchedulers
 import rx.schedulers.Schedulers
 
@@ -29,14 +32,23 @@ import okhttp3.OkHttpClient
 
 class MessageActivity : RxAppCompatActivity() {
 
+    private lateinit var realm: Realm
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_message)
 
-        val returnButton = findViewById<Button>(R.id.return_button)
-        val sendButton = findViewById<Button>(R.id.send_button)
+        //Realmを利用するために必要なもの
+        realm = Realm.getDefaultInstance()
+        val messages = realm.where<Message>().findAll()
+        val listView: ListView = findViewById<ListView>(R.id.message_list_view)
+        listView.adapter = MessageListAdapter(messages)
+
+        val returnButton: Button = findViewById<Button>(R.id.return_button)
+        val sendButton: Button = findViewById<Button>(R.id.send_button)
         val messageEditText = findViewById<EditText>(R.id.message_edit_text)
 
+        //画面上部の名前を送信相手の名前に変更
         val groupName = findViewById<TextView>(R.id.send_user_name_text_view)
         val group: Member = getIntent().getParcelableExtra(MemberActivity.EXTRA_TEXTDATA)
         groupName.text = group.name
@@ -47,12 +59,12 @@ class MessageActivity : RxAppCompatActivity() {
                 .setLenient()
                 .create()
         val authenticatedClient = OkHttpClient().newBuilder()
-                .addInterceptor(Interceptor {
-                    chain -> chain.proceed(
-                        chain.request()
-                                .newBuilder()
-                                .header("Authorization", "Bearer")
-                                .build())
+                .addInterceptor(Interceptor { chain ->
+                    chain.proceed(
+                            chain.request()
+                                    .newBuilder()
+                                    .header("Authorization", "Bearer")
+                                    .build())
                 })
                 .build()
         val retrofit = Retrofit.Builder()
@@ -73,17 +85,15 @@ class MessageActivity : RxAppCompatActivity() {
             startActivity(intent)
         }
 
-        var listAdapter = MessageListAdapter(applicationContext)
-        var listView = findViewById<ListView>(R.id.message_list_view)
-        listView.adapter = listAdapter
-
         // 送信ボタン押したらmessagesリストにMessageオブジェクト追加し、ListViewを更新
         sendButton.setOnClickListener {
             if (messageEditText.text.isNotEmpty()) {
-                val sendMessage: Message = Message(textmessage=messageEditText.text.toString(), sender = 0, date= Date())
-                listAdapter.messages.add(sendMessage)
-                listView.adapter = listAdapter
-                messageEditText.setText("", TextView.BufferType.NORMAL)
+                realm.executeTransaction {
+                    val maxId = realm.where<Message>().max("id")
+                    val nextId = (maxId?.toLong() ?: 0L) + 1
+                    val message = realm.createObject<Message>(nextId)
+                    message.textmessage = messageEditText.text.toString()
+                }
 
                 //ここから通信部分！
 
@@ -100,7 +110,7 @@ class MessageActivity : RxAppCompatActivity() {
                             Toast.makeText(applicationContext, "dead", Toast.LENGTH_LONG)
                         })
                         */
-                val testMessage: TestMessage = TestMessage(Text="good night")
+                val testMessage: TestMessage = TestMessage(Text = "good night")
 
 
 
@@ -123,9 +133,8 @@ class MessageActivity : RxAppCompatActivity() {
                             Log.d("COMM", "get failed: $it")
                         })
 
-                
-                //ここまで通信部分！
 
+                //ここまで通信部分！
 
 
             } else {
@@ -146,5 +155,9 @@ class MessageActivity : RxAppCompatActivity() {
             }
         }
     }
-    private fun dummyMessage(textmessage: String): Message = Message(textmessage=textmessage, sender = 0, date = Date())
+
+    override fun onDestroy() {
+        super.onDestroy()
+        realm.close()
+    }
 }
