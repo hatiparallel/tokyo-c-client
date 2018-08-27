@@ -1,17 +1,14 @@
 package com.tokyoc.line_client
 
-import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Button
 import android.content.Intent
-import android.text.Editable
 import android.util.Log
 import android.widget.ListView
 import android.widget.TextView
 import android.widget.EditText
 
 import com.google.gson.FieldNamingPolicy
-import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 
 import retrofit2.Retrofit
@@ -19,7 +16,6 @@ import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
 
 import com.trello.rxlifecycle.components.support.RxAppCompatActivity
-import com.trello.rxlifecycle.kotlin.bindToLifecycle
 import rx.android.schedulers.AndroidSchedulers
 import rx.schedulers.Schedulers
 
@@ -33,6 +29,7 @@ class MessageActivity : RxAppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_message)
 
+        val token = intent.getStringExtra("token")
         val returnButton = findViewById<Button>(R.id.return_button)
         val sendButton = findViewById<Button>(R.id.send_button)
         val messageEditText = findViewById<EditText>(R.id.message_edit_text)
@@ -47,12 +44,12 @@ class MessageActivity : RxAppCompatActivity() {
                 .setLenient()
                 .create()
         val authenticatedClient = OkHttpClient().newBuilder()
-                .addInterceptor(Interceptor {
-                    chain -> chain.proceed(
-                        chain.request()
-                                .newBuilder()
-                                .header("Authorization", "Bearer")
-                                .build())
+                .addInterceptor(Interceptor { chain ->
+                    chain.proceed(
+                            chain.request()
+                                    .newBuilder()
+                                    .header("Authorization", "Bearer $token")
+                                    .build())
                 })
                 .build()
         val retrofit = Retrofit.Builder()
@@ -66,81 +63,41 @@ class MessageActivity : RxAppCompatActivity() {
         val testClient = retrofit.create(TestClient::class.java)
         val getClient = retrofit.create(GetClient::class.java)
 
-
         // ボタンをクリックしたらMember画面に遷移
         returnButton.setOnClickListener {
             val intent = Intent(this, MemberActivity::class.java)
+            intent.putExtra("token", token)
             startActivity(intent)
         }
 
         var listAdapter = MessageListAdapter(applicationContext)
         var listView = findViewById<ListView>(R.id.message_list_view)
         listView.adapter = listAdapter
-
+        Log.d("TEST", token)
         // 送信ボタン押したらmessagesリストにMessageオブジェクト追加し、ListViewを更新
         sendButton.setOnClickListener {
-            if (messageEditText.text.isNotEmpty()) {
-                val sendMessage: Message = Message(content=messageEditText.text.toString())
-                listAdapter.messages.add(sendMessage)
-                listView.adapter = listAdapter
-                messageEditText.setText("", TextView.BufferType.NORMAL)
-
-                //ここから通信部分！
-
-                senderClient.sendMessage(channel=1, message=sendMessage) //channel番号はgetExtraから本来は読み込む
-                        .subscribeOn(Schedulers.io())
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe({
-                            //正常
-                        }, {
-                            //error
-                            Toast.makeText(applicationContext, "dead", Toast.LENGTH_LONG)
-                        })
-
-                val testMessage: TestMessage = TestMessage(Text="good night")
-
-
-
-                testClient.postTest(group.groupId, testMessage)
-                        .subscribeOn(Schedulers.io())
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe({
-                            Log.d("COMM", "post done: $it")
-                        }, {
-                            Log.d("COMM", "post failed: $it")
-                        })
-
-                getClient.getMessages()
-                        .subscribeOn(Schedulers.io())
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .bindToLifecycle(this)
-                        .subscribe({
-                            Log.d("COMM", "get done: $it")
-                        }, {
-                            Log.d("COMM", "get failed: $it")
-                        })
-
-                
-                //ここまで通信部分！
-
-
-
-            } else {
-                /*
-                //サーバからのMessage受け取り。実際は常時スレッドを立てる。
-                //現状ではテキスト空欄で送信ボタンを押したときだけ動作。テスト用。
-                receiverClient.getMessages(1) //実際は相手の識別番号
-                        .subscribeOn(Schedulers.io())
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe({
-                            val messagesReceived: List<Message> = it
-                            listAdapter.messages.plus(messagesReceived)
-                        }, {
-                            //error処理
-                            Toast.makeText(applicationContext, "dead", Toast.LENGTH_LONG)
-                        })
-                        */
+            if (messageEditText.text.isEmpty()) {
+                return@setOnClickListener
             }
+
+            val sendMessage: Message = Message(content = messageEditText.text.toString())
+            listAdapter.messages.add(sendMessage)
+            listView.adapter = listAdapter
+            messageEditText.setText("", TextView.BufferType.NORMAL)
+
+            //ここから通信部分！
+
+            senderClient.sendMessage(channel = group.groupId, message = sendMessage) //channel番号はgetExtraから本来は読み込む
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe({
+                        //正常
+                    }, {
+                        //error
+                        Log.d("COMM", "post failed")
+                    })
+
+            //ここまで通信部分！
         }
     }
 }
