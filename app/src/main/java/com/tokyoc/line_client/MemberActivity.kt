@@ -13,7 +13,7 @@ import com.google.firebase.auth.FirebaseAuth
 class MemberActivity : AppCompatActivity() {
 
     companion object {
-        const val EXTRA_TEXTDATA = "com.tokyoc.line_client.TEXTDATA"
+        const val EXTRA_MEMBER = "member"
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -29,7 +29,7 @@ class MemberActivity : AppCompatActivity() {
         listView.setOnItemClickListener { adapterView, view, position, id ->
             val member = listAdapter.members[position]
             val intent = Intent(this, MessageActivity::class.java)
-            intent.putExtra(EXTRA_TEXTDATA, member)
+            intent.putExtra(EXTRA_MEMBER, member)
             intent.putExtra("token", getIntent().getStringExtra("token"))
             startActivity(intent)
         }
