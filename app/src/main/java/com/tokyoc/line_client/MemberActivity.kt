@@ -20,31 +20,25 @@ class MemberActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_member)
 
-        val listAdapter = MemberListAdapter(applicationContext)
-        listAdapter.members = listOf(dummyMember("Aさん"),dummyMember("Bさん"),dummyMember("Cさん"), dummyMember("Dさん"), dummyMember("Eさん"))
-
         val listView: ListView = findViewById(R.id.list_view)
+        val listAdapter = MemberListAdapter(applicationContext)
+
         listView.adapter = listAdapter
+        listAdapter.members = listOf(dummyMember("Aさん"), dummyMember("Bさん"), dummyMember("Cさん"), dummyMember("Dさん"), dummyMember("Eさん"))
 
         listView.setOnItemClickListener { adapterView, view, position, id ->
             val member = listAdapter.members[position]
             val intent = Intent(this, MessageActivity::class.java)
             intent.putExtra(EXTRA_TEXTDATA, member)
+            intent.putExtra("token", getIntent().getStringExtra("token"))
             startActivity(intent)
         }
 
-        val signoutButton = findViewById<Button>(R.id.signout_button)
-        signoutButton.setOnClickListener {
-            signOut()
-            val intent2 = Intent(this, SigninActivity::class.java)
-            startActivity(intent2)
+        findViewById<Button>(R.id.signout_button).setOnClickListener {
+            FirebaseAuth.getInstance().signOut()
+            startActivity(Intent(this, SigninActivity::class.java))
         }
-
     }
-    private fun dummyMember(name: String): Member = Member(name=name, id=123, groupId=123)
 
-    fun signOut() {
-        FirebaseAuth.getInstance().signOut()
-        Toast.makeText(applicationContext, "signOut succeeded", Toast.LENGTH_LONG).show()
-    }
+    private fun dummyMember(name: String): Member = Member(name = name, id = 123, groupId = 123)
 }

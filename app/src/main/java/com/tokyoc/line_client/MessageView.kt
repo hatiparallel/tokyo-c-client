@@ -31,7 +31,7 @@ class MessageView : FrameLayout {
     }
 
     fun setMessage(message: Message) {
-        messageTextView?.text = message.textmessage
+        messageTextView?.text = message.content
         messageProfileImageView?.setBackgroundColor(Color.RED)
     }
 }

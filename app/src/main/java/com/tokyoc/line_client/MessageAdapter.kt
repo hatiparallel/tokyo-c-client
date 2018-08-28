@@ -12,12 +12,13 @@ import io.realm.RealmBaseAdapter
 
 class MessageListAdapter(data: OrderedRealmCollection<Message>) : RealmBaseAdapter<Message>(data) {
 
-    // var messages: MutableList<Message> = mutableListOf()
+    var messages0: MutableList<Message> = mutableListOf()
 
     inner class ViewHolder(cell: View) {
-//        val imageview = cell.findViewById<ImageView>(R.id.message_profile_image_view)
-//        val bubbleview = cell.findViewById<com.daasuu.bl.BubbleLayout>(R.id.bubble_view)
-        val textmessage = cell.findViewById<TextView>(android.R.id.text1)
+        //val imageview = cell.findViewById<ImageView>(R.id.message_profile_image_view)
+        //val bubbleview = cell.findViewById<com.daasuu.bl.BubbleLayout>(R.id.bubble_view)
+        //簡単のためリストに格納するViewをsimple_list_item_1にしている
+        val messagecontent = cell.findViewById<TextView>(android.R.id.text1)
     }
 
     //override fun getCount(): Int = messages.size
@@ -42,7 +43,7 @@ class MessageListAdapter(data: OrderedRealmCollection<Message>) : RealmBaseAdapt
 
         adapterData?.run {
             val message = get(position)
-            viewHolder.textmessage.text = message.textmessage
+            viewHolder.messagecontent.text = message.content
         }
         return view
     }
