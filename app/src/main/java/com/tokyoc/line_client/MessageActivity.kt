@@ -34,13 +34,14 @@ class MessageActivity : RxAppCompatActivity() {
         setContentView(R.layout.activity_message)
 
         val token = intent.getStringExtra("token")
+        val group: Member = intent.getParcelableExtra(MemberActivity.EXTRA_MEMBER)
+
         val returnButton = findViewById<Button>(R.id.return_button)
         val sendButton = findViewById<Button>(R.id.send_button)
         val messageEditText = findViewById<EditText>(R.id.message_edit_text)
         val listAdapter = MessageListAdapter(applicationContext)
         val listView = findViewById<ListView>(R.id.message_list_view)
         val groupName = findViewById<TextView>(R.id.send_user_name_text_view)
-        val group: Member = intent.getParcelableExtra(MemberActivity.EXTRA_TEXTDATA)
 
         listView.adapter = listAdapter
         groupName.text = group.name

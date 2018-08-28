@@ -10,7 +10,11 @@ import android.widget.Toast
 import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.AuthResult
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.GetTokenResult
+import com.google.firebase.auth.UserProfileChangeRequest
+
+
 
 class SignupActivity : AppCompatActivity() {
     val firebase: FirebaseAuth = FirebaseAuth.getInstance()
@@ -19,7 +23,7 @@ class SignupActivity : AppCompatActivity() {
         super.onCreate(saveInstanceState)
         setContentView(R.layout.activity_signup)
 
-        val userEditText: EditText = findViewById<EditText>(R.id.user_edit_text)
+        val nameEditText: EditText = findViewById<EditText>(R.id.name_edit_text)
         val emailEditText: EditText = findViewById<EditText>(R.id.email_edit_text)
         val passwordEditText: EditText = findViewById<EditText>(R.id.password_edit_text)
 
@@ -29,40 +33,51 @@ class SignupActivity : AppCompatActivity() {
         }
 
         findViewById<Button>(R.id.signup_button).setOnClickListener() {
-            val user: String = userEditText.text.toString()
+            val name: String = nameEditText.text.toString()
             val email: String = emailEditText.text.toString()
             val password: String = passwordEditText.text.toString()
 
-            if (user.isEmpty() || email.isEmpty() || password.isEmpty()) {
+            if (name.isEmpty() || email.isEmpty() || password.isEmpty()) {
                 Toast.makeText(applicationContext, "any field cannot be empty", Toast.LENGTH_LONG).show()
                 return@setOnClickListener
             }
 
-            signUp(email, password)
+            signUp(name, email, password)
         }
     }
 
-    fun signUp(email: String, password: String) {
+    fun signUp(name: String, email: String, password: String) {
         firebase.createUserWithEmailAndPassword(email, password).addOnCompleteListener { task: Task<AuthResult> ->
             if (!task.isSuccessful) {
                 Toast.makeText(applicationContext, "sign up error: ${task.exception?.message}", Toast.LENGTH_LONG).show()
                 return@addOnCompleteListener
             }
 
-            firebase.currentUser?.getIdToken(true)?.addOnCompleteListener { tokenTask: Task<GetTokenResult> ->
-                if (!tokenTask.isSuccessful) {
-                    Toast.makeText(applicationContext, "sign up token error: ${tokenTask.exception?.message}", Toast.LENGTH_LONG).show()
+            val user: FirebaseUser? = firebase.currentUser
+            val profileUpdates = UserProfileChangeRequest.Builder()
+                    .setDisplayName(name)
+                    .build()
+            user?.updateProfile(profileUpdates)?.addOnCompleteListener { profileTask ->
+                if (!profileTask.isSuccessful) {
+                    Toast.makeText(applicationContext, "sign up profile error: ${profileTask.exception?.message}", Toast.LENGTH_LONG).show()
                     return@addOnCompleteListener
                 }
 
-                val token: String? = tokenTask.getResult().token
+                user?.getIdToken(true)?.addOnCompleteListener { tokenTask: Task<GetTokenResult> ->
+                    if (!tokenTask.isSuccessful) {
+                        Toast.makeText(applicationContext, "sign up token error: ${tokenTask.exception?.message}", Toast.LENGTH_LONG).show()
+                        return@addOnCompleteListener
+                    }
 
-                if (token == null) {
-                    Toast.makeText(applicationContext, "token is null", Toast.LENGTH_LONG).show()
-                } else {
-                    val intent = Intent(this, MemberActivity::class.java)
-                    intent.putExtra("token", token)
-                    startActivity(intent)
+                    val token: String? = tokenTask.getResult().token
+
+                    if (token == null) {
+                        Toast.makeText(applicationContext, "token is null", Toast.LENGTH_LONG).show()
+                    } else {
+                        val intent = Intent(this, MemberActivity::class.java)
+                        intent.putExtra("token", token)
+                        startActivity(intent)
+                    }
                 }
             }
         }
