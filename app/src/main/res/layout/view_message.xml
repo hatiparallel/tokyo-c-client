@@ -38,7 +38,7 @@
             android:layout_marginLeft="4dp"
             android:textSize="28dp"
             android:background="#fff"
-            android:text="メッセージをここに表示させる"/>
+            android:text="メッセージをここに表示"/>
     </com.daasuu.bl.BubbleLayout>
 
 </LinearLayout>
