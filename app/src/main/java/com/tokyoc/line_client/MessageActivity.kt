@@ -103,9 +103,16 @@ class MessageActivity : RxAppCompatActivity() {
                 .bindToLifecycle(this)
                 .subscribe(
                         {
-                            listAdapter.messages0.add(it)
-                            listView.adapter = listAdapter
-                            messageEditText.setText("", TextView.BufferType.NORMAL)
+                            val message0 = it
+                            realm.executeTransaction {
+                                val maxId = realm.where<Message>().max("id")
+                                val nextId = (maxId?.toLong() ?: 0L) + 1
+                                val message = realm.createObject<Message>(nextId)
+                                message.content = message0.content
+                            }
+//                            listAdapter.messages0.add(it)
+//                            listView.adapter = listAdapter
+                            Log.d("COMM", "recieved")
                         },
                         {
                             Log.d("COMM", "receive failed: $it")
@@ -123,19 +130,9 @@ class MessageActivity : RxAppCompatActivity() {
                 return@setOnClickListener
             }
 
-            //以下でデータベースにデータを登録
-            realm.executeTransaction {
-                val maxId = realm.where<Message>().max("id")
-                val nextId = (maxId?.toLong() ?: 0L) + 1
-                val message = realm.createObject<Message>(nextId)
-                message.content = messageEditText.text.toString()
-            }
-
             //通信部分の準備
             val message: Message = Message()
             message.content = messageEditText.text.toString()
-            listAdapter.messages0.add(message)
-            listView.adapter = listAdapter
             messageEditText.setText("", TextView.BufferType.NORMAL)
 
             //ここから通信部分！
