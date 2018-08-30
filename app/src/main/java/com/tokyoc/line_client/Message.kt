@@ -10,9 +10,8 @@ open class Message: RealmObject() {
     @PrimaryKey
     var id: Int = 0
     var channel: Int = 0
-    var author: Int = 0
+    val author: String = "",
     var isEvent: Int = 0
     var postedAt: Date = Date()
     var content: String = ""
 }
-
