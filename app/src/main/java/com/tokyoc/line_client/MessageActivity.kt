@@ -5,6 +5,7 @@ import android.widget.Button
 import android.content.Intent
 import android.icu.text.DateFormat
 import android.util.Log
+import android.view.View
 import android.widget.ListView
 import android.widget.TextView
 import android.widget.EditText
@@ -18,6 +19,9 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 import com.trello.rxlifecycle.components.support.RxAppCompatActivity
 import com.trello.rxlifecycle.kotlin.bindToLifecycle
+import io.realm.Realm
+import io.realm.kotlin.createObject
+import io.realm.kotlin.where
 import rx.android.schedulers.AndroidSchedulers
 import rx.schedulers.Schedulers
 
@@ -28,10 +32,16 @@ import java.io.IOException
 import java.util.concurrent.TimeUnit
 
 class MessageActivity : RxAppCompatActivity() {
+    private lateinit var realm: Realm
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_message)
+
+        //Realmを利用するために必要なもの
+        realm = Realm.getDefaultInstance()
+        val messages = realm.where<Message>().findAll()
+        val listView: ListView = findViewById<ListView>(R.id.message_list_view)
 
         val token = intent.getStringExtra("token")
         val group: Member = intent.getParcelableExtra(MemberActivity.EXTRA_MEMBER)
@@ -39,8 +49,7 @@ class MessageActivity : RxAppCompatActivity() {
         val returnButton = findViewById<Button>(R.id.return_button)
         val sendButton = findViewById<Button>(R.id.send_button)
         val messageEditText = findViewById<EditText>(R.id.message_edit_text)
-        val listAdapter = MessageListAdapter(applicationContext)
-        val listView = findViewById<ListView>(R.id.message_list_view)
+        val listAdapter = MessageListAdapter(messages)
         val groupName = findViewById<TextView>(R.id.send_user_name_text_view)
 
         listView.adapter = listAdapter
@@ -94,7 +103,7 @@ class MessageActivity : RxAppCompatActivity() {
                 .bindToLifecycle(this)
                 .subscribe(
                         {
-                            listAdapter.messages.add(it)
+                            listAdapter.messages0.add(it)
                             listView.adapter = listAdapter
                             messageEditText.setText("", TextView.BufferType.NORMAL)
                         },
@@ -114,12 +123,25 @@ class MessageActivity : RxAppCompatActivity() {
                 return@setOnClickListener
             }
 
-            val message: Message = Message(content = messageEditText.text.toString())
+            //以下でデータベースにデータを登録
+            realm.executeTransaction {
+                val maxId = realm.where<Message>().max("id")
+                val nextId = (maxId?.toLong() ?: 0L) + 1
+                val message = realm.createObject<Message>(nextId)
+                message.content = messageEditText.text.toString()
+            }
+
+            //通信部分の準備
+            val message0: Message = Message()
+            message0.content = messageEditText.text.toString()
+            listAdapter.messages0.add(message0)
+            listView.adapter = listAdapter
+            messageEditText.setText("", TextView.BufferType.NORMAL)
+
             //ここから通信部分！
+            Log.d("COMM", gson.toJson(message0))
 
-            Log.d("COMM", gson.toJson(message))
-
-            senderClient.sendMessage(group.groupId, message) //channel番号はgetExtraから本来は読み込む
+            senderClient.sendMessage(group.groupId, message0) //channel番号はgetExtraから本来は読み込む
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe({
@@ -127,8 +149,11 @@ class MessageActivity : RxAppCompatActivity() {
                     }, {
                         Log.d("COMM", "post failed: ${it}")
                     })
-
-            //ここまで通信部分！
         }
+    }
+    //Realmインスタンスを破棄
+    override fun onDestroy() {
+        super.onDestroy()
+        realm.close()
     }
 }
