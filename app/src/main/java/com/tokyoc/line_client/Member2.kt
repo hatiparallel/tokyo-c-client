@@ -1,13 +1,16 @@
 package com.tokyoc.line_client
 
+import android.os.Parcelable
 import io.realm.RealmObject
 import io.realm.annotations.PrimaryKey
+import kotlinx.android.parcel.Parcelize
 
 //MemberデータFormat
-open class Member2: RealmObject() {
+@Parcelize
+open class Member2: RealmObject(), Parcelable {
     @PrimaryKey
     var id: Int = 0
-    var name: String = ""
+    var name: String = "Aさん"
     var userId: Int = 0
     var groupId: Int = 0
 }

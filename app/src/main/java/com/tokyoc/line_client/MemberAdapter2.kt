@@ -9,7 +9,7 @@ import io.realm.RealmBaseAdapter
 
 class MemberListAdapter2(data: OrderedRealmCollection<Member2>) : RealmBaseAdapter<Member2>(data) {
 
-    var members: MutableList<Member2> = mutableListOf()
+    var members0: MutableList<Member2> = mutableListOf()
 
     inner class ViewHolder(cell: View) {
         val username = cell.findViewById<TextView>(R.id.user_name_view)
@@ -33,8 +33,8 @@ class MemberListAdapter2(data: OrderedRealmCollection<Member2>) : RealmBaseAdapt
         }
 
         adapterData?.run {
-        val member = get(position)
-        viewHolder.username.text = member.name
+            val member = get(position)
+            viewHolder.username.text = member.name
         }
         return view
     }

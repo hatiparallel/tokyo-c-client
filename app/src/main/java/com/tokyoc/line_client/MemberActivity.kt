@@ -9,8 +9,11 @@ import android.content.Intent
 import com.google.gson.GsonBuilder
 
 import com.google.firebase.auth.FirebaseAuth
+import io.realm.Realm
+import io.realm.kotlin.where
 
 class MemberActivity : AppCompatActivity() {
+    private lateinit var realm: Realm
 
     companion object {
         const val EXTRA_MEMBER = "member"
@@ -20,14 +23,17 @@ class MemberActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_member)
 
-        val listView: ListView = findViewById(R.id.list_view)
-        val listAdapter = MemberListAdapter(applicationContext)
+        //Realmを利用するために必要なもの
+        realm = Realm.getDefaultInstance()
+        val members = realm.where<Member2>().findAll()
+        val listView: ListView = findViewById(R.id.member_list_view)
+        val listAdapter = MemberListAdapter2(members)
 
         listView.adapter = listAdapter
-        listAdapter.members = listOf(dummyMember("Aさん"), dummyMember("Bさん"), dummyMember("Cさん"), dummyMember("Dさん"), dummyMember("Eさん"), dummyMember("Dさん"), dummyMember("Dさん"), dummyMember("Dさん"))
+        //listAdapter.members0 = mutableListOf(dummyMember("Aさん"), dummyMember("Bさん"), dummyMember("Cさん"), dummyMember("Dさん"), dummyMember("Eさん"), dummyMember("Dさん"), dummyMember("Dさん"), dummyMember("Dさん"))
 
         listView.setOnItemClickListener { adapterView, view, position, id ->
-            val member = listAdapter.members[position]
+            val member = members[position]
             val intent = Intent(this, MessageActivity::class.java)
             intent.putExtra(EXTRA_MEMBER, member)
             intent.putExtra("token", getIntent().getStringExtra("token"))
@@ -43,6 +49,4 @@ class MemberActivity : AppCompatActivity() {
             startActivity(Intent(this, SigninActivity::class.java))
         }
     }
-
-    private fun dummyMember(name: String): Member = Member(name = name, id = 123, groupId = 123)
 }
