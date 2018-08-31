@@ -1,17 +1,39 @@
 package com.tokyoc.line_client
 
-import android.content.Context
-import android.widget.BaseAdapter
+import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
+import io.realm.OrderedRealmCollection
+import io.realm.RealmBaseAdapter
 
-class MemberListAdapter(private val context: Context) : BaseAdapter() {
+class MemberListAdapter(data: OrderedRealmCollection<Member>) : RealmBaseAdapter<Member>(data) {
 
-    var members: List<Member> = emptyList()
+    inner class ViewHolder(cell: View) {
+        val username = cell.findViewById<TextView>(R.id.user_name_view)
+    }
 
-    override fun getCount(): Int = members.size
-    override fun getItem(position: Int): Any? = members[position]
-    override fun getItemId(position: Int): Long = 0
-    override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View =
-            ((convertView as? MemberView) ?: MemberView(context)).apply { setMember(members[position]) }
+    override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
+        val view: View
+        val viewHolder: ViewHolder
+
+        when (convertView) {
+            null -> {
+                val inflater = LayoutInflater.from(parent?.context)
+                view = inflater.inflate(R.layout.view_member, parent, false)
+                viewHolder = ViewHolder(view)
+                view.tag = viewHolder
+            }
+            else -> {
+                view = convertView
+                viewHolder = view.tag as MemberListAdapter.ViewHolder
+            }
+        }
+
+        adapterData?.run {
+            val member = get(position)
+            viewHolder.username.text = member.name
+        }
+        return view
+    }
 }

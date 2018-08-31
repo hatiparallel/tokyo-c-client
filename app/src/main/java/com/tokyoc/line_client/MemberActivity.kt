@@ -25,12 +25,10 @@ class MemberActivity : AppCompatActivity() {
 
         //Realmを利用するために必要なもの
         realm = Realm.getDefaultInstance()
-        val members = realm.where<Member2>().findAll()
+        val members = realm.where<Member>().findAll()
         val listView: ListView = findViewById(R.id.member_list_view)
-        val listAdapter = MemberListAdapter2(members)
-
+        val listAdapter = MemberListAdapter(members)
         listView.adapter = listAdapter
-        //listAdapter.members0 = mutableListOf(dummyMember("Aさん"), dummyMember("Bさん"), dummyMember("Cさん"), dummyMember("Dさん"), dummyMember("Eさん"), dummyMember("Dさん"), dummyMember("Dさん"), dummyMember("Dさん"))
 
         listView.setOnItemClickListener { adapterView, view, position, id ->
             val member = members[position]
