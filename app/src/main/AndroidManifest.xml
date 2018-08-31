@@ -30,6 +30,9 @@
 
         <activity
             android:name=".SignupActivity" />
+
+        <activity
+            android:name=".AddFriendActivity" />
     </application>
 
 </manifest>

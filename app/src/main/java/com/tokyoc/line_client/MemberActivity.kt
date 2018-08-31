@@ -34,6 +34,10 @@ class MemberActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
+        findViewById<Button>(R.id.add_friend_button).setOnClickListener {
+            startActivity(Intent(this, AddFriendActivity::class.java))
+        }
+
         findViewById<Button>(R.id.signout_button).setOnClickListener {
             FirebaseAuth.getInstance().signOut()
             startActivity(Intent(this, SigninActivity::class.java))
