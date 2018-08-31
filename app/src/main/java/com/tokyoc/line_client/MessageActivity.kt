@@ -103,9 +103,16 @@ class MessageActivity : RxAppCompatActivity() {
                 .bindToLifecycle(this)
                 .subscribe(
                         {
-                            listAdapter.messages0.add(it)
-                            listView.adapter = listAdapter
-                            messageEditText.setText("", TextView.BufferType.NORMAL)
+                            val message0 = it
+                            realm.executeTransaction {
+                                val maxId = realm.where<Message>().max("id")
+                                val nextId = (maxId?.toLong() ?: 0L) + 1
+                                val message = realm.createObject<Message>(nextId)
+                                message.content = message0.content
+                            }
+//                            listAdapter.messages0.add(it)
+//                            listView.adapter = listAdapter
+                            Log.d("COMM", "recieved")
                         },
                         {
                             Log.d("COMM", "receive failed: $it")
@@ -123,25 +130,15 @@ class MessageActivity : RxAppCompatActivity() {
                 return@setOnClickListener
             }
 
-            //以下でデータベースにデータを登録
-            realm.executeTransaction {
-                val maxId = realm.where<Message>().max("id")
-                val nextId = (maxId?.toLong() ?: 0L) + 1
-                val message = realm.createObject<Message>(nextId)
-                message.content = messageEditText.text.toString()
-            }
-
             //通信部分の準備
-            val message0: Message = Message()
-            message0.content = messageEditText.text.toString()
-            listAdapter.messages0.add(message0)
-            listView.adapter = listAdapter
+            val message: Message = Message()
+            message.content = messageEditText.text.toString()
             messageEditText.setText("", TextView.BufferType.NORMAL)
 
             //ここから通信部分！
-            Log.d("COMM", gson.toJson(message0))
+            Log.d("COMM", gson.toJson(message))
 
-            senderClient.sendMessage(group.groupId, message0) //channel番号はgetExtraから本来は読み込む
+            senderClient.sendMessage(group.groupId, message) //channel番号はgetExtraから本来は読み込む
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe({
