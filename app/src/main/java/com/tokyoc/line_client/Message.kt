@@ -4,7 +4,7 @@ import io.realm.RealmObject
 import io.realm.annotations.PrimaryKey
 import java.util.*
 
-// MessageデータのFormat
+//MessageデータのFormat
 open class Message: RealmObject() {
     //データを一意に指定するためにidにPrimaryKeyアノテーションを付加
     @PrimaryKey

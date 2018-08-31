@@ -24,7 +24,7 @@ class MemberActivity : AppCompatActivity() {
         val listAdapter = MemberListAdapter(applicationContext)
 
         listView.adapter = listAdapter
-        listAdapter.members = listOf(dummyMember("Aさん"), dummyMember("Bさん"), dummyMember("Cさん"), dummyMember("Dさん"), dummyMember("Eさん"))
+        listAdapter.members = listOf(dummyMember("Aさん"), dummyMember("Bさん"), dummyMember("Cさん"), dummyMember("Dさん"), dummyMember("Eさん"), dummyMember("Dさん"), dummyMember("Dさん"), dummyMember("Dさん"))
 
         listView.setOnItemClickListener { adapterView, view, position, id ->
             val member = listAdapter.members[position]
