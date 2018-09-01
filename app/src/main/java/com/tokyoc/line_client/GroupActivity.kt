@@ -10,26 +10,26 @@ import com.google.gson.GsonBuilder
 
 import com.google.firebase.auth.FirebaseAuth
 
-class MemberActivity : AppCompatActivity() {
+class GroupActivity : AppCompatActivity() {
 
     companion object {
-        const val EXTRA_MEMBER = "member"
+        const val EXTRA_GROUP = "group"
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_member)
+        setContentView(R.layout.activity_group)
 
         val listView: ListView = findViewById(R.id.list_view)
-        val listAdapter = MemberListAdapter(applicationContext)
+        val listAdapter = GroupListAdapter(applicationContext)
 
         listView.adapter = listAdapter
-        listAdapter.members = listOf(dummyMember("Aさん"), dummyMember("Bさん"), dummyMember("Cさん"), dummyMember("Dさん"), dummyMember("Eさん"))
+        listAdapter.groups = listOf(dummyGroup("い"), dummyGroup("ろ"), dummyGroup("は"), dummyGroup("に"), dummyGroup("ほ"))
 
         listView.setOnItemClickListener { adapterView, view, position, id ->
-            val member = listAdapter.members[position]
-            val intent = Intent(this, MessageActivity::class.java)
-            intent.putExtra(EXTRA_MEMBER, member)
+            val group = listAdapter.groups[position]
+            val intent = Intent(this, GroupMessageActivity::class.java)
+            intent.putExtra(EXTRA_GROUP, group)
             intent.putExtra("token", getIntent().getStringExtra("token"))
             startActivity(intent)
         }
@@ -39,12 +39,14 @@ class MemberActivity : AppCompatActivity() {
             startActivity(Intent(this, SigninActivity::class.java))
         }
 
-        findViewById<Button>(R.id.group_button).setOnClickListener {
-            val intent = Intent(this, GroupActivity::class.java)
+        findViewById<Button>(R.id.member_button).setOnClickListener {
+            val intent = Intent(this, MemberActivity::class.java)
             intent.putExtra("token", getIntent().getStringExtra("token"))
             startActivity(intent)
         }
     }
 
     private fun dummyMember(name: String): Member = Member(name = name, id = 123, groupId = 123)
+    private fun dummyGroup(name: String): Group = Group(name = name, groupId = 123,
+            members = listOf(dummyMember("Aさん"), dummyMember("Bさん"), dummyMember("Cさん")))
 }

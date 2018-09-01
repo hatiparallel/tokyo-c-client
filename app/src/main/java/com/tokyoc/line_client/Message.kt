@@ -1,11 +1,14 @@
 package com.tokyoc.line_client
 
+import android.os.Parcelable
 import io.realm.RealmObject
 import io.realm.annotations.PrimaryKey
+import kotlinx.android.parcel.Parcelize
 import java.util.*
 
 // MessageデータのFormat
-open class Message: RealmObject() {
+@Parcelize
+open class Message: Parcelable, RealmObject() {
     //データを一意に指定するためにidにPrimaryKeyアノテーションを付加
     @PrimaryKey
     var id: Int = 0

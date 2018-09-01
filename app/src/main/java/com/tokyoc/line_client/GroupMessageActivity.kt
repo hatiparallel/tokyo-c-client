@@ -31,7 +31,7 @@ import retrofit2.adapter.rxjava.HttpException
 import java.io.IOException
 import java.util.concurrent.TimeUnit
 
-class MessageActivity : RxAppCompatActivity() {
+class GroupMessageActivity : RxAppCompatActivity() {
     private lateinit var realm: Realm
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -44,7 +44,7 @@ class MessageActivity : RxAppCompatActivity() {
         val listView: ListView = findViewById<ListView>(R.id.message_list_view)
 
         val token = intent.getStringExtra("token")
-        val group: Member = intent.getParcelableExtra(MemberActivity.EXTRA_MEMBER)
+        val group: Group = intent.getParcelableExtra(GroupActivity.EXTRA_GROUP)
 
         val returnButton = findViewById<Button>(R.id.return_button)
         val sendButton = findViewById<Button>(R.id.send_button)
@@ -111,7 +111,6 @@ class MessageActivity : RxAppCompatActivity() {
                                 val message = realm.createObject<Message>(nextId)
                                 message.content = message0.content
                             }
-
                             listView.setSelection(listAdapter.messages0.size)
 //                            listAdapter.messages0.add(it)
 //                            listView.adapter = listAdapter
@@ -121,9 +120,9 @@ class MessageActivity : RxAppCompatActivity() {
                             Log.d("COMM", "receive failed: $it")
                         })
 
-        // ボタンをクリックしたらMember画面に遷移
+        // ボタンをクリックしたらGroup画面に遷移
         returnButton.setOnClickListener {
-            val intent = Intent(this, MemberActivity::class.java)
+            val intent = Intent(this, GroupActivity::class.java)
             intent.putExtra("token", token)
             startActivity(intent)
         }

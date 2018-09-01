@@ -1,11 +1,10 @@
 package com.tokyoc.line_client
 
 import android.os.Parcelable
-import io.realm.RealmObject
 import kotlinx.android.parcel.Parcelize
 
 // MemberデータFormat
 @Parcelize
-data class Member(var name: String,
-                  var id: Int,
+data class Group(var name: String,
+                  var members: List<Member>,
                   var groupId: Int): Parcelable
