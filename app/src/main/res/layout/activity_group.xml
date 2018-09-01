@@ -24,10 +24,10 @@
             android:text="Sign out"/>
 
         <Button
-            android:id="@+id/group_button"
-            android:layout_width="wrap_content"
+            android:id="@+id/member_button"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Group" />
+            android:text="Member"/>
 
     </LinearLayout>
 
