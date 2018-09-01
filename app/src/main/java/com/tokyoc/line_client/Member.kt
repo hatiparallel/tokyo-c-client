@@ -13,3 +13,4 @@ open class Member(
     open var name: String = "Aさん",
     open var userId: Int = 0,
     open var groupId: Int = 0): Parcelable, RealmObject()
+
