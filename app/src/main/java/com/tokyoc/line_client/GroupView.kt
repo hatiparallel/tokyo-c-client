@@ -18,8 +18,8 @@ class GroupView : FrameLayout {
     constructor(context: Context?, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr)
     constructor(context: Context?, attrs: AttributeSet?, defStyleAttr: Int, defStyleRes: Int) : super(context, attrs, defStyleAttr, defStyleRes)
 
-    var groupImageView: ImageView? = null
-    var groupNameTextView: TextView? = null
+    var groupImageView: ImageView
+    var groupNameTextView: TextView
 
     init {
         LayoutInflater.from(context).inflate(R.layout.view_groups, this)
@@ -28,7 +28,7 @@ class GroupView : FrameLayout {
     }
 
     fun setGroup(group: Group) {
-        groupImageView?.setBackgroundColor(Color.GREEN)
-        groupNameTextView?.text = group.name
+        groupImageView.setBackgroundColor(Color.GREEN)
+        groupNameTextView.text = group.name
     }
 }

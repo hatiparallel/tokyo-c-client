@@ -17,8 +17,8 @@ class MemberView : FrameLayout {
     constructor(context: Context?, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr)
     constructor(context: Context?, attrs: AttributeSet?, defStyleAttr: Int, defStyleRes: Int) : super(context, attrs, defStyleAttr, defStyleRes)
 
-    var profileImageView: ImageView? = null
-    var userNameTextView: TextView? = null
+    var profileImageView: ImageView
+    var userNameTextView: TextView
 
     init {
         LayoutInflater.from(context).inflate(R.layout.view_member, this)
@@ -27,7 +27,7 @@ class MemberView : FrameLayout {
     }
 
     fun setMember(member: Member) {
-        userNameTextView?.text = member.name
-        profileImageView?.setBackgroundColor(Color.RED)
+        userNameTextView.text = member.name
+        profileImageView.setBackgroundColor(Color.RED)
     }
 }

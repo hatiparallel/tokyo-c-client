@@ -18,11 +18,8 @@ class MessageView : FrameLayout {
     constructor(context: Context?, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr)
     constructor(context: Context?, attrs: AttributeSet?, defStyleAttr: Int, defStyleRes: Int) : super(context, attrs, defStyleAttr, defStyleRes)
 
-    var messageProfileImageView: ImageView? = null
-    var messageView1: View? = null
-    var messageView2: View? = null
-    var messageView3: View? = null
-    var messageTextView: TextView? = null
+    var messageProfileImageView: ImageView
+    var messageTextView: TextView
 
     init {
         LayoutInflater.from(context).inflate(R.layout.view_message, this)
@@ -31,7 +28,7 @@ class MessageView : FrameLayout {
     }
 
     fun setMessage(message: Message) {
-        messageTextView?.text = message.content
-        messageProfileImageView?.setBackgroundColor(Color.RED)
+        messageTextView.text = message.content
+        messageProfileImageView.setBackgroundColor(Color.RED)
     }
 }
