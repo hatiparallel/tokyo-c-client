@@ -110,6 +110,8 @@ class MessageActivity : RxAppCompatActivity() {
                                 val message = realm.createObject<Message>(nextId)
                                 message.content = message0.content
                             }
+
+                            listView.setSelection(listAdapter.messages0.size)
 //                            listAdapter.messages0.add(it)
 //                            listView.adapter = listAdapter
                             Log.d("COMM", "recieved")

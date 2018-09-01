@@ -9,7 +9,7 @@ import io.realm.RealmBaseAdapter
 
 class MessageListAdapter(data: OrderedRealmCollection<Message>) : RealmBaseAdapter<Message>(data) {
 
-    var messages0: MutableList<Message> = mutableListOf()
+    var messages0: MutableList<Message> = data
 
     inner class ViewHolder(cell: View) {
         val messagecontent = cell.findViewById<TextView>(R.id.message_text_view)
