@@ -3,8 +3,6 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 apply plugin: 'realm-android'
 
-apply plugin: 'kotlin-kapt'
-//What's this?
 
 android {
     compileSdkVersion 28
