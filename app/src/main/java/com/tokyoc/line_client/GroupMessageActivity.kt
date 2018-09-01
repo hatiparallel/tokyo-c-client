@@ -54,6 +54,7 @@ class GroupMessageActivity : RxAppCompatActivity() {
 
         listView.adapter = listAdapter
         groupName.text = group.name
+        listView.setSelection(listAdapter.messages0.size)
 
         //通信に使うものたちの定義
         val gson = GsonBuilder()
