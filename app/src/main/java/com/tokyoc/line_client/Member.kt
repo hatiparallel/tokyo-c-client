@@ -7,10 +7,9 @@ import kotlinx.android.parcel.Parcelize
 
 //MemberデータFormat
 @Parcelize
-open class Member: RealmObject(), Parcelable {
+open class Member(
     @PrimaryKey
-    var id: Int = 0
-    var name: String = "Aさん"
-    var userId: Int = 0
-    var groupId: Int = 0
-}
+    open var id: Int = 0,
+    open var name: String = "Aさん",
+    open var userId: Int = 0,
+    open var groupId: Int = 0): Parcelable, RealmObject()
