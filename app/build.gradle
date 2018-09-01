@@ -30,7 +30,7 @@ android {
     productFlavors {
         development {
             dimension "environment"
-            buildConfigField "String", "BACKEND_BASEURL", "\"http://192.168.56.1/\""
+            buildConfigField "String", "BACKEND_BASEURL", "\"http://10.0.2.2/\""
         }
 
         production {
