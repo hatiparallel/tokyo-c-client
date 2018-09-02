@@ -44,16 +44,16 @@ class MessageActivity : RxAppCompatActivity() {
         val listView: ListView = findViewById<ListView>(R.id.message_list_view)
 
         val token = intent.getStringExtra("token")
-        val group: Member = intent.getParcelableExtra(MemberActivity.EXTRA_MEMBER)
+        val member: Member = intent.getParcelableExtra(MemberActivity.EXTRA_MEMBER)
 
         val returnButton = findViewById<Button>(R.id.return_button)
         val sendButton = findViewById<Button>(R.id.send_button)
         val messageEditText = findViewById<EditText>(R.id.message_edit_text)
         val listAdapter = MessageListAdapter(messages)
-        val groupName = findViewById<TextView>(R.id.send_user_name_text_view)
+        val memberName = findViewById<TextView>(R.id.send_user_name_text_view)
 
         listView.adapter = listAdapter
-        groupName.text = group.name
+        memberName.text = member.name
         listView.setSelection(listAdapter.messages0.size)
 
         //通信に使うものたちの定義
@@ -81,9 +81,9 @@ class MessageActivity : RxAppCompatActivity() {
         val senderClient = retrofit.create(SenderClient::class.java)
 
         Log.d("COMM", "token: $token")
-        Log.d("COMM", "listening /streams/${group.groupId}")
+        Log.d("COMM", "listening /streams/${member.groupId}")
 
-        retrofit.create(ReceiverClient::class.java).getMessages(group.groupId)
+        retrofit.create(ReceiverClient::class.java).getMessages(member.groupId)
                 .flatMap {
                     val source = it.source()
 
@@ -141,7 +141,7 @@ class MessageActivity : RxAppCompatActivity() {
             //ここから通信部分！
             Log.d("COMM", gson.toJson(message))
 
-            senderClient.sendMessage(group.groupId, message) //channel番号はgetExtraから本来は読み込む
+            senderClient.sendMessage(member.groupId, message)
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe({

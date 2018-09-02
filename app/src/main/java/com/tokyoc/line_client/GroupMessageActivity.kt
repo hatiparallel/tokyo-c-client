@@ -36,7 +36,7 @@ class GroupMessageActivity : RxAppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_message)
+        setContentView(R.layout.activity_group_message)
 
         //Realmを利用するために必要なもの
         realm = Realm.getDefaultInstance()
@@ -49,7 +49,7 @@ class GroupMessageActivity : RxAppCompatActivity() {
         val returnButton = findViewById<Button>(R.id.return_button)
         val sendButton = findViewById<Button>(R.id.send_button)
         val messageEditText = findViewById<EditText>(R.id.message_edit_text)
-        val listAdapter = MessageListAdapter(messages)
+        val listAdapter = GroupMessageListAdapter(messages)
         val groupName = findViewById<TextView>(R.id.send_user_name_text_view)
 
         listView.adapter = listAdapter

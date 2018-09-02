@@ -18,6 +18,8 @@ class AddFriendActivity: AppCompatActivity() {
         setContentView(R.layout.activity_friend_add)
         realm = Realm.getDefaultInstance()
 
+        val token = intent.getStringExtra("token")
+
         findViewById<Button>(R.id.to_member).setOnClickListener {
             realm.executeTransaction {
                 val maxId = realm.where<Member>().max("id")
@@ -25,7 +27,9 @@ class AddFriendActivity: AppCompatActivity() {
                 val member = realm.createObject<Member>(nextId)
                 member.name = user_id.text.toString()
             }
-            startActivity(Intent(this, MemberActivity::class.java))
+            val intent = Intent(this, MemberActivity::class.java)
+            intent.putExtra("token", token)
+            startActivity(intent)
         }
     }
 
