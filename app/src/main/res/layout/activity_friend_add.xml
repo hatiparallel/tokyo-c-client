@@ -5,6 +5,14 @@
     android:gravity="center"
     android:orientation="vertical">
 
+    <Button
+        android:id="@+id/to_member_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="200dp"
+        android:layout_marginRight="150dp"
+        android:text="戻る" />
+
     <EditText
         android:id="@+id/user_id"
         android:layout_width="wrap_content"
@@ -12,8 +20,9 @@
         android:hint="IDを入力してください" />
 
     <Button
-        android:id="@+id/to_member"
+        android:id="@+id/add_friend_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="220dp"
         android:text="追加" />
 </LinearLayout>
