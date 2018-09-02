@@ -3,6 +3,7 @@ package com.tokyoc.line_client
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.TextView
 import io.realm.OrderedRealmCollection
 import io.realm.RealmBaseAdapter
@@ -11,6 +12,7 @@ class MemberListAdapter(data: OrderedRealmCollection<Member>) : RealmBaseAdapter
 
     inner class ViewHolder(cell: View) {
         val username = cell.findViewById<TextView>(R.id.user_name_view)
+        val userImage = cell.findViewById<ImageView>(R.id.profile_image_view)
     }
 
     override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
@@ -33,6 +35,7 @@ class MemberListAdapter(data: OrderedRealmCollection<Member>) : RealmBaseAdapter
         adapterData?.run {
             val member = get(position)
             viewHolder.username.text = member.name
+            viewHolder.userImage.setImageResource(R.drawable.img001)
         }
         return view
     }
