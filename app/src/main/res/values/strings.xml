@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">LINE_Client</string>
+    <string name="app_name">YODA</string>
     <string name="button_return">戻る</string>
     <string name="receiver_name">送信相手</string>
     <string name="edit_message">メッセージを入力してください</string>
