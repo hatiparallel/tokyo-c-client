@@ -39,7 +39,9 @@ class MemberActivity : AppCompatActivity() {
         }
 
         findViewById<Button>(R.id.add_friend_button).setOnClickListener {
-            startActivity(Intent(this, AddFriendActivity::class.java))
+            val intent = Intent(this, AddFriendActivity::class.java)
+            intent.putExtra("token", getIntent().getStringExtra("token"))
+            startActivity(intent)
         }
 
         findViewById<Button>(R.id.signout_button).setOnClickListener {
