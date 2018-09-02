@@ -40,6 +40,10 @@
 
         <activity
             android:name=".AddFriendActivity" />
+
+        <activity
+            android:name=".MakeGroupActivity" />
+
     </application>
 
 </manifest>

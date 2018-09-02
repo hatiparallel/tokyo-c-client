@@ -9,6 +9,8 @@ import android.content.Intent
 import com.google.gson.GsonBuilder
 
 import com.google.firebase.auth.FirebaseAuth
+import io.realm.RealmList
+import kotlinx.android.parcel.RawValue
 
 class GroupActivity : AppCompatActivity() {
 
@@ -20,7 +22,7 @@ class GroupActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_group)
 
-        val listView: ListView = findViewById(R.id.list_view)
+        val listView: ListView = findViewById(R.id.group_list_view)
         val listAdapter = GroupListAdapter(applicationContext)
 
         listView.adapter = listAdapter
@@ -44,9 +46,15 @@ class GroupActivity : AppCompatActivity() {
             intent.putExtra("token", getIntent().getStringExtra("token"))
             startActivity(intent)
         }
+
+        findViewById<Button>(R.id.make_group_button).setOnClickListener {
+            val intent = Intent(this, MakeGroupActivity::class.java)
+            intent.putExtra("token", getIntent().getStringExtra("token"))
+            startActivity(intent)
+        }
     }
 
     private fun dummyMember(name: String): Member = Member(name = name, id = 123, groupId = 123)
-    private fun dummyGroup(name: String): Group = Group(name = name, groupId = 123,
-            members = listOf(dummyMember("Aさん"), dummyMember("Bさん"), dummyMember("Cさん")))
+    private fun dummyGroup(name: String): Group = Group(name = name, groupId = 123)
+            //members = RealmList(dummyMember("Aさん"), dummyMember("Bさん"), dummyMember("Cさん")))
 }

@@ -22,7 +22,7 @@ class GroupView : FrameLayout {
     var groupNameTextView: TextView
 
     init {
-        LayoutInflater.from(context).inflate(R.layout.view_groups, this)
+        LayoutInflater.from(context).inflate(R.layout.view_group, this)
         groupImageView = findViewById<ImageView>(R.id.group_image_view)
         groupNameTextView = findViewById<TextView>(R.id.group_name_view)
     }
