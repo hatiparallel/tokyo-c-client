@@ -35,6 +35,7 @@ class MakeGroupActivity: RxAppCompatActivity() {
         val token = intent.getStringExtra("token")
 
         val groupNameEditText = findViewById<EditText>(R.id.group_name)
+        val existingGroupIdEditText = findViewById<EditText>(R.id.existing_group_id)
 
         //通信の準備
         val gson = GsonBuilder()
@@ -57,7 +58,9 @@ class MakeGroupActivity: RxAppCompatActivity() {
                 .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
                 .addConverterFactory(GsonConverterFactory.create(gson))
                 .build()
+
         val makeGroupClient = retrofit.create(MakeGroupClient::class.java)
+        val joinGroupClient = retrofit.create(JoinGroupClient::class.java)
 
 
         findViewById<Button>(R.id.make_group).setOnClickListener {
@@ -79,8 +82,26 @@ class MakeGroupActivity: RxAppCompatActivity() {
                     }, {
                         Log.d("COMM", "post failed: ${it}")
                     })
+        }
 
+        findViewById<Button>(R.id.join_group).setOnClickListener {
+            if (existingGroupIdEditText.text.isEmpty()) {
+                return@setOnClickListener
+            }
 
+            val groupId = existingGroupIdEditText.text.toString()
+
+            joinGroupClient.joinGroup(groupId.toInt())
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe({
+                        Log.d("COMM", "join done: ${it}")
+                        val intent = Intent(this, GroupActivity::class.java)
+                        intent.putExtra("token", token)
+                        startActivity(intent)
+                    }, {
+                        Log.d("COMM", "join failed: ${it}")
+                    })
         }
     }
 /*
