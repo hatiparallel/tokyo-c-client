@@ -1,5 +1,6 @@
 package com.tokyoc.line_client
 
+import android.content.DialogInterface
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.ListView
@@ -11,6 +12,9 @@ import com.google.gson.GsonBuilder
 import com.google.firebase.auth.FirebaseAuth
 import io.realm.RealmList
 import kotlinx.android.parcel.RawValue
+import android.support.v7.app.AlertDialog
+import android.util.Log
+import android.view.KeyEvent
 
 class GroupActivity : AppCompatActivity() {
 
@@ -37,8 +41,17 @@ class GroupActivity : AppCompatActivity() {
         }
 
         findViewById<Button>(R.id.signout_button).setOnClickListener {
-            FirebaseAuth.getInstance().signOut()
-            startActivity(Intent(this, SigninActivity::class.java))
+            val intent = Intent(this, SigninActivity::class.java)
+            AlertDialog.Builder(this).apply {
+                setTitle("Sign Out")
+                setMessage("Really Sign Out?")
+                setPositiveButton("OK", DialogInterface.OnClickListener { _, _ ->
+                    FirebaseAuth.getInstance().signOut()
+                    startActivity(intent)
+                })
+                setNegativeButton("Cancel", null)
+                show()
+            }
         }
 
         findViewById<Button>(R.id.member_button).setOnClickListener {
@@ -53,6 +66,19 @@ class GroupActivity : AppCompatActivity() {
             startActivity(intent)
         }
     }
+
+    override fun onKeyDown(keyCode: Int, event: KeyEvent): Boolean {
+        when (keyCode) {
+            KeyEvent.KEYCODE_BACK -> {
+                Log.d("COMM", "back")
+                Toast.makeText(applicationContext, "this key is invalid", Toast.LENGTH_LONG)
+                        .show()
+                return false
+            }
+            else -> return super.onKeyDown(keyCode, event)
+        }
+    }
+
 
     private fun dummyMember(name: String): Member = Member(name = name, id = 123, groupId = 123)
     private fun dummyGroup(name: String): Group = Group(name = name, groupId = 123)

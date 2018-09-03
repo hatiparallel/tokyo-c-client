@@ -61,7 +61,7 @@ class SigninActivity : AppCompatActivity() {
                 if (token == null) {
                     Toast.makeText(applicationContext, "sign in: token is null", Toast.LENGTH_LONG).show()
                 } else {
-                    val intent = Intent(this, MemberActivity::class.java)
+                    val intent = Intent(this, GroupActivity::class.java)
                     intent.putExtra("token", token)
                     startActivity(intent)
                 }
