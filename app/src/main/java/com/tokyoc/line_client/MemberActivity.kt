@@ -38,6 +38,14 @@ class MemberActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
+        listView.setOnItemLongClickListener { adapterView, view, position, id ->
+            val deleteMember = adapterView.getItemAtPosition(position) as Member
+            realm.executeTransaction {
+                realm.where<Member>().equalTo("id", deleteMember.id)?.findFirst()?.deleteFromRealm()
+            }
+            return@setOnItemLongClickListener true
+        }
+
         findViewById<Button>(R.id.add_friend_button).setOnClickListener {
             val intent = Intent(this, AddFriendActivity::class.java)
             intent.putExtra("token", getIntent().getStringExtra("token"))
