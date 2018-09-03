@@ -7,7 +7,7 @@
     android:gravity="center">
 
     <ListView
-        android:id="@+id/list_view"
+        android:id="@+id/group_list_view"
         android:layout_width="match_parent"
         android:layout_height="550dp"/>
     
@@ -28,6 +28,12 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Member"/>
+
+        <Button
+            android:id="@+id/make_group_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="New Group"/>
 
     </LinearLayout>
 
