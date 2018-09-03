@@ -8,6 +8,7 @@ import android.widget.Button
 import android.widget.Toast
 import android.content.Intent
 import android.support.v7.app.AlertDialog
+import android.view.KeyEvent
 import com.google.gson.GsonBuilder
 
 import com.google.firebase.auth.FirebaseAuth
@@ -72,6 +73,17 @@ class MemberActivity : AppCompatActivity() {
             val intent = Intent(this, GroupActivity::class.java)
             intent.putExtra("token", getIntent().getStringExtra("token"))
             startActivity(intent)
+        }
+    }
+
+    override fun onKeyDown(keyCode: Int, event: KeyEvent): Boolean {
+        when (keyCode) {
+            KeyEvent.KEYCODE_BACK -> {
+                Toast.makeText(applicationContext, "this key is invalid", Toast.LENGTH_LONG)
+                        .show()
+                return false
+            }
+            else -> return super.onKeyDown(keyCode, event)
         }
     }
 }

@@ -14,6 +14,7 @@ import io.realm.RealmList
 import kotlinx.android.parcel.RawValue
 import android.support.v7.app.AlertDialog
 import android.util.Log
+import android.view.KeyEvent
 
 class GroupActivity : AppCompatActivity() {
 
@@ -65,6 +66,19 @@ class GroupActivity : AppCompatActivity() {
             startActivity(intent)
         }
     }
+
+    override fun onKeyDown(keyCode: Int, event: KeyEvent): Boolean {
+        when (keyCode) {
+            KeyEvent.KEYCODE_BACK -> {
+                Log.d("COMM", "back")
+                Toast.makeText(applicationContext, "this key is invalid", Toast.LENGTH_LONG)
+                        .show()
+                return false
+            }
+            else -> return super.onKeyDown(keyCode, event)
+        }
+    }
+
 
     private fun dummyMember(name: String): Member = Member(name = name, id = 123, groupId = 123)
     private fun dummyGroup(name: String): Group = Group(name = name, groupId = 123)
