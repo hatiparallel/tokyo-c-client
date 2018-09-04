@@ -28,7 +28,7 @@ class GroupView : FrameLayout {
     }
 
     fun setGroup(group: Group) {
-        groupImageView.setBackgroundColor(Color.GREEN)
+        groupImageView.setImageResource(R.drawable.img001)
         groupNameTextView.text = group.name
     }
 }

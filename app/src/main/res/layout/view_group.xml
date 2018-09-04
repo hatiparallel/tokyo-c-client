@@ -2,24 +2,24 @@
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal"
-    android:padding="16dp"
+    android:padding="8dp"
     tools:context=".GroupActivity">
 
-    <ImageView
+    <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/group_image_view"
-        android:layout_width="60dp"
-        android:layout_height="60dp"
-        tools:background="#f80" />
+        android:layout_width="70dp"
+        android:layout_height="70dp"
+        android:src="@drawable/img001" />
 
     <TextView
         android:id="@+id/group_name_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="10dp"
+        android:layout_marginTop="10dp"
         android:textSize="18sp"
         tools:text="groupA" />
 

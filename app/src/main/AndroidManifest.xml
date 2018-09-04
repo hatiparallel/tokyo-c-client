@@ -26,10 +26,6 @@
             android:windowSoftInputMode="adjustResize" />
 
         <activity
-            android:name=".GroupMessageActivity"
-            android:windowSoftInputMode="adjustResize" />
-
-        <activity
             android:name=".MemberActivity" />
 
         <activity
