@@ -24,16 +24,16 @@
             android:text="Sign out"/>
 
         <Button
-            android:id="@+id/add_friend_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="友達追加" />
-
-        <Button
             android:id="@+id/group_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Group" />
+
+        <Button
+            android:id="@+id/add_friend_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="友達追加" />
 
     </LinearLayout>
 </LinearLayout>

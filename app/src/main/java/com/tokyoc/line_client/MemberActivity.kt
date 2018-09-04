@@ -33,14 +33,7 @@ class MemberActivity : AppCompatActivity() {
         val listAdapter = MemberListAdapter(members)
         listView.adapter = listAdapter
 
-        listView.setOnItemClickListener { adapterView, view, position, id ->
-            val member = members[position]
-            val intent = Intent(this, MessageActivity::class.java)
-            intent.putExtra(EXTRA_MEMBER, member)
-            intent.putExtra("token", getIntent().getStringExtra("token"))
-            startActivity(intent)
-        }
-
+        //Memberを長押しした時の処理
         listView.setOnItemLongClickListener { adapterView, view, position, id ->
             val deleteMember = adapterView.getItemAtPosition(position) as Member
             realm.executeTransaction {
@@ -49,12 +42,14 @@ class MemberActivity : AppCompatActivity() {
             return@setOnItemLongClickListener true
         }
 
+        //友達追加ボタンを押した時の処理
         findViewById<Button>(R.id.add_friend_button).setOnClickListener {
             val intent = Intent(this, AddFriendActivity::class.java)
             intent.putExtra("token", getIntent().getStringExtra("token"))
             startActivity(intent)
         }
 
+        //サインアウトボタンを押した時の処理
         findViewById<Button>(R.id.signout_button).setOnClickListener {
             val intent = Intent(this, SigninActivity::class.java)
             AlertDialog.Builder(this).apply {
@@ -69,6 +64,7 @@ class MemberActivity : AppCompatActivity() {
             }
         }
 
+        //groupボタンを押した時の処理
         findViewById<Button>(R.id.group_button).setOnClickListener {
             val intent = Intent(this, GroupActivity::class.java)
             intent.putExtra("token", getIntent().getStringExtra("token"))

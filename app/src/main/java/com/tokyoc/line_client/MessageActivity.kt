@@ -36,7 +36,7 @@ class MessageActivity : RxAppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_message)
+        setContentView(R.layout.activity_group_message)
 
         //Realmを利用するために必要なもの
         realm = Realm.getDefaultInstance()
@@ -44,16 +44,16 @@ class MessageActivity : RxAppCompatActivity() {
         val listView: ListView = findViewById<ListView>(R.id.message_list_view)
 
         val token = intent.getStringExtra("token")
-        val member: Member = intent.getParcelableExtra(MemberActivity.EXTRA_MEMBER)
+        val group: Group = intent.getParcelableExtra(GroupActivity.EXTRA_GROUP)
 
         val returnButton = findViewById<Button>(R.id.return_button)
         val sendButton = findViewById<Button>(R.id.send_button)
         val messageEditText = findViewById<EditText>(R.id.message_edit_text)
-        val listAdapter = MessageListAdapter(messages)
-        val memberName = findViewById<TextView>(R.id.send_user_name_text_view)
+        val listAdapter = GroupMessageListAdapter(messages)
+        val groupName = findViewById<TextView>(R.id.send_user_name_text_view)
 
         listView.adapter = listAdapter
-        memberName.text = member.name
+        groupName.text = group.name
         listView.setSelection(listAdapter.messages0.size)
 
         //通信に使うものたちの定義
@@ -81,9 +81,9 @@ class MessageActivity : RxAppCompatActivity() {
         val senderClient = retrofit.create(SenderClient::class.java)
 
         Log.d("COMM", "token: $token")
-        Log.d("COMM", "listening /streams/${member.groupId}")
+        Log.d("COMM", "listening /streams/${group.groupId}")
 
-        retrofit.create(ReceiverClient::class.java).getMessages(member.groupId)
+        retrofit.create(ReceiverClient::class.java).getMessages(group.groupId)
                 .flatMap {
                     val source = it.source()
 
@@ -111,7 +111,6 @@ class MessageActivity : RxAppCompatActivity() {
                                 val message = realm.createObject<Message>(nextId)
                                 message.content = message0.content
                             }
-
                             listView.setSelection(listAdapter.messages0.size)
 //                            listAdapter.messages0.add(it)
 //                            listView.adapter = listAdapter
@@ -121,9 +120,9 @@ class MessageActivity : RxAppCompatActivity() {
                             Log.d("COMM", "receive failed: $it")
                         })
 
-        // ボタンをクリックしたらMember画面に遷移
+        // ボタンをクリックしたらGroup画面に遷移
         returnButton.setOnClickListener {
-            val intent = Intent(this, MemberActivity::class.java)
+            val intent = Intent(this, GroupActivity::class.java)
             intent.putExtra("token", token)
             startActivity(intent)
         }
@@ -141,7 +140,7 @@ class MessageActivity : RxAppCompatActivity() {
             //ここから通信部分！
             Log.d("COMM", gson.toJson(message))
 
-            senderClient.sendMessage(member.groupId, message)
+            senderClient.sendMessage(group.groupId, message) //channel番号はgetExtraから本来は読み込む
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe({

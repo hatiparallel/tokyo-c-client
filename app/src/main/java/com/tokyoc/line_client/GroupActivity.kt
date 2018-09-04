@@ -7,11 +7,8 @@ import android.widget.ListView
 import android.widget.Button
 import android.widget.Toast
 import android.content.Intent
-import com.google.gson.GsonBuilder
 
 import com.google.firebase.auth.FirebaseAuth
-import io.realm.RealmList
-import kotlinx.android.parcel.RawValue
 import android.support.v7.app.AlertDialog
 import android.util.Log
 import android.view.KeyEvent
@@ -40,7 +37,7 @@ class GroupActivity : AppCompatActivity() {
         //Groupをクリックした時の処理
         listView.setOnItemClickListener { adapterView, view, position, id ->
             val group = groups[position]
-            val intent = Intent(this, GroupMessageActivity::class.java)
+            val intent = Intent(this, MessageActivity::class.java)
             intent.putExtra(EXTRA_GROUP, group)
             intent.putExtra("token", getIntent().getStringExtra("token"))
             startActivity(intent)
