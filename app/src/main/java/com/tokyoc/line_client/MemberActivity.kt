@@ -35,9 +35,17 @@ class MemberActivity : AppCompatActivity() {
 
         //Memberを長押しした時の処理
         listView.setOnItemLongClickListener { adapterView, view, position, id ->
-            val deleteMember = adapterView.getItemAtPosition(position) as Member
-            realm.executeTransaction {
-                realm.where<Member>().equalTo("id", deleteMember.id)?.findFirst()?.deleteFromRealm()
+            AlertDialog.Builder(this).apply {
+                setTitle("Delete Friend")
+                setMessage("Really Delete Friend?")
+                setPositiveButton("OK", DialogInterface.OnClickListener { _, _ ->
+                    val deleteMember = adapterView.getItemAtPosition(position) as Member
+                    realm.executeTransaction {
+                        realm.where<Member>().equalTo("id", deleteMember.id)?.findFirst()?.deleteFromRealm()
+                    }
+                })
+                setNegativeButton("Cancel", null)
+                show()
             }
             return@setOnItemLongClickListener true
         }
