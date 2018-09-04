@@ -1,17 +1,44 @@
 package com.tokyoc.line_client
 
 import android.content.Context
+import android.view.LayoutInflater
 import android.widget.BaseAdapter
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
+import android.widget.TextView
+import io.realm.OrderedRealmCollection
+import io.realm.RealmBaseAdapter
 
-class GroupListAdapter(private val context: Context) : BaseAdapter() {
+class GroupListAdapter(data: OrderedRealmCollection<Group>) : RealmBaseAdapter<Group>(data) {
 
-    var groups: List<Group> = emptyList()
+    inner class ViewHolder(cell: View) {
+        val groupName = cell.findViewById<TextView>(R.id.group_name_view)
+        val groupImage = cell.findViewById<ImageView>(R.id.group_image_view)
+    }
 
-    override fun getCount(): Int = groups.size
-    override fun getItem(position: Int): Any? = groups[position]
-    override fun getItemId(position: Int): Long = 0
-    override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View =
-            ((convertView as? GroupView) ?: GroupView(context)).apply { setGroup(groups[position]) }
+    override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
+        val view: View
+        val viewHolder: ViewHolder
+
+        when (convertView) {
+            null -> {
+                val inflater = LayoutInflater.from(parent?.context)
+                view = inflater.inflate(R.layout.view_group, parent, false)
+                viewHolder = ViewHolder(view)
+                view.tag = viewHolder
+            }
+            else -> {
+                view = convertView
+                viewHolder = view.tag as GroupListAdapter.ViewHolder
+            }
+        }
+
+        adapterData?.run {
+            val member = get(position)
+            viewHolder.groupName.text = member.name
+            viewHolder.groupImage.setImageResource(R.drawable.img001)
+        }
+        return view
+    }
 }
