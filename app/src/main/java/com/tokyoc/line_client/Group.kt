@@ -7,10 +7,11 @@ import io.realm.annotations.PrimaryKey
 import kotlinx.android.parcel.Parcelize
 import kotlinx.android.parcel.RawValue
 
-// MemberデータFormat
+//GroupデータFormat
 @Parcelize
 open class Group(
-        //@PrimaryKey
-        open var name: String, // = "",
-        //open var members:@RawValue RealmList<Member> = RealmList(),
-        open var groupId: Int): Parcelable //, RealmObject()
+    @PrimaryKey
+    open var id: Int = 0,
+    open var name: String = "GroupA",
+    //open var members:@RawValue RealmList<Member> = RealmList(),
+    open var groupId: Int = 0): Parcelable, RealmObject()
