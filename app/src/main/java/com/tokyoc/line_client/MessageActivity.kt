@@ -49,7 +49,7 @@ class MessageActivity : RxAppCompatActivity() {
         val returnButton = findViewById<Button>(R.id.return_button)
         val sendButton = findViewById<Button>(R.id.send_button)
         val messageEditText = findViewById<EditText>(R.id.message_edit_text)
-        val listAdapter = GroupMessageListAdapter(messages)
+        val listAdapter = MessageListAdapter(messages)
         val groupName = findViewById<TextView>(R.id.send_user_name_text_view)
 
         listView.adapter = listAdapter
@@ -112,9 +112,7 @@ class MessageActivity : RxAppCompatActivity() {
                                 message.content = message0.content
                             }
                             listView.setSelection(listAdapter.messages0.size)
-//                            listAdapter.messages0.add(it)
-//                            listView.adapter = listAdapter
-                            Log.d("COMM", "recieved")
+                            Log.d("COMM", "received")
                         },
                         {
                             Log.d("COMM", "receive failed: $it")
