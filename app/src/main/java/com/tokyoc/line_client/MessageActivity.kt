@@ -106,10 +106,13 @@ class MessageActivity : RxAppCompatActivity() {
                         {
                             val message0 = it
                             realm.executeTransaction {
-                                val maxId = realm.where<Message>().max("id")
-                                val nextId = (maxId?.toLong() ?: 0L) + 1
-                                val message = realm.createObject<Message>(nextId)
+                                val message = realm.createObject<Message>(message0.id)
                                 message.content = message0.content
+                                message.author = message0.author
+                                message.channel = message0.channel
+                                message.isEvent = message0.isEvent
+                                message.postedAt = message0.postedAt
+                                Log.d("COMM", "registered: ${message0.id}")
                             }
                             listView.setSelection(listAdapter.messages0.size)
 //                            listAdapter.messages0.add(it)
