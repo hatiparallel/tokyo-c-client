@@ -44,11 +44,11 @@ class GroupActivity : AppCompatActivity() {
         }
 
         listView.setOnItemLongClickListener { adapterView, view, position, id ->
+            val groupLeave = adapterView.getItemAtPosition(position) as Group
             AlertDialog.Builder(this).apply {
                 setTitle("Leave Group")
-                setMessage("Really Leave this Group?")
+                setMessage("Really Leave ${groupLeave.name}?")
                 setPositiveButton("OK", DialogInterface.OnClickListener { _, _ ->
-                    val groupLeave = adapterView.getItemAtPosition(position) as Group
                     realm.executeTransaction {
                         realm.where<Group>().equalTo("id", groupLeave.id)?.findFirst()?.deleteFromRealm()
                     }
