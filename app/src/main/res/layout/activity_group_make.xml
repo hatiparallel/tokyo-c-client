@@ -27,17 +27,4 @@
         android:layout_height="wrap_content"
         android:text="作成" />
 
-    <EditText
-        android:id="@+id/existing_group_id"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:hint="参加するグループのIDを入力してください" />
-
-    <Button
-        android:id="@+id/join_group"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="グループに参加" />
-
-
 </LinearLayout>
