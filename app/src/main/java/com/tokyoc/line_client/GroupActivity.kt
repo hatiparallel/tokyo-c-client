@@ -43,6 +43,23 @@ class GroupActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
+        listView.setOnItemLongClickListener { adapterView, view, position, id ->
+            AlertDialog.Builder(this).apply {
+                setTitle("Leave Group")
+                setMessage("Really Leave this Group?")
+                setPositiveButton("OK", DialogInterface.OnClickListener { _, _ ->
+                    val groupLeave = adapterView.getItemAtPosition(position) as Group
+                    realm.executeTransaction {
+                        realm.where<Group>().equalTo("id", groupLeave.id)?.findFirst()?.deleteFromRealm()
+                    }
+                })
+                setNegativeButton("Cancel", null)
+                show()
+            }
+            return@setOnItemLongClickListener true
+        }
+
+
         //signoutボタンを押した時の処理
         findViewById<Button>(R.id.signout_button).setOnClickListener {
             val intent = Intent(this, SigninActivity::class.java)
