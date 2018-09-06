@@ -13,6 +13,7 @@ class MessageListAdapter(data: OrderedRealmCollection<Message>) : RealmBaseAdapt
 
     inner class ViewHolder(cell: View) {
         val messagecontent = cell.findViewById<TextView>(R.id.message_text_view)
+        val messageAuthor = cell.findViewById<TextView>(R.id.author_name_text_view)
     }
 
     override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
@@ -22,7 +23,7 @@ class MessageListAdapter(data: OrderedRealmCollection<Message>) : RealmBaseAdapt
         when (convertView) {
             null -> {
                 val inflater = LayoutInflater.from(parent?.context)
-                view = inflater.inflate(R.layout.view_message, parent, false)
+                view = inflater.inflate(R.layout.view_group_message, parent, false)
                 viewHolder = ViewHolder(view)
                 view.tag = viewHolder
             }
@@ -35,8 +36,8 @@ class MessageListAdapter(data: OrderedRealmCollection<Message>) : RealmBaseAdapt
         adapterData?.run {
             val message = get(position)
             viewHolder.messagecontent.text = message.content
+            viewHolder.messageAuthor.text = "誰かさん"
         }
         return view
     }
 }
-
