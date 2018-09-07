@@ -101,9 +101,4 @@ class GroupActivity : AppCompatActivity() {
             else -> return super.onKeyDown(keyCode, event)
         }
     }
-
-
-    private fun dummyMember(name: String): Member = Member(name = name, id = 123, groupId = 123)
-    private fun dummyGroup(name: String): Group = Group(name = name, groupId = 123)
-            //members = RealmList(dummyMember("Aさん"), dummyMember("Bさん"), dummyMember("Cさん")))
 }

@@ -18,6 +18,10 @@ interface Client {
     fun makeGroup(@Body group: Group): Observable<Group>
 
     @Headers("Content-Type: application/json")
+    @PUT("/channels/{channel}/{person}")
+    fun invitePerson(@Path("channel") channel: Int, @Path("person") person: String): Observable<String>
+
+    @Headers("Content-Type: application/json")
     @GET("/people/{uid}")
     fun getPerson(@Path("uid") uid: String): Observable<Member>
 

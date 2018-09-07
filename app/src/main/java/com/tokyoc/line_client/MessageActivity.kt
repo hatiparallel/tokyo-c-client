@@ -48,6 +48,7 @@ class MessageActivity : RxAppCompatActivity() {
 
         val returnButton = findViewById<Button>(R.id.return_button)
         val sendButton = findViewById<Button>(R.id.send_button)
+        val inviteButton = findViewById<Button>(R.id.invite_button)
         val messageEditText = findViewById<EditText>(R.id.message_edit_text)
         val listAdapter = MessageListAdapter(messages)
         val groupName = findViewById<TextView>(R.id.send_user_name_text_view)
@@ -152,6 +153,13 @@ class MessageActivity : RxAppCompatActivity() {
                     }, {
                         Log.d("COMM", "post failed: ${it}")
                     })
+        }
+
+        inviteButton.setOnClickListener {
+            val intent = Intent(this, InviteActivity::class.java)
+            intent.putExtra("token", token)
+            intent.putExtra("group", group)
+            startActivity(intent)
         }
     }
     //Realmインスタンスを破棄
