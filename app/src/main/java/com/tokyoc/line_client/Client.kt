@@ -13,6 +13,15 @@ interface Client {
     @POST("/messages/{channel}") //serverの構造依存
     fun sendMessage(@Path("channel") channel: Int, @Body message: Message): Observable<Message>
 
+
+    @Headers("Content-type: application/json")
+    @POST("/friendships/")
+    fun sendPIN(@Body pin: Int): Observable<List<String>>
+
+    @PUT("/friendships/")
+    fun makeFriends(): Observable<List<String>>
+
+
     @Headers("Content-Type: application/json")
     @POST("/channels/") //serverの構造依存
     fun makeGroup(@Body group: Group): Observable<Group>
@@ -21,13 +30,16 @@ interface Client {
     @PUT("/channels/{channel}/{person}")
     fun invitePerson(@Path("channel") channel: Int, @Path("person") person: String): Observable<String>
 
+
     @Headers("Content-Type: application/json")
     @GET("/people/{uid}")
     fun getPerson(@Path("uid") uid: String): Observable<Member>
 
+
     @Headers("Content-Type: application/json")
     @GET("/status")
     fun getStatus(): Observable<Status>
+
 
     @GET("/pin")
     @Streaming
