@@ -23,17 +23,7 @@ class SigninActivity : AppCompatActivity() {
         val passwordEditText: EditText = findViewById<EditText>(R.id.password_edit_text)
 
         findViewById<Button>(R.id.signin_button).setOnClickListener {
-            val email = emailEditText.text.toString()
-            val password = passwordEditText.text.toString()
-
-            //空白でなければ一般のサインイン処理
-            if (email.isEmpty() && password.isEmpty()) {
-                val intent = Intent(this, MemberActivity::class.java)
-                startActivity(intent)
-                return@setOnClickListener
-            }
-
-            signIn(email, password)
+            signIn(emailEditText.text.toString(), passwordEditText.text.toString())
         }
 
         findViewById<TextView>(R.id.to_signup).setOnClickListener {
