@@ -59,7 +59,7 @@ class MakeGroupActivity: RxAppCompatActivity() {
                 .addConverterFactory(GsonConverterFactory.create(gson))
                 .build()
 
-        val makeGroupClient = retrofit.create(MakeGroupClient::class.java)
+        val client = retrofit.create(Client::class.java)
 
 
         //グループ作成ボタンを押した時の処理
@@ -71,12 +71,12 @@ class MakeGroupActivity: RxAppCompatActivity() {
             val groupName = groupNameEditText.text.toString()
             val new_group = Group(0, groupName, 0)
 
-            makeGroupClient.makeGroup(new_group)
+            client.makeGroup(new_group)
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe({
                         Log.d("COMM", "post done: ${it}")
-                        val groupId = it.toInt()
+                        val groupId = it.groupId
                         realm.executeTransaction {
                             val maxId = realm.where<Group>().max("id")
                             val nextId = (maxId?.toLong() ?: 0L) + 1

@@ -78,48 +78,51 @@ class MessageActivity : RxAppCompatActivity() {
                 .addConverterFactory(GsonConverterFactory.create(gson))
                 .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
                 .build()
-        val senderClient = retrofit.create(SenderClient::class.java)
+        val client = retrofit.create(Client::class.java)
+        var since_id = realm.where<Message>().max("id")
 
         Log.d("COMM", "token: $token")
         Log.d("COMM", "listening /streams/${group.groupId}")
 
-        retrofit.create(ReceiverClient::class.java).getMessages(group.groupId)
-                .flatMap {
-                    val source = it.source()
+        if (since_id != null) {
+            client.getMessages(group.groupId, since_id.toInt())
+                    .flatMap {
+                        val source = it.source()
 
-                    rx.Observable.create(rx.Observable.OnSubscribe<Message> {
-                        try {
-                            while (!source.exhausted()) {
-                                it.onNext(gson.fromJson<Message>(source.readUtf8Line(), Message::class.java))
-                            }
+                        rx.Observable.create(rx.Observable.OnSubscribe<Message> {
+                            try {
+                                while (!source.exhausted()) {
+                                    it.onNext(gson.fromJson<Message>(source.readUtf8Line(), Message::class.java))
+                                }
 
-                            it.onCompleted()
-                        } catch (e: IOException) {
-                            it.onError(e)
-                        }
-                    })
-                }
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .bindToLifecycle(this)
-                .subscribe(
-                        {
-                            val message0 = it
-                            realm.executeTransaction {
-                                val message = realm.createObject<Message>(message0.id)
-                                message.content = message0.content
-                                message.author = message0.author
-                                message.channel = message0.channel
-                                message.isEvent = message0.isEvent
-                                message.postedAt = message0.postedAt
-                                Log.d("COMM", "registered: ${message0.id}")
+                                it.onCompleted()
+                            } catch (e: IOException) {
+                                it.onError(e)
                             }
-                            listView.setSelection(listAdapter.messages0.size)
-                            Log.d("COMM", "received")
-                        },
-                        {
-                            Log.d("COMM", "receive failed: $it")
                         })
+                    }
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .bindToLifecycle(this)
+                    .subscribe(
+                            {
+                                val message0 = it
+                                realm.executeTransaction {
+                                    val message = realm.createObject<Message>(message0.id)
+                                    message.content = message0.content
+                                    message.author = message0.author
+                                    message.channel = message0.channel
+                                    message.isEvent = message0.isEvent
+                                    message.postedAt = message0.postedAt
+                                    Log.d("COMM", "registered: ${message0.id}")
+                                }
+                                listView.setSelection(listAdapter.messages0.size)
+                                Log.d("COMM", "received")
+                            },
+                            {
+                                Log.d("COMM", "receive failed: $it")
+                            })
+        }
 
         // ボタンをクリックしたらGroup画面に遷移
         returnButton.setOnClickListener {
@@ -141,7 +144,7 @@ class MessageActivity : RxAppCompatActivity() {
             //ここから通信部分！
             Log.d("COMM", gson.toJson(message))
 
-            senderClient.sendMessage(group.groupId, message) //channel番号はgetExtraから本来は読み込む
+            client.sendMessage(group.groupId, message) //channel番号はgetExtraから本来は読み込む
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe({
