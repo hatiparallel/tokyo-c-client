@@ -32,4 +32,7 @@ interface Client {
     @GET("/pin")
     @Streaming
     fun getPIN(): Observable<ResponseBody>
+
+    @DELETE("/friendships/{person}")
+    fun deleteFriend(@Path("person") person: String): Observable<List<String>>
 }
