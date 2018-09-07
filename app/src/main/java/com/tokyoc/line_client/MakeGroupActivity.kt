@@ -37,30 +37,7 @@ class MakeGroupActivity: RxAppCompatActivity() {
 
         val groupNameEditText = findViewById<EditText>(R.id.group_name)
 
-        //通信の準備
-        val gson = GsonBuilder()
-                .setFieldNamingPolicy(FieldNamingPolicy.UPPER_CAMEL_CASE)
-                .setLenient()
-                .create()
-        val authenticatedClient = OkHttpClient().newBuilder()
-                .readTimeout(0, TimeUnit.SECONDS)
-                .addInterceptor(Interceptor { chain ->
-                    chain.proceed(
-                            chain.request()
-                                    .newBuilder()
-                                    .header("Authorization", "Bearer $token")
-                                    .build())
-                })
-                .build()
-        val retrofit = Retrofit.Builder()
-                .client(authenticatedClient)
-                .baseUrl(BuildConfig.BACKEND_BASEURL)
-                .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
-                .addConverterFactory(GsonConverterFactory.create(gson))
-                .build()
-
-        val client = retrofit.create(Client::class.java)
-
+        val client = Client.build(token)
 
         //グループ作成ボタンを押した時の処理
         findViewById<Button>(R.id.make_group).setOnClickListener {
