@@ -28,6 +28,7 @@
         <activity android:name=".SignupActivity" />
         <activity android:name=".AddFriendActivity" />
         <activity android:name=".MakeGroupActivity" />
+        <activity android:name=".InviteActivity" />
 
         <service android:name=".PollingService" />
     </application>
