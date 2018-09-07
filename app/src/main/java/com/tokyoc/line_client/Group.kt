@@ -13,5 +13,5 @@ open class Group(
     @PrimaryKey
     open var id: Int = 0,
     open var name: String = "GroupA",
-    //open var members:@RawValue RealmList<Member> = RealmList(),
+    open var members: MutableList<String> = mutableListOf(),
     open var groupId: Int = 0): Parcelable, RealmObject()

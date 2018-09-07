@@ -69,9 +69,10 @@ class InviteActivity : AppCompatActivity() {
         val listAdapter = MemberListAdapter(members)
         listView.adapter = listAdapter
 
-        //Memberを長押しした時の処理
+        //Memberを押した時の処理
         listView.setOnItemClickListener { adapterView, view, position, id ->
             val memberInvite = adapterView.getItemAtPosition(position) as Member
+            val intent = Intent(this, MessageActivity::class.java)
             AlertDialog.Builder(this).apply {
                 setTitle("Delete Friend")
                 setMessage("Really Invite ${memberInvite.name}?")
@@ -82,6 +83,11 @@ class InviteActivity : AppCompatActivity() {
                             .observeOn(AndroidSchedulers.mainThread())
                             .subscribe({
                                 Log.d("COMM", "post done: ${it}")
+                                realm.executeTransaction {
+                                    group.members.add(memberInvite.userId)
+                                }
+                                intent.putExtra("token", getIntent().getStringExtra("token"))
+                                startActivity(intent)
                             }, {
                                 Log.d("COMM", "post failed: ${it}")
                             })
@@ -89,14 +95,6 @@ class InviteActivity : AppCompatActivity() {
                 setNegativeButton("Cancel", null)
                 show()
             }
-        }
-
-
-        //groupボタンを押した時の処理
-        findViewById<Button>(R.id.group_button).setOnClickListener {
-            val intent = Intent(this, GroupActivity::class.java)
-            intent.putExtra("token", getIntent().getStringExtra("token"))
-            startActivity(intent)
         }
     }
 
