@@ -54,6 +54,10 @@ class SigninActivity : AppCompatActivity() {
                     val intent = Intent(this, GroupActivity::class.java)
                     intent.putExtra("token", token)
                     startActivity(intent)
+
+                    val service = Intent(this, PollingService::class.java)
+                    service.putExtra("token", token)
+                    startService(service)
                 }
             }
         }
