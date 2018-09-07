@@ -69,7 +69,7 @@ class MakeGroupActivity: RxAppCompatActivity() {
             }
 
             val groupName = groupNameEditText.text.toString()
-            val new_group = Group(0, groupName, 0)
+            val new_group = Group()
 
             client.makeGroup(new_group)
                     .subscribeOn(Schedulers.io())
