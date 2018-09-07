@@ -32,35 +32,37 @@ class InviteActivity : AppCompatActivity() {
         const val EXTRA_MEMBER = "member"
     }
 
-    val token = intent.getStringExtra("token")
-    val group: Group = intent.getParcelableExtra("group")
-
-    val gson = GsonBuilder()
-            .setDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
-            .setFieldNamingPolicy(FieldNamingPolicy.UPPER_CAMEL_CASE)
-            .setLenient()
-            .create()
-    val authenticatedClient = OkHttpClient().newBuilder()
-            .readTimeout(0, TimeUnit.SECONDS)
-            .addInterceptor(Interceptor { chain ->
-                chain.proceed(
-                        chain.request()
-                                .newBuilder()
-                                .header("Authorization", "Bearer $token")
-                                .build())
-            })
-            .build()
-    val retrofit = Retrofit.Builder()
-            .client(authenticatedClient)
-            .baseUrl(BuildConfig.BACKEND_BASEURL)
-            .addConverterFactory(GsonConverterFactory.create(gson))
-            .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
-            .build()
-    val client = retrofit.create(Client::class.java)
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_member)
+
+        val token = intent.getStringExtra("token")
+        val groupId: Int = intent.getIntExtra("groupId", 0)
+
+        val group = realm.where<Group>().equalTo("groupId", groupId).findFirst()
+
+        val gson = GsonBuilder()
+                .setDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
+                .setFieldNamingPolicy(FieldNamingPolicy.UPPER_CAMEL_CASE)
+                .setLenient()
+                .create()
+        val authenticatedClient = OkHttpClient().newBuilder()
+                .readTimeout(0, TimeUnit.SECONDS)
+                .addInterceptor(Interceptor { chain ->
+                    chain.proceed(
+                            chain.request()
+                                    .newBuilder()
+                                    .header("Authorization", "Bearer $token")
+                                    .build())
+                })
+                .build()
+        val retrofit = Retrofit.Builder()
+                .client(authenticatedClient)
+                .baseUrl(BuildConfig.BACKEND_BASEURL)
+                .addConverterFactory(GsonConverterFactory.create(gson))
+                .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
+                .build()
+        val client = retrofit.create(Client::class.java)
 
         //Realmを利用するために必要なもの
         realm = Realm.getDefaultInstance()
@@ -78,13 +80,13 @@ class InviteActivity : AppCompatActivity() {
                 setMessage("Really Invite ${memberInvite.name}?")
                 setPositiveButton("OK", DialogInterface.OnClickListener { _, _ ->
                     Log.d("COMM", "will invite ${memberInvite.name}")
-                    client.invitePerson(group.groupId, memberInvite.userId)
+                    client.invitePerson(groupId, memberInvite.userId)
                             .subscribeOn(Schedulers.io())
                             .observeOn(AndroidSchedulers.mainThread())
                             .subscribe({
                                 Log.d("COMM", "post done: ${it}")
                                 realm.executeTransaction {
-                                    group.members.add(memberInvite.userId)
+                                    group?.members?.add(memberInvite.userId)
                                 }
                                 intent.putExtra("token", getIntent().getStringExtra("token"))
                                 startActivity(intent)

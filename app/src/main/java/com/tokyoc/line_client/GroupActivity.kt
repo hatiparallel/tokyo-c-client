@@ -19,7 +19,7 @@ class GroupActivity : AppCompatActivity() {
     private lateinit var realm: Realm
 
     companion object {
-        const val EXTRA_GROUP = "group"
+        const val EXTRA_GROUP = "groupId"
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -38,7 +38,7 @@ class GroupActivity : AppCompatActivity() {
         listView.setOnItemClickListener { adapterView, view, position, id ->
             val group = groups[position]
             val intent = Intent(this, MessageActivity::class.java)
-            intent.putExtra(EXTRA_GROUP, group)
+            intent.putExtra(EXTRA_GROUP, group?.groupId)
             intent.putExtra("token", getIntent().getStringExtra("token"))
             startActivity(intent)
         }
