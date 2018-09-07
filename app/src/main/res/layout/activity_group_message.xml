@@ -24,15 +24,17 @@
             android:id="@+id/send_user_name_text_view"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginRight="110dp"
+            android:layout_marginLeft="110dp"
+            android:gravity="center"
             android:textSize="20dp"
             android:text="@string/receiver_name" />
 
         <Button
             android:id="@+id/invite_button"
-            android:layout_width="wrap_content"
+            android:layout_width="60dp"
             android:layout_height="wrap_content"
             android:text="招待"/>
-
     </LinearLayout>
 
 
