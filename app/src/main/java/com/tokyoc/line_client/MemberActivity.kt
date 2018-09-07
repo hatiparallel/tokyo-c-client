@@ -33,6 +33,11 @@ class MemberActivity : AppCompatActivity() {
         val listAdapter = MemberListAdapter(members)
         listView.adapter = listAdapter
 
+        val token = intent.getStringExtra("token")
+
+        // 通信の準備
+        val client = Client.build(token)
+
         //Memberを長押しした時の処理
         listView.setOnItemLongClickListener { adapterView, view, position, id ->
             val memberDelete = adapterView.getItemAtPosition(position) as Member
