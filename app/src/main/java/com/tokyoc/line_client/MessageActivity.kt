@@ -57,28 +57,8 @@ class MessageActivity : RxAppCompatActivity() {
         listView.setSelection(listAdapter.messages0.size)
 
         //通信に使うものたちの定義
-        val gson = GsonBuilder()
-                .setDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
-                .setFieldNamingPolicy(FieldNamingPolicy.UPPER_CAMEL_CASE)
-                .setLenient()
-                .create()
-        val authenticatedClient = OkHttpClient().newBuilder()
-                .readTimeout(0, TimeUnit.SECONDS)
-                .addInterceptor(Interceptor { chain ->
-                    chain.proceed(
-                            chain.request()
-                                    .newBuilder()
-                                    .header("Authorization", "Bearer $token")
-                                    .build())
-                })
-                .build()
-        val retrofit = Retrofit.Builder()
-                .client(authenticatedClient)
-                .baseUrl(BuildConfig.BACKEND_BASEURL)
-                .addConverterFactory(GsonConverterFactory.create(gson))
-                .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
-                .build()
-        val client = retrofit.create(Client::class.java)
+        val client = Client.build(token)
+
         var since_id = realm.where<Message>().max("id")
         if (since_id == null) {
             since_id = 0
@@ -95,7 +75,7 @@ class MessageActivity : RxAppCompatActivity() {
                         rx.Observable.create(rx.Observable.OnSubscribe<Message> {
                             try {
                                 while (!source.exhausted()) {
-                                    it.onNext(gson.fromJson<Message>(source.readUtf8Line(), Message::class.java))
+                                    it.onNext(Client.gson.fromJson<Message>(source.readUtf8Line(), Message::class.java))
                                 }
 
                                 it.onCompleted()
@@ -146,7 +126,7 @@ class MessageActivity : RxAppCompatActivity() {
             messageEditText.setText("", TextView.BufferType.NORMAL)
 
             //ここから通信部分！
-            Log.d("COMM", gson.toJson(message))
+            Log.d("COMM", Client.gson.toJson(message))
 
             client.sendMessage(groupId, message) //channel番号はgetExtraから本来は読み込む
                     .subscribeOn(Schedulers.io())
