@@ -44,7 +44,9 @@ class MessageActivity : RxAppCompatActivity() {
         val listView: ListView = findViewById<ListView>(R.id.message_list_view)
 
         val token = intent.getStringExtra("token")
-        val group: Group = intent.getParcelableExtra(GroupActivity.EXTRA_GROUP)
+        val groupId: Int = intent.getIntExtra(GroupActivity.EXTRA_GROUP, 0)
+
+        val group = realm.where<Group>().equalTo("groupId", groupId).findFirst()
 
         val returnButton = findViewById<Button>(R.id.return_button)
         val sendButton = findViewById<Button>(R.id.send_button)
@@ -54,7 +56,7 @@ class MessageActivity : RxAppCompatActivity() {
         val groupName = findViewById<TextView>(R.id.send_user_name_text_view)
 
         listView.adapter = listAdapter
-        groupName.text = group.name
+        groupName.text = group?.name
         listView.setSelection(listAdapter.messages0.size)
 
         //通信に使うものたちの定義
@@ -81,12 +83,15 @@ class MessageActivity : RxAppCompatActivity() {
                 .build()
         val client = retrofit.create(Client::class.java)
         var since_id = realm.where<Message>().max("id")
+        if (since_id == null) {
+            since_id = 0
+        }
 
         Log.d("COMM", "token: $token")
-        Log.d("COMM", "listening /streams/${group.groupId}")
+        Log.d("COMM", "listening /streams/${group?.groupId}")
 
         if (since_id != null) {
-            client.getMessages(group.groupId, since_id.toInt())
+            client.getMessages(groupId, since_id.toInt())
                     .flatMap {
                         val source = it.source()
 
@@ -108,6 +113,7 @@ class MessageActivity : RxAppCompatActivity() {
                     .subscribe(
                             {
                                 val message0 = it
+                                Log.d("COMM", "${it.id}")
                                 realm.executeTransaction {
                                     val message = realm.createObject<Message>(message0.id)
                                     message.content = message0.content
@@ -145,7 +151,7 @@ class MessageActivity : RxAppCompatActivity() {
             //ここから通信部分！
             Log.d("COMM", gson.toJson(message))
 
-            client.sendMessage(group.groupId, message) //channel番号はgetExtraから本来は読み込む
+            client.sendMessage(groupId, message) //channel番号はgetExtraから本来は読み込む
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe({
@@ -158,7 +164,7 @@ class MessageActivity : RxAppCompatActivity() {
         inviteButton.setOnClickListener {
             val intent = Intent(this, InviteActivity::class.java)
             intent.putExtra("token", token)
-            intent.putExtra("group", group)
+            intent.putExtra("groupId", groupId)
             startActivity(intent)
         }
     }
