@@ -115,6 +115,7 @@ class MessageActivity : RxAppCompatActivity() {
             startActivity(intent)
         }
 
+        // 送信ボタンをタップした時の処理
         sendButton.setOnClickListener {
             if (messageEditText.text.isEmpty()) {
                 return@setOnClickListener
@@ -128,7 +129,7 @@ class MessageActivity : RxAppCompatActivity() {
             //ここから通信部分！
             Log.d("COMM", Client.gson.toJson(message))
 
-            client.sendMessage(groupId, message) //channel番号はgetExtraから本来は読み込む
+            client.sendMessage(groupId, message)
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe({
