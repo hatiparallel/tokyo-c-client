@@ -62,7 +62,7 @@ class SendPinActivity : AppCompatActivity() {
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe({
-                            Log.d("COMM", "post done: ${it.size}")
+                            Log.d("COMM", "post done: ${it.length}")
                             Toast.makeText(applicationContext, "PIN was accepted. Wait for your partner confirm it.", Toast.LENGTH_LONG).show()
                             val intent = Intent(this, MemberActivity::class.java)
                             intent.putExtra("token", token)

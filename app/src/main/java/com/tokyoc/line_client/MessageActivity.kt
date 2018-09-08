@@ -113,7 +113,7 @@ class MessageActivity : RxAppCompatActivity() {
                     .subscribe(
                             {
                                 val message0 = it
-                                Log.d("COMM", "${it.id}")
+                                Log.d("COMM", "message ID: ${it.id}")
                                 realm.executeTransaction {
                                     val message = realm.createObject<Message>(message0.id)
                                     message.content = message0.content
