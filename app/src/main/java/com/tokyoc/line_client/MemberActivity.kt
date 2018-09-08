@@ -8,6 +8,7 @@ import android.widget.Button
 import android.widget.Toast
 import android.content.Intent
 import android.support.v7.app.AlertDialog
+import android.util.Log
 import android.view.KeyEvent
 import com.google.gson.GsonBuilder
 
@@ -52,7 +53,9 @@ class MemberActivity : AppCompatActivity() {
 
         //友達追加ボタンを押した時の処理
         findViewById<Button>(R.id.add_friend_button).setOnClickListener {
-            val intent = Intent(this, AddFriendActivity::class.java)
+            Log.d("COMM", "wow")
+            Toast.makeText(applicationContext, "dajfi;osajfio;a", Toast.LENGTH_LONG).show()
+            val intent = Intent(this, SendPinActivity::class.java)
             intent.putExtra("token", getIntent().getStringExtra("token"))
             startActivity(intent)
         }

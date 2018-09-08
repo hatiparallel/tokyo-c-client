@@ -40,6 +40,15 @@
         <activity
             android:name=".MakeGroupActivity" />
 
+        <activity
+            android:name=".MakePinActivity" />
+
+        <activity
+            android:name=".SendPinActivity" />
+
+        <activity
+            android:name=".InviteActivity"/>
+
     </application>
 
 </manifest>

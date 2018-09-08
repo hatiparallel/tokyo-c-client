@@ -24,9 +24,12 @@ import rx.schedulers.Schedulers
 import java.util.concurrent.TimeUnit
 
 class SendPinActivity : AppCompatActivity() {
-    val token = intent.getStringExtra("token")
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_pin_send)
 
-    override fun onCreate(saveInstanceState: Bundle?) {
+        val token = intent.getStringExtra("token")
+
         val gson = GsonBuilder()
                 .setDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
                 .setFieldNamingPolicy(FieldNamingPolicy.UPPER_CAMEL_CASE)
@@ -50,10 +53,8 @@ class SendPinActivity : AppCompatActivity() {
                 .build()
         val client = retrofit.create(Client::class.java)
 
-        super.onCreate(saveInstanceState)
-        setContentView(R.layout.activity_pin_send)
-
         val pinEditText: EditText = findViewById<EditText>(R.id.pin_edit_text)
+        Log.d("COMM", "yeah")
 
         findViewById<Button>(R.id.send_pin_button).setOnClickListener {
             val pin = pinEditText.text.toString()
