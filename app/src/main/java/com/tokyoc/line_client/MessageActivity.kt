@@ -3,9 +3,7 @@ package com.tokyoc.line_client
 import android.os.Bundle
 import android.widget.Button
 import android.content.Intent
-import android.icu.text.DateFormat
 import android.util.Log
-import android.view.View
 import android.widget.ListView
 import android.widget.TextView
 import android.widget.EditText
@@ -27,7 +25,6 @@ import rx.schedulers.Schedulers
 
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
-import retrofit2.adapter.rxjava.HttpException
 import java.io.IOException
 import java.util.concurrent.TimeUnit
 
@@ -36,7 +33,7 @@ class MessageActivity : RxAppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_group_message)
+        setContentView(R.layout.activity_message)
 
         //Realmを利用するために必要なもの
         realm = Realm.getDefaultInstance()
@@ -118,6 +115,7 @@ class MessageActivity : RxAppCompatActivity() {
             startActivity(intent)
         }
 
+        // 送信ボタンをタップした時の処理
         sendButton.setOnClickListener {
             if (messageEditText.text.isEmpty()) {
                 return@setOnClickListener
@@ -131,7 +129,7 @@ class MessageActivity : RxAppCompatActivity() {
             //ここから通信部分！
             Log.d("COMM", Client.gson.toJson(message))
 
-            client.sendMessage(groupId, message) //channel番号はgetExtraから本来は読み込む
+            client.sendMessage(groupId, message)
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe({
@@ -141,6 +139,7 @@ class MessageActivity : RxAppCompatActivity() {
                     })
         }
 
+        // 招待ボタンを押した時の処理
         inviteButton.setOnClickListener {
             val intent = Intent(this, InviteActivity::class.java)
             intent.putExtra("token", token)
