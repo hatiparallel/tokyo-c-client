@@ -8,6 +8,12 @@ import android.content.Intent
 import android.support.v7.app.AlertDialog
 import android.util.Log
 import android.widget.TextView
+import android.widget.EditText
+import android.widget.Toast
+import com.google.android.gms.tasks.Task
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.AuthResult
+import com.google.firebase.auth.GetTokenResult
 import com.google.gson.FieldNamingPolicy
 import com.google.gson.GsonBuilder
 import com.trello.rxlifecycle.components.support.RxAppCompatActivity
@@ -103,7 +109,7 @@ class MakePinActivity : RxAppCompatActivity() {
                                                             .subscribe({
                                                                 Log.d("COMM", "make friends succeeded: ${it.size}")
                                                                 realm.executeTransaction {
-                                                                    val maxId = realm.where<Member>().max("id")
+                                                                    val maxId = realm.where<Member>().max("id")r
                                                                     val nextId = (maxId?.toLong() ?: 0L) + 1
                                                                     val member = realm.createObject<Member>(nextId)
                                                                     member.userId = member0.userId

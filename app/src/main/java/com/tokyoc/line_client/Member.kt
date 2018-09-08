@@ -16,5 +16,5 @@ open class Member(
     @SerializedName("PhotoURL")
     open var photo: String = "",
     @SerializedName("UID")
-    open var userId: String = ""): Parcelable, RealmObject()
+    open var userId: String = "A"): Parcelable, RealmObject()
 

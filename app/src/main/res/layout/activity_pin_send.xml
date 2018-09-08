@@ -20,7 +20,7 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="20dp"
         android:text="友達追加する人のPINを入力してください" />
-
+  
     <EditText
         android:id="@+id/pin_edit_text"
         android:layout_width="match_parent"

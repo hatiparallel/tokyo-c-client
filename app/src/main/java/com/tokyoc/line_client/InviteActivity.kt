@@ -47,28 +47,8 @@ class InviteActivity : AppCompatActivity() {
         val listView: ListView = findViewById(R.id.member_list_view)
         val listAdapter = MemberListAdapter(members)
         listView.adapter = listAdapter
-        val gson = GsonBuilder()
-                .setDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
-                .setFieldNamingPolicy(FieldNamingPolicy.UPPER_CAMEL_CASE)
-                .setLenient()
-                .create()
-        val authenticatedClient = OkHttpClient().newBuilder()
-                .readTimeout(0, TimeUnit.SECONDS)
-                .addInterceptor(Interceptor { chain ->
-                    chain.proceed(
-                            chain.request()
-                                    .newBuilder()
-                                    .header("Authorization", "Bearer $token")
-                                    .build())
-                })
-                .build()
-        val retrofit = Retrofit.Builder()
-                .client(authenticatedClient)
-                .baseUrl(BuildConfig.BACKEND_BASEURL)
-                .addConverterFactory(GsonConverterFactory.create(gson))
-                .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
-                .build()
-        val client = retrofit.create(Client::class.java)
+
+        val client = Client.build(token)
 
         var multiple_flag: Boolean = false
         var multiple_invite: Array<Boolean> = Array(members.size, { i -> false })

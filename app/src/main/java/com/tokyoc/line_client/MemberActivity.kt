@@ -15,6 +15,8 @@ import com.google.gson.GsonBuilder
 import com.google.firebase.auth.FirebaseAuth
 import io.realm.Realm
 import io.realm.kotlin.where
+import rx.android.schedulers.AndroidSchedulers
+import rx.schedulers.Schedulers
 
 class MemberActivity : AppCompatActivity() {
     private lateinit var realm: Realm
@@ -34,20 +36,34 @@ class MemberActivity : AppCompatActivity() {
         val listAdapter = MemberListAdapter(members)
         listView.adapter = listAdapter
 
-        //Memberを長押しした時の処理
+        val token = intent.getStringExtra("token")
+
+        // 通信の準備
+        val client = Client.build(token)
+
+        //Memberを長押しした時に友達削除
         listView.setOnItemLongClickListener { adapterView, view, position, id ->
             val memberDelete = adapterView.getItemAtPosition(position) as Member
-            AlertDialog.Builder(this).apply {
-                setTitle("Delete Friend")
-                setMessage("Really Delete ${memberDelete.name}?")
-                setPositiveButton("OK", DialogInterface.OnClickListener { _, _ ->
-                    realm.executeTransaction {
-                        realm.where<Member>().equalTo("id", memberDelete.id)?.findFirst()?.deleteFromRealm()
-                    }
-                })
-                setNegativeButton("Cancel", null)
-                show()
-            }
+            Log.d("COMM", "Id is ${memberDelete.id}")
+            Log.d("COMM", "userId is ${memberDelete.userId}")
+            client.deleteFriend(memberDelete.userId)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe({
+                        AlertDialog.Builder(this).apply {
+                            setTitle("Delete Friend")
+                            setMessage("Really Delete ${memberDelete.name}?")
+                            setPositiveButton("OK", DialogInterface.OnClickListener { _, _ ->
+                                realm.executeTransaction {
+                                    realm.where<Member>().equalTo("id", memberDelete.id)?.findFirst()?.deleteFromRealm()
+                                }
+                            })
+                            setNegativeButton("Cancel", null)
+                            show()
+                        }
+                    },{
+                        Log.d("COMM", "post failed: ${it}")
+                    })
             return@setOnItemLongClickListener true
         }
 
@@ -73,7 +89,7 @@ class MemberActivity : AppCompatActivity() {
             }
         }
 
-        //groupボタンを押した時の処理
+        //groupボタンを押した時にGroupActivityに遷移
         findViewById<Button>(R.id.group_button).setOnClickListener {
             val intent = Intent(this, GroupActivity::class.java)
             intent.putExtra("token", getIntent().getStringExtra("token"))

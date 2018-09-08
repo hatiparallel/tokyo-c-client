@@ -3,6 +3,7 @@ package com.tokyoc.line_client
 import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
+import android.util.Log
 import android.widget.Button
 import io.realm.Realm
 import io.realm.kotlin.createObject
@@ -25,6 +26,7 @@ class AddFriendActivity: AppCompatActivity() {
                 val nextId = (maxId?.toLong() ?: 0L) + 1
                 val member = realm.createObject<Member>(nextId)
                 member.name = user_id.text.toString()
+                Log.d("COMM", "this userId is ${member.userId}")
             }
             val intent = Intent(this, MemberActivity::class.java)
             intent.putExtra("token", token)
