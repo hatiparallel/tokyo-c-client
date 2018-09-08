@@ -54,7 +54,6 @@ class SendPinActivity : AppCompatActivity() {
         val client = retrofit.create(Client::class.java)
 
         val pinEditText: EditText = findViewById<EditText>(R.id.pin_edit_text)
-        Log.d("COMM", "yeah")
 
         findViewById<Button>(R.id.send_pin_button).setOnClickListener {
             val pin = pinEditText.text.toString()

@@ -8,12 +8,6 @@ import android.content.Intent
 import android.support.v7.app.AlertDialog
 import android.util.Log
 import android.widget.TextView
-import android.widget.EditText
-import android.widget.Toast
-import com.google.android.gms.tasks.Task
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.AuthResult
-import com.google.firebase.auth.GetTokenResult
 import com.google.gson.FieldNamingPolicy
 import com.google.gson.GsonBuilder
 import com.trello.rxlifecycle.components.support.RxAppCompatActivity
@@ -68,6 +62,7 @@ class MakePinActivity : RxAppCompatActivity() {
         val client = retrofit.create(Client::class.java)
 
         client.getPIN()
+                .onBackpressureBuffer()
                 .flatMap {
                     val source = it.source()
 
@@ -88,7 +83,6 @@ class MakePinActivity : RxAppCompatActivity() {
                 .bindToLifecycle(this)
                 .subscribe(
                         {
-                            Log.d("ANNOYING", "${it.type}")
                             if (it.type == "pin") {
                                 pin_show.text = it.pin.toString()
                             } else if (it.type == "request") {
@@ -103,7 +97,7 @@ class MakePinActivity : RxAppCompatActivity() {
                                                 setTitle("Friend Request")
                                                 setMessage("Make Friends with ${it.name}?")
                                                 setPositiveButton("OK", DialogInterface.OnClickListener { _, _ ->
-                                                    client.makeFriends()
+                                                    client.makeFriends(uid)
                                                             .subscribeOn(Schedulers.io())
                                                             .observeOn(AndroidSchedulers.mainThread())
                                                             .subscribe({
@@ -130,7 +124,18 @@ class MakePinActivity : RxAppCompatActivity() {
                             }
                         },
                         {
-                            Log.d("COMM", "receive failed: $it")
+                            Log.d("COMM", "get_pin receive failed: $it")
+                            val intent = Intent(this, SendPinActivity::class.java)
+                            AlertDialog.Builder(this).apply {
+                                setTitle("Error")
+                                setMessage("サーバとの通信に失敗しました。\n一旦戻ってから再度PINを発行してください。")
+                                setPositiveButton("OK", DialogInterface.OnClickListener { _, _ ->
+                                    intent.putExtra("token", token)
+                                    startActivity(intent)
+                                })
+                                setNegativeButton("Cancel", null)
+                                show()
+                            }
                         })
 
         findViewById<Button>(R.id.return_button).setOnClickListener {

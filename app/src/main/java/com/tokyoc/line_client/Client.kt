@@ -18,8 +18,8 @@ interface Client {
     @POST("/friendships/")
     fun sendPIN(@Body pin: Int): Observable<List<String>>
 
-    @PUT("/friendships/")
-    fun makeFriends(): Observable<List<String>>
+    @PUT("/friendships/{person}")
+    fun makeFriends(@Path("person") person: String): Observable<List<String>>
 
 
     @Headers("Content-Type: application/json")

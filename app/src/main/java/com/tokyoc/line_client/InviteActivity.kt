@@ -34,13 +34,18 @@ class InviteActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_member)
+        setContentView(R.layout.activity_invite)
 
         val token = intent.getStringExtra("token")
         val groupId: Int = intent.getIntExtra("groupId", 0)
 
+        //Realmを利用するために必要なもの
+        realm = Realm.getDefaultInstance()
         val group = realm.where<Group>().equalTo("groupId", groupId).findFirst()
-
+        val members = realm.where<Member>().findAll()
+        val listView: ListView = findViewById(R.id.member_list_view)
+        val listAdapter = MemberListAdapter(members)
+        listView.adapter = listAdapter
         val gson = GsonBuilder()
                 .setDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
                 .setFieldNamingPolicy(FieldNamingPolicy.UPPER_CAMEL_CASE)
@@ -63,13 +68,6 @@ class InviteActivity : AppCompatActivity() {
                 .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
                 .build()
         val client = retrofit.create(Client::class.java)
-
-        //Realmを利用するために必要なもの
-        realm = Realm.getDefaultInstance()
-        val members = realm.where<Member>().findAll()
-        val listView: ListView = findViewById(R.id.member_list_view)
-        val listAdapter = MemberListAdapter(members)
-        listView.adapter = listAdapter
 
         //Memberを押した時の処理
         listView.setOnItemClickListener { adapterView, view, position, id ->
@@ -98,6 +96,13 @@ class InviteActivity : AppCompatActivity() {
                 show()
             }
         }
-    }
 
+        findViewById<Button>(R.id.return_button).setOnClickListener {
+
+        }
+
+        findViewById<Button>(R.id.decide_button).setOnClickListener {
+
+        }
+    }
 }

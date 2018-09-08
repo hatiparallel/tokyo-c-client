@@ -53,8 +53,6 @@ class MemberActivity : AppCompatActivity() {
 
         //友達追加ボタンを押した時の処理
         findViewById<Button>(R.id.add_friend_button).setOnClickListener {
-            Log.d("COMM", "wow")
-            Toast.makeText(applicationContext, "dajfi;osajfio;a", Toast.LENGTH_LONG).show()
             val intent = Intent(this, SendPinActivity::class.java)
             intent.putExtra("token", getIntent().getStringExtra("token"))
             startActivity(intent)
