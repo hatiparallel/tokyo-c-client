@@ -109,7 +109,7 @@ class MakePinActivity : RxAppCompatActivity() {
                                                             .subscribe({
                                                                 Log.d("COMM", "make friends succeeded: ${it.size}")
                                                                 realm.executeTransaction {
-                                                                    val maxId = realm.where<Member>().max("id")r
+                                                                    val maxId = realm.where<Member>().max("id")
                                                                     val nextId = (maxId?.toLong() ?: 0L) + 1
                                                                     val member = realm.createObject<Member>(nextId)
                                                                     member.userId = member0.userId
