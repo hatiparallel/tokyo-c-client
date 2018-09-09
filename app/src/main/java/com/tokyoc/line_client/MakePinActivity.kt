@@ -68,6 +68,7 @@ class MakePinActivity : RxAppCompatActivity() {
         val client = retrofit.create(Client::class.java)
 
         client.getPIN()
+                .onBackpressureBuffer()
                 .flatMap {
                     val source = it.source()
 
@@ -88,7 +89,6 @@ class MakePinActivity : RxAppCompatActivity() {
                 .bindToLifecycle(this)
                 .subscribe(
                         {
-                            Log.d("ANNOYING", "${it.type}")
                             if (it.type == "pin") {
                                 pin_show.text = it.pin.toString()
                             } else if (it.type == "request") {
@@ -103,13 +103,13 @@ class MakePinActivity : RxAppCompatActivity() {
                                                 setTitle("Friend Request")
                                                 setMessage("Make Friends with ${it.name}?")
                                                 setPositiveButton("OK", DialogInterface.OnClickListener { _, _ ->
-                                                    client.makeFriends()
+                                                    client.makeFriends(uid)
                                                             .subscribeOn(Schedulers.io())
                                                             .observeOn(AndroidSchedulers.mainThread())
                                                             .subscribe({
                                                                 Log.d("COMM", "make friends succeeded: ${it.size}")
                                                                 realm.executeTransaction {
-                                                                    val maxId = realm.where<Group>().max("id")
+                                                                    val maxId = realm.where<Member>().max("id")r
                                                                     val nextId = (maxId?.toLong() ?: 0L) + 1
                                                                     val member = realm.createObject<Member>(nextId)
                                                                     member.userId = member0.userId
@@ -130,7 +130,18 @@ class MakePinActivity : RxAppCompatActivity() {
                             }
                         },
                         {
-                            Log.d("COMM", "receive failed: $it")
+                            Log.d("COMM", "get_pin receive failed: $it")
+                            val intent = Intent(this, SendPinActivity::class.java)
+                            AlertDialog.Builder(this).apply {
+                                setTitle("Error")
+                                setMessage("サーバとの通信に失敗しました。\n一旦戻ってから再度PINを発行してください。")
+                                setPositiveButton("OK", DialogInterface.OnClickListener { _, _ ->
+                                    intent.putExtra("token", token)
+                                    startActivity(intent)
+                                })
+                                setNegativeButton("Cancel", null)
+                                show()
+                            }
                         })
 
         findViewById<Button>(R.id.return_button).setOnClickListener {

@@ -23,12 +23,31 @@
         <activity
             android:name=".MessageActivity"
             android:windowSoftInputMode="adjustResize" />
-        <activity android:name=".MemberActivity" />
-        <activity android:name=".GroupActivity" />
-        <activity android:name=".SignupActivity" />
-        <activity android:name=".AddFriendActivity" />
-        <activity android:name=".MakeGroupActivity" />
-        <activity android:name=".InviteActivity" />
+
+        <activity
+            android:name=".MemberActivity" />
+
+        <activity
+            android:name=".GroupActivity" />
+
+        <activity
+            android:name=".SignupActivity" />
+
+        <activity
+            android:name=".AddFriendActivity" />
+
+        <activity
+            android:name=".MakeGroupActivity" />
+
+        <activity
+            android:name=".MakePinActivity" />
+
+        <activity
+            android:name=".SendPinActivity" />
+
+        <activity
+            android:name=".InviteActivity"/>
+      
         <service android:name=".PollingService" />
     </application>
 
