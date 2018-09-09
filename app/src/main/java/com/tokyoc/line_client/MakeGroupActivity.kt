@@ -54,6 +54,7 @@ class MakeGroupActivity: RxAppCompatActivity() {
                     .subscribe({
                         Log.d("COMM", "post done: ${it}")
                         val groupId = it.groupId
+                        Log.d("COMM", "${groupId}")
                         realm.executeTransaction {
                             val maxId = realm.where<Group>().max("id")
                             val nextId = (maxId?.toLong() ?: 0L) + 1
