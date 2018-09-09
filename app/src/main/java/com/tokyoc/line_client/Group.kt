@@ -11,7 +11,7 @@ import kotlinx.android.parcel.RawValue
 //GroupデータFormat
 open class Group(
     @PrimaryKey
-    open var id: Int = 0,
+    @SerializedName("Id")
+    open var groupId: Int = 0,
     open var name: String = "",
-    open var members: RealmList<String> = RealmList(),
-    open var groupId: Int = 0): RealmObject()
+    open var members: RealmList<String> = RealmList() ): RealmObject()

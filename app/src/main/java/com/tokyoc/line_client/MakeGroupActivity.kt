@@ -52,14 +52,11 @@ class MakeGroupActivity: RxAppCompatActivity() {
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe({
-                        Log.d("COMM", "post done: name is ${it.name}, groupId is ${it.id}")
-                        val groupId = it.id
+                        Log.d("COMM", "post done: name is ${it.name}, groupId is ${it.groupId}")
+                        val groupId = it.groupId
                         realm.executeTransaction {
-                            val maxId = realm.where<Group>().max("id")
-                            val nextId = (maxId?.toLong() ?: 0L) + 1
-                            val group = realm.createObject<Group>(nextId)
+                            val group = realm.createObject<Group>(groupId)
                             group.name = groupName
-                            group.groupId = groupId
                         }
                         val intent = Intent(this, GroupActivity::class.java)
                         intent.putExtra("token", token)

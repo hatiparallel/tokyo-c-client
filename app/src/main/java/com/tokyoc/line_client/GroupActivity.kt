@@ -50,8 +50,8 @@ class GroupActivity : AppCompatActivity() {
                 setMessage("Really Leave ${groupLeave.name}?")
                 setPositiveButton("OK", DialogInterface.OnClickListener { _, _ ->
                     realm.executeTransaction {
-                        Log.d("COMM", "leaving ${groupLeave.id}")
-                        realm.where<Group>().equalTo("id", groupLeave.id)?.findFirst()?.deleteFromRealm()
+                        Log.d("COMM", "leaving ${groupLeave.groupId}")
+                        realm.where<Group>().equalTo("groupId", groupLeave.groupId)?.findFirst()?.deleteFromRealm()
                     }
                 })
                 setNegativeButton("Cancel", null)
