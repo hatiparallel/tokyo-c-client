@@ -32,7 +32,9 @@ class GroupActivity : AppCompatActivity() {
         val listView: ListView = findViewById(R.id.group_list_view)
         val listAdapter = GroupListAdapter(groups)
         listView.adapter = listAdapter
-        //listAdapter.groups = listOf(dummyGroup("い"), dummyGroup("ろ"), dummyGroup("は"), dummyGroup("に"), dummyGroup("ほ"))
+
+        val token = intent.getStringExtra("token")
+        val client = Client.build(token)
 
         //Groupをクリックした時の処理
         listView.setOnItemClickListener { adapterView, view, position, id ->
@@ -79,14 +81,14 @@ class GroupActivity : AppCompatActivity() {
         //memberボタンを押した時の処理
         findViewById<Button>(R.id.member_button).setOnClickListener {
             val intent = Intent(this, MemberActivity::class.java)
-            intent.putExtra("token", getIntent().getStringExtra("token"))
+            intent.putExtra("token", token)
             startActivity(intent)
         }
 
         //グループ作成ボタンを押した時の処理
         findViewById<Button>(R.id.make_group_button).setOnClickListener {
             val intent = Intent(this, MakeGroupActivity::class.java)
-            intent.putExtra("token", getIntent().getStringExtra("token"))
+            intent.putExtra("token", token)
             startActivity(intent)
         }
     }
