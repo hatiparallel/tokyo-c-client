@@ -1,32 +1,19 @@
 package com.tokyoc.line_client
 
-import android.os.Bundle
-import android.widget.Button
 import android.content.Intent
+import android.os.Bundle
 import android.util.Log
+import android.widget.Button
+import android.widget.EditText
 import android.widget.ListView
 import android.widget.TextView
-import android.widget.EditText
-
-import com.google.gson.FieldNamingPolicy
-import com.google.gson.GsonBuilder
-
-import retrofit2.Retrofit
-import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory
-import retrofit2.converter.gson.GsonConverterFactory
-
 import com.trello.rxlifecycle.components.support.RxAppCompatActivity
 import com.trello.rxlifecycle.kotlin.bindToLifecycle
 import io.realm.Realm
-import io.realm.kotlin.createObject
 import io.realm.kotlin.where
 import rx.android.schedulers.AndroidSchedulers
 import rx.schedulers.Schedulers
-
-import okhttp3.Interceptor
-import okhttp3.OkHttpClient
 import java.io.IOException
-import java.util.concurrent.TimeUnit
 
 class MessageActivity : RxAppCompatActivity() {
     private lateinit var realm: Realm
@@ -41,9 +28,9 @@ class MessageActivity : RxAppCompatActivity() {
         val listView: ListView = findViewById<ListView>(R.id.message_list_view)
 
         val token = intent.getStringExtra("token")
-        val groupId: Int = intent.getIntExtra(GroupActivity.EXTRA_GROUP, 0)
+        val groupId: Int = intent.getIntExtra("group", 0)
 
-        val group = realm.where<Group>().equalTo("groupId", groupId).findFirst()
+        val group = realm.where<Group>().equalTo("id", groupId).findFirst()
 
         val returnButton = findViewById<Button>(R.id.return_button)
         val sendButton = findViewById<Button>(R.id.send_button)
@@ -58,55 +45,44 @@ class MessageActivity : RxAppCompatActivity() {
 
         //通信に使うものたちの定義
         val client = Client.build(token)
-
-        var since_id = realm.where<Message>().max("id")
-        if (since_id == null) {
-            since_id = 0
-        }
+        var sinceId = realm.where<Message>().max("id") ?: 0
 
         Log.d("COMM", "token: $token")
-        Log.d("COMM", "listening /streams/${group?.groupId}")
+        Log.d("COMM", "listening /streams/${group?.id}")
 
-        if (since_id != null) {
-            client.getMessages(groupId, since_id.toInt())
-                    .flatMap {
-                        val source = it.source()
+        client.getMessages(groupId, sinceId.toInt())
+                .flatMap {
+                    val source = it.source()
 
-                        rx.Observable.create(rx.Observable.OnSubscribe<Message> {
-                            try {
-                                while (!source.exhausted()) {
-                                    it.onNext(Client.gson.fromJson<Message>(source.readUtf8Line(), Message::class.java))
-                                }
-
-                                it.onCompleted()
-                            } catch (e: IOException) {
-                                it.onError(e)
+                    rx.Observable.create(rx.Observable.OnSubscribe<Message> {
+                        try {
+                            while (!source.exhausted()) {
+                                it.onNext(Client.gson.fromJson<Message>(source.readUtf8Line(), Message::class.java))
                             }
+
+                            it.onCompleted()
+                        } catch (e: IOException) {
+                            it.onError(e)
+                        }
+                    })
+                }
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .bindToLifecycle(this)
+                .subscribe(
+                        {
+                            val message = it
+                            Log.d("COMM", "message ID: ${it.id}")
+                            realm.executeTransaction {
+                                realm.insert(message)
+                                Log.d("COMM", "registered: ${message.id}")
+                            }
+                            listView.setSelection(listAdapter.messages0.size)
+                            Log.d("COMM", "received")
+                        },
+                        {
+                            Log.d("COMM", "receive failed: $it")
                         })
-                    }
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .bindToLifecycle(this)
-                    .subscribe(
-                            {
-                                val message0 = it
-                                Log.d("COMM", "message ID: ${it.id}")
-                                realm.executeTransaction {
-                                    val message = realm.createObject<Message>(message0.id)
-                                    message.content = message0.content
-                                    message.author = message0.author
-                                    message.channel = message0.channel
-                                    message.isEvent = message0.isEvent
-                                    message.postedAt = message0.postedAt
-                                    Log.d("COMM", "registered: ${message0.id}")
-                                }
-                                listView.setSelection(listAdapter.messages0.size)
-                                Log.d("COMM", "received")
-                            },
-                            {
-                                Log.d("COMM", "receive failed: $it")
-                            })
-        }
 
         // ボタンをクリックしたらGroup画面に遷移
         returnButton.setOnClickListener {
@@ -143,10 +119,11 @@ class MessageActivity : RxAppCompatActivity() {
         inviteButton.setOnClickListener {
             val intent = Intent(this, InviteActivity::class.java)
             intent.putExtra("token", token)
-            intent.putExtra("groupId", groupId)
+            intent.putExtra("group", groupId)
             startActivity(intent)
         }
     }
+
     //Realmインスタンスを破棄
     override fun onDestroy() {
         super.onDestroy()
