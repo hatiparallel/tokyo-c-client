@@ -54,10 +54,10 @@ interface Client {
 
     @Headers("Content-type: application/json")
     @POST("/friendships/")
-    fun sendPIN(@Body pin: Int): Observable<List<String>>
+    fun sendPIN(@Body pin: Int): Observable<String>
 
-    @PUT("/friendships/")
-    fun makeFriends(): Observable<List<String>>
+    @PUT("/friendships/{person}")
+    fun makeFriends(@Path("person") person: String): Observable<List<String>>
 
 
     @Headers("Content-Type: application/json")
@@ -66,7 +66,8 @@ interface Client {
 
     @Headers("Content-Type: application/json")
     @PUT("/channels/{channel}/{person}")
-    fun invitePerson(@Path("channel") channel: Int, @Path("person") person: String): Observable<String>
+    fun invitePerson(@Path("channel") channel: Int, @Path("person") person: String): Observable<Group>
+
 
 
     @Headers("Content-Type: application/json")

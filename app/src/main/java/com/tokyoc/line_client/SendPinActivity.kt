@@ -24,9 +24,12 @@ import rx.schedulers.Schedulers
 import java.util.concurrent.TimeUnit
 
 class SendPinActivity : AppCompatActivity() {
-    val token = intent.getStringExtra("token")
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_pin_send)
 
-    override fun onCreate(saveInstanceState: Bundle?) {
+        val token = intent.getStringExtra("token")
+
         val gson = GsonBuilder()
                 .setDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
                 .setFieldNamingPolicy(FieldNamingPolicy.UPPER_CAMEL_CASE)
@@ -50,9 +53,6 @@ class SendPinActivity : AppCompatActivity() {
                 .build()
         val client = retrofit.create(Client::class.java)
 
-        super.onCreate(saveInstanceState)
-        setContentView(R.layout.activity_pin_send)
-
         val pinEditText: EditText = findViewById<EditText>(R.id.pin_edit_text)
 
         findViewById<Button>(R.id.send_pin_button).setOnClickListener {
@@ -62,7 +62,7 @@ class SendPinActivity : AppCompatActivity() {
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe({
-                            Log.d("COMM", "post done: ${it.size}")
+                            Log.d("COMM", "post done: ${it.length}")
                             Toast.makeText(applicationContext, "PIN was accepted. Wait for your partner confirm it.", Toast.LENGTH_LONG).show()
                             val intent = Intent(this, MemberActivity::class.java)
                             intent.putExtra("token", token)
