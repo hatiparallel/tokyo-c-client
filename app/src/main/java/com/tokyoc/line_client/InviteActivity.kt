@@ -26,7 +26,7 @@ class InviteActivity : AppCompatActivity() {
         setContentView(R.layout.activity_invite)
 
         val token = intent.getStringExtra("token")
-        val groupId: Int = intent.getIntExtra("group", 0)
+        val groupId: Int = intent.getIntExtra("groupId", 0)
 
         //Realmを利用するために必要なもの
         realm = Realm.getDefaultInstance()
@@ -106,7 +106,7 @@ class InviteActivity : AppCompatActivity() {
         findViewById<Button>(R.id.decide_button).setOnClickListener {
             val intent = Intent(this, MessageActivity::class.java)
             intent.putExtra("token", token)
-            intent.putExtra("group", groupId)
+            intent.putExtra("groupId", groupId)
             startActivity(intent)
         }
     }

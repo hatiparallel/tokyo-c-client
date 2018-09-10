@@ -28,7 +28,7 @@ class MessageActivity : RxAppCompatActivity() {
         val listView: ListView = findViewById<ListView>(R.id.message_list_view)
 
         val token = intent.getStringExtra("token")
-        val groupId: Int = intent.getIntExtra("group", 0)
+        val groupId: Int = intent.getIntExtra("groupId", 0)
 
         val group = realm.where<Group>().equalTo("id", groupId).findFirst()
 
@@ -119,7 +119,7 @@ class MessageActivity : RxAppCompatActivity() {
         inviteButton.setOnClickListener {
             val intent = Intent(this, InviteActivity::class.java)
             intent.putExtra("token", token)
-            intent.putExtra("group", groupId)
+            intent.putExtra("groupId", groupId)
             startActivity(intent)
         }
     }
