@@ -99,7 +99,7 @@ class InviteActivity : AppCompatActivity() {
         findViewById<Button>(R.id.return_button).setOnClickListener {
             val intent = Intent(this, MessageActivity::class.java)
             intent.putExtra("token", token)
-            intent.putExtra("group", groupId)
+            intent.putExtra("groupId", groupId)
             startActivity(intent)
         }
 

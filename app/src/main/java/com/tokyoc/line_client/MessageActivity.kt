@@ -141,7 +141,7 @@ class MessageActivity : RxAppCompatActivity() {
         memberListButton.setOnClickListener {
             val intent = Intent(this, GroupMemberActivity::class.java)
             intent.putExtra("token", token)
-            intent.putExtra("group", groupId)
+            intent.putExtra("groupId", groupId)
             intent.putExtra("members", memberList)
             startActivity(intent)
         }
