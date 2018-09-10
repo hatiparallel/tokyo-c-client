@@ -12,29 +12,29 @@ import com.google.firebase.auth.*
 import com.google.firebase.storage.FirebaseStorage
 
 
-class ProfileActivity : AppCompatActivity() {
+class ChangeNameActivity : AppCompatActivity() {
     val storage: FirebaseStorage = FirebaseStorage.getInstance()
 
     override fun onCreate(saveInstanceState: Bundle?) {
         super.onCreate(saveInstanceState)
-        setContentView(R.layout.activity_profile)
+        setContentView(R.layout.activity_name_change)
 
         val token = intent.getStringExtra("token")
 
-        findViewById<Button>(R.id.change_name_button).setOnClickListener() {
-            val intent = Intent(this, ChangeNameActivity::class.java)
+        val nameEditText = findViewById<EditText>(R.id.new_name_edit_text)
+
+        findViewById<Button>(R.id.decide_button).setOnClickListener() {
+            if (nameEditText.text.isEmpty()) {
+                return@setOnClickListener
+            }
+            val intent = Intent(this, ProfileActivity::class.java)
             intent.putExtra("token", token)
             startActivity(intent)
         }
 
-        findViewById<Button>(R.id.change_image_button).setOnClickListener() {
-            val intent = Intent(this, ChangeImageActivity::class.java)
-            intent.putExtra("token", token)
-            startActivity(intent)
-        }
 
         findViewById<TextView>(R.id.return_button).setOnClickListener() {
-            val intent = Intent(this, MemberActivity::class.java)
+            val intent = Intent(this, ProfileActivity::class.java)
             intent.putExtra("token", token)
             startActivity(intent)
         }

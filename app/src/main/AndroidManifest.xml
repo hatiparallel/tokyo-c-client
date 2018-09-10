@@ -50,6 +50,9 @@
 
         <activity
             android:name=".ChangeImageActivity" />
+
+        <activity
+            android:name=".ChangeNameActivity" />
       
         <service android:name=".PollingService" />
     </application>

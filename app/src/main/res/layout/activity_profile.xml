@@ -6,60 +6,45 @@
     android:gravity="center"
     android:orientation="vertical">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="30dp"
-        android:text="変更する情報を選んでください"
-        android:textSize="24sp" />
 
-    <EditText
-        android:id = "@+id/name_edit_text"
+    <LinearLayout
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:orientation="horizontal"
+        android:gravity="center_horizontal">
+
+        <TextView
+            android:id = "@+id/name_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="取得中" />
+
+        <Button
+            android:id="@+id/change_name_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="名前変更"/>
+
+    </LinearLayout>
+
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="24dp"
-        android:layout_marginStart="24dp"
-        android:hint="変更後のユーザー名を入力してください" />
+        android:orientation="horizontal"
+        android:gravity="center_horizontal">
 
-    <EditText
-        android:id="@+id/email_edit_text"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="24dp"
-        android:layout_marginStart="24dp"
-        android:layout_marginTop="6dp"
-        android:hint="変更後のメールアドレスを入力してください" />
+        <ImageView
+            android:id="@+id/photo_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
 
-    <EditText
-        android:id = "@+id/password_edit_text"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="24dp"
-        android:layout_marginStart="24dp"
-        android:layout_marginTop="6dp"
-        android:hint="変更後のパスワードを入力してください" />
+        <Button
+            android:id="@+id/change_image_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="画像変更"/>
 
-    <EditText
-        android:id = "@+id/again_password_edit_text"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="24dp"
-        android:layout_marginStart="24dp"
-        android:layout_marginTop="6dp"
-        android:hint="再度変更後のパスワードを入力してください" />
-
-    <Button
-        android:id="@+id/change_image_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="画像変更"/>
-
-    <Button
-        android:id="@+id/decide_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="12dp"
-        android:text="決定" />
+    </LinearLayout>
 
     <Button
         android:id="@+id/return_button"
