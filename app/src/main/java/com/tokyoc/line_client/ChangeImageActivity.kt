@@ -35,7 +35,7 @@ class ChangeImageActivity : AppCompatActivity() {
         findViewById<Button>(R.id.get_image_button).setOnClickListener() {
             val intent = Intent(Intent.ACTION_OPEN_DOCUMENT)
             intent.addCategory(Intent.CATEGORY_OPENABLE)
-            intent.setType("image/*")
+            intent.setType("image/jpeg")
             startActivityForResult(intent, image_request_code)
         }
 
@@ -52,8 +52,7 @@ class ChangeImageActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
 
-            //val imageRef = storageRef.child("images/${myUid}.jpg")
-            val imageRef = storageRef.child("a.jpg")
+            val imageRef = storageRef.child("images/${myUid}.jpg")
             imageRef.putFile(uri!!)
                     .addOnSuccessListener {
                         Log.d("COMM", "upload success")
