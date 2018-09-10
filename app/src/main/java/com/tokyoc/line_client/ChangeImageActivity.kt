@@ -15,9 +15,12 @@ import kotlinx.android.synthetic.main.activity_image_change.*
 import java.io.IOException
 import android.graphics.BitmapFactory
 import android.os.ParcelFileDescriptor
-import android.support.v4.*
+import com.google.firebase.storage.StorageReference
+import retrofit2.adapter.rxjava.HttpException
+
 class ChangeImageActivity : AppCompatActivity() {
-    val storage: FirebaseStorage = FirebaseStorage.getInstance()
+    val firebaseUser:FirebaseUser? = FirebaseAuth.getInstance().currentUser
+    val storageRef: StorageReference = FirebaseStorage.getInstance().reference
 
     val image_request_code = 2700
 
@@ -27,9 +30,7 @@ class ChangeImageActivity : AppCompatActivity() {
         super.onCreate(saveInstanceState)
         setContentView(R.layout.activity_image_change)
 
-
         val token = intent.getStringExtra("token")
-
 
         findViewById<Button>(R.id.get_image_button).setOnClickListener() {
             val intent = Intent(Intent.ACTION_OPEN_DOCUMENT)
@@ -40,9 +41,47 @@ class ChangeImageActivity : AppCompatActivity() {
 
 
         findViewById<Button>(R.id.decide_button).setOnClickListener() {
-            val intent = Intent(this, ProfileActivity::class.java)
-            intent.putExtra("token", token)
-            startActivity(intent)
+            if (uri == null) {
+                Toast.makeText(applicationContext, "画像を選択してください", Toast.LENGTH_LONG).show()
+                return@setOnClickListener
+            }
+
+            val myUid = firebaseUser?.uid
+            if (myUid == null) {
+                Toast.makeText(applicationContext, "ユーザーが認証できていません", Toast.LENGTH_LONG).show()
+                return@setOnClickListener
+            }
+
+            //val imageRef = storageRef.child("images/${myUid}.jpg")
+            val imageRef = storageRef.child("a.jpg")
+            imageRef.putFile(uri!!)
+                    .addOnSuccessListener {
+                        Log.d("COMM", "upload success")
+                        imageRef.downloadUrl
+                                .addOnCompleteListener {
+                                    val downloadUrl = it.result
+                                    Log.d("COMM", "get url success: ${downloadUrl}")
+                                    val profileUpdates = UserProfileChangeRequest.Builder()
+                                            .setPhotoUri(downloadUrl)
+                                            .build()
+                                    firebaseUser?.updateProfile(profileUpdates)
+                                            ?.addOnCompleteListener {
+                                                Log.d("COMM", "update success: ${it.result}")
+                                                val intent = Intent(this, ProfileActivity::class.java)
+                                                intent.putExtra("token", token)
+                                                startActivity(intent)
+                                            }
+                                            ?.addOnFailureListener {
+                                                Log.d("COMM", "update failure: ${it.message}")
+                                            }
+                                }
+                                .addOnFailureListener {
+                                    Log.d("COMM", "get url failure: ${it.message}")
+                                }
+                    }
+                    .addOnFailureListener {
+                        Log.d("COMM", "upload failure: ${it.message}")
+                    }
         }
 
         findViewById<TextView>(R.id.return_button).setOnClickListener() {

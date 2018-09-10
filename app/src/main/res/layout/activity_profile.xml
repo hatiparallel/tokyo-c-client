@@ -12,7 +12,7 @@
         android:layout_marginTop="30dp"
         android:text="変更する情報を選んでください"
         android:textSize="24sp" />
-
+    
     <EditText
         android:id = "@+id/name_edit_text"
         android:layout_width="match_parent"
