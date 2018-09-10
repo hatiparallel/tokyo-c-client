@@ -55,7 +55,7 @@ class MakePinActivity : RxAppCompatActivity() {
                                 pin_show.text = it.pin.toString()
                             } else if (it.type == "request") {
                                 val uid: String = it.person
-                                client.getPerson(uid)
+                                Member.lookup(uid, client)
                                         .subscribeOn(Schedulers.io())
                                         .observeOn(AndroidSchedulers.mainThread())
                                         .subscribe({
