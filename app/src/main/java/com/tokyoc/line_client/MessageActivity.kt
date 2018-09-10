@@ -25,6 +25,7 @@ import rx.schedulers.Schedulers
 
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
+import rx.Observable
 import java.io.IOException
 import java.util.concurrent.TimeUnit
 
@@ -35,13 +36,14 @@ class MessageActivity : RxAppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_message)
 
-        //Realmを利用するために必要なもの
-        realm = Realm.getDefaultInstance()
-        val messages = realm.where<Message>().findAll()
-        val listView: ListView = findViewById<ListView>(R.id.message_list_view)
 
         val token = intent.getStringExtra("token")
         val groupId: Int = intent.getIntExtra(GroupActivity.EXTRA_GROUP, 0)
+
+        //Realmを利用するために必要なもの
+        realm = Realm.getDefaultInstance()
+        val messages = realm.where<Message>().equalTo("channel", groupId).findAll()
+        val listView: ListView = findViewById<ListView>(R.id.message_list_view)
 
         val group = realm.where<Group>().equalTo("groupId", groupId).findFirst()
 
@@ -72,7 +74,7 @@ class MessageActivity : RxAppCompatActivity() {
                     .flatMap {
                         val source = it.source()
 
-                        rx.Observable.create(rx.Observable.OnSubscribe<Message> {
+                        Observable.create(Observable.OnSubscribe<Message> {
                             try {
                                 while (!source.exhausted()) {
                                     it.onNext(Client.gson.fromJson<Message>(source.readUtf8Line(), Message::class.java))
