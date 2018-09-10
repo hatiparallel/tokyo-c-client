@@ -74,6 +74,9 @@ dependencies {
     def rxlifecycleVersion = '0.6.1'
     implementation "com.trello:rxlifecycle-kotlin:$rxlifecycleVersion"
     implementation "com.trello:rxlifecycle-components:$rxlifecycleVersion"
+
+    //firebase cloud storage利用のためのもの
+    implementation 'com.google.firebase:firebase-storage:16.0.1'
 }
 
 apply plugin: 'com.google.gms.google-services'
