@@ -68,6 +68,7 @@ class MessageActivity : RxAppCompatActivity() {
 
         Log.d("COMM", "token: $token")
         Log.d("COMM", "listening /streams/${group?.groupId}")
+        Log.d("COMM", "members of this group: ${group?.members}")
 
         if (since_id != null) {
             client.getMessages(groupId, since_id.toInt())
