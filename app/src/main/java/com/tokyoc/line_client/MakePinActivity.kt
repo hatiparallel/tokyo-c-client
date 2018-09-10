@@ -27,6 +27,7 @@ class MakePinActivity : RxAppCompatActivity() {
 
         val pin_show = findViewById<TextView>(R.id.pin)
         val token = intent.getStringExtra("token")
+
         val client = Client.build(token)
 
         client.getPIN()

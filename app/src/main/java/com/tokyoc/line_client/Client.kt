@@ -51,12 +51,17 @@ interface Client {
     @POST("/messages/{channel}") //serverの構造依存
     fun sendMessage(@Path("channel") channel: Int, @Body message: Message): Observable<Message>
 
+  
     @Headers("Content-type: application/json")
     @POST("/friendships/")
     fun sendPIN(@Body pin: Int): Observable<String>
 
     @PUT("/friendships/{person}")
     fun makeFriends(@Path("person") person: String): Observable<List<String>>
+
+    @DELETE("/friendships/{person}")
+    fun deleteFriend(@Path("person") person: String): Observable<List<String>>
+
 
     @Headers("Content-Type: application/json")
     @POST("/channels/") //serverの構造依存
@@ -66,6 +71,11 @@ interface Client {
     @PUT("/channels/{channel}/{person}")
     fun invitePerson(@Path("channel") channel: Int, @Path("person") person: String): Observable<Group>
 
+    @Headers("Content-Type: application/json")
+    @DELETE("/channels/{channel}/{person}")
+    fun leaveGroup(@Path("channel") channel: Int, @Path("person") person: String): Observable<Group>
+  
+  
     @Headers("Content-Type: application/json")
     @GET("/people/{uid}")
     fun getPerson(@Path("uid") uid: String): Observable<Member>
@@ -78,6 +88,4 @@ interface Client {
     @Streaming
     fun getPIN(): Observable<ResponseBody>
 
-    @DELETE("/friendships/{person}")
-    fun deleteFriend(@Path("person") person: String): Observable<List<String>>
 }
