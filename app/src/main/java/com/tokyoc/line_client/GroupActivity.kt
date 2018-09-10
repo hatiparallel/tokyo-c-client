@@ -42,7 +42,7 @@ class GroupActivity : AppCompatActivity() {
         listView.setOnItemClickListener { adapterView, view, position, id ->
             val group = groups[position]
             val intent = Intent(this, MessageActivity::class.java)
-            intent.putExtra("group", group?.id)
+            intent.putExtra("groupId", group?.id)
             intent.putExtra("token", getIntent().getStringExtra("token"))
             startActivity(intent)
         }
@@ -59,13 +59,13 @@ class GroupActivity : AppCompatActivity() {
                         Log.d("COMM", "could not get UID")
                     } else {
                         Log.d("COMM", "succeeded to get UID: $myUid")
-                        client.leaveGroup(groupLeave.groupId, myUid)
+                        client.leaveGroup(groupLeave.id, myUid)
                                 .subscribeOn(Schedulers.io())
                                 .observeOn(AndroidSchedulers.mainThread())
                                 .subscribe({
                                     realm.executeTransaction {
-                                        Log.d("COMM", "leaving ${groupLeave.groupId}")
-                                        realm.where<Group>().equalTo("groupId", groupLeave.groupId)?.findFirst()?.deleteFromRealm()
+                                        Log.d("COMM", "leaving ${groupLeave.id}")
+                                        realm.where<Group>().equalTo("id", groupLeave.id)?.findFirst()?.deleteFromRealm()
                                     }
                                     Log.d("COMM", "delete done: ${it.name}")
                                 }, {
@@ -74,8 +74,8 @@ class GroupActivity : AppCompatActivity() {
                                     if (httpCode.toInt() == 410) {
                                         Log.d("COMM", "You were the last participant. See you.")
                                         realm.executeTransaction {
-                                            Log.d("COMM", "leaving ${groupLeave.groupId}")
-                                            realm.where<Group>().equalTo("groupId", groupLeave.groupId)?.findFirst()?.deleteFromRealm()
+                                            Log.d("COMM", "leaving ${groupLeave.id}")
+                                            realm.where<Group>().equalTo("id", groupLeave.id)?.findFirst()?.deleteFromRealm()
                                         }
                                     } else {
                                         Log.d("COMM", "delete failed: ${it.message}")
