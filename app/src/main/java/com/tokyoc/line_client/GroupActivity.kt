@@ -13,6 +13,9 @@ import android.widget.Toast
 import com.google.firebase.auth.FirebaseAuth
 import io.realm.Realm
 import io.realm.kotlin.where
+import retrofit2.adapter.rxjava.HttpException
+import rx.android.schedulers.AndroidSchedulers
+import rx.schedulers.Schedulers
 
 class GroupActivity : AppCompatActivity() {
     private lateinit var realm: Realm
@@ -31,13 +34,15 @@ class GroupActivity : AppCompatActivity() {
         val listView: ListView = findViewById(R.id.group_list_view)
         val listAdapter = GroupListAdapter(groups)
         listView.adapter = listAdapter
-        //listAdapter.groups = listOf(dummyGroup("い"), dummyGroup("ろ"), dummyGroup("は"), dummyGroup("に"), dummyGroup("ほ"))
+
+        val token = intent.getStringExtra("token")
+        val client = Client.build(token)
 
         //Groupをクリックした時の処理
         listView.setOnItemClickListener { adapterView, view, position, id ->
             val group = groups[position]
             val intent = Intent(this, MessageActivity::class.java)
-            intent.putExtra("group", group?.id)
+            intent.putExtra("groupId", group?.id)
             intent.putExtra("token", getIntent().getStringExtra("token"))
             startActivity(intent)
         }
@@ -48,9 +53,34 @@ class GroupActivity : AppCompatActivity() {
                 setTitle("Leave Group")
                 setMessage("Really Leave ${groupLeave.name}?")
                 setPositiveButton("OK", DialogInterface.OnClickListener { _, _ ->
-                    realm.executeTransaction {
-                        Log.d("COMM", "leaving ${groupLeave.id}")
-                        realm.where<Group>().equalTo("id", groupLeave.id)?.findFirst()?.deleteFromRealm()
+                    val myUid: String? = FirebaseAuth.getInstance().currentUser?.uid
+                    if (myUid == null) {
+                        Toast.makeText(applicationContext, "sorry, could not get UID", Toast.LENGTH_LONG).show()
+                        Log.d("COMM", "could not get UID")
+                    } else {
+                        Log.d("COMM", "succeeded to get UID: $myUid")
+                        client.leaveGroup(groupLeave.id, myUid)
+                                .subscribeOn(Schedulers.io())
+                                .observeOn(AndroidSchedulers.mainThread())
+                                .subscribe({
+                                    realm.executeTransaction {
+                                        Log.d("COMM", "leaving ${groupLeave.id}")
+                                        realm.where<Group>().equalTo("id", groupLeave.id)?.findFirst()?.deleteFromRealm()
+                                    }
+                                    Log.d("COMM", "delete done: ${it.name}")
+                                }, {
+                                    val httpException = it as HttpException
+                                    val httpCode = httpException.code()
+                                    if (httpCode.toInt() == 410) {
+                                        Log.d("COMM", "You were the last participant. See you.")
+                                        realm.executeTransaction {
+                                            Log.d("COMM", "leaving ${groupLeave.id}")
+                                            realm.where<Group>().equalTo("id", groupLeave.id)?.findFirst()?.deleteFromRealm()
+                                        }
+                                    } else {
+                                        Log.d("COMM", "delete failed: ${it.message}")
+                                    }
+                                })
                     }
                 })
                 setNegativeButton("Cancel", null)
@@ -78,14 +108,14 @@ class GroupActivity : AppCompatActivity() {
         //memberボタンを押した時の処理
         findViewById<Button>(R.id.member_button).setOnClickListener {
             val intent = Intent(this, MemberActivity::class.java)
-            intent.putExtra("token", getIntent().getStringExtra("token"))
+            intent.putExtra("token", token)
             startActivity(intent)
         }
 
         //グループ作成ボタンを押した時の処理
         findViewById<Button>(R.id.make_group_button).setOnClickListener {
             val intent = Intent(this, MakeGroupActivity::class.java)
-            intent.putExtra("token", getIntent().getStringExtra("token"))
+            intent.putExtra("token", token)
             startActivity(intent)
         }
     }

@@ -26,28 +26,7 @@ class SendPinActivity : AppCompatActivity() {
 
         val token = intent.getStringExtra("token")
 
-        val gson = GsonBuilder()
-                .setDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
-                .setFieldNamingPolicy(FieldNamingPolicy.UPPER_CAMEL_CASE)
-                .setLenient()
-                .create()
-        val authenticatedClient = OkHttpClient().newBuilder()
-                .readTimeout(0, TimeUnit.SECONDS)
-                .addInterceptor(Interceptor { chain ->
-                    chain.proceed(
-                            chain.request()
-                                    .newBuilder()
-                                    .header("Authorization", "Bearer $token")
-                                    .build())
-                })
-                .build()
-        val retrofit = Retrofit.Builder()
-                .client(authenticatedClient)
-                .baseUrl(BuildConfig.BACKEND_BASEURL)
-                .addConverterFactory(GsonConverterFactory.create(gson))
-                .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
-                .build()
-        val client = retrofit.create(Client::class.java)
+        val client = Client.build(token)
 
         val pinEditText: EditText = findViewById<EditText>(R.id.pin_edit_text)
 

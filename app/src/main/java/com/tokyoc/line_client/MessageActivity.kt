@@ -24,7 +24,7 @@ class MessageActivity : RxAppCompatActivity() {
 
 
         val token = intent.getStringExtra("token")
-        val groupId: Int = intent.getIntExtra("group", 0)
+        val groupId: Int = intent.getIntExtra("groupId", 0)
 
         //Realmを利用するために必要なもの
         realm = Realm.getDefaultInstance()
@@ -133,7 +133,7 @@ class MessageActivity : RxAppCompatActivity() {
         inviteButton.setOnClickListener {
             val intent = Intent(this, InviteActivity::class.java)
             intent.putExtra("token", token)
-            intent.putExtra("group", groupId)
+            intent.putExtra("groupId", groupId)
             startActivity(intent)
         }
 
