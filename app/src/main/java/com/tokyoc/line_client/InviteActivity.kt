@@ -1,30 +1,18 @@
 package com.tokyoc.line_client
 
 import android.content.DialogInterface
-import android.support.v7.app.AppCompatActivity
-import android.os.Bundle
-import android.widget.ListView
-import android.widget.Button
-import android.widget.Toast
 import android.content.Intent
 import android.graphics.Color
+import android.os.Bundle
 import android.support.v7.app.AlertDialog
+import android.support.v7.app.AppCompatActivity
 import android.util.Log
-import android.view.KeyEvent
-import com.google.gson.GsonBuilder
-
-import com.google.firebase.auth.FirebaseAuth
-import com.google.gson.FieldNamingPolicy
+import android.widget.Button
+import android.widget.ListView
 import io.realm.Realm
 import io.realm.kotlin.where
-import okhttp3.Interceptor
-import okhttp3.OkHttpClient
-import retrofit2.Retrofit
-import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory
-import retrofit2.converter.gson.GsonConverterFactory
 import rx.android.schedulers.AndroidSchedulers
 import rx.schedulers.Schedulers
-import java.util.concurrent.TimeUnit
 
 class InviteActivity : AppCompatActivity() {
     private lateinit var realm: Realm
@@ -38,11 +26,11 @@ class InviteActivity : AppCompatActivity() {
         setContentView(R.layout.activity_invite)
 
         val token = intent.getStringExtra("token")
-        val groupId: Int = intent.getIntExtra("groupId", 0)
+        val groupId: Int = intent.getIntExtra("group", 0)
 
         //Realmを利用するために必要なもの
         realm = Realm.getDefaultInstance()
-        val group = realm.where<Group>().equalTo("groupId", groupId).findFirst()
+        val group = realm.where<Group>().equalTo("id", groupId).findFirst()
         val members = realm.where<Member>().findAll()
         val listView: ListView = findViewById(R.id.member_list_view)
         val listAdapter = MemberListAdapter(members)
@@ -63,17 +51,17 @@ class InviteActivity : AppCompatActivity() {
                     setMessage("Really Invite ${memberInvite.name}?")
                     setPositiveButton("OK", DialogInterface.OnClickListener { _, _ ->
                         Log.d("COMM", "will invite ${memberInvite.name}")
-                        Log.d("COMM", "${groupId}, ${memberInvite.userId}")
-                        client.invitePerson(groupId, memberInvite.userId)
+                        Log.d("COMM", "${groupId}, ${memberInvite.id}")
+                        client.invitePerson(groupId, memberInvite.id)
                                 .subscribeOn(Schedulers.io())
                                 .observeOn(AndroidSchedulers.mainThread())
                                 .subscribe({
                                     Log.d("COMM", "post done: ${it}")
                                     realm.executeTransaction {
-                                        group?.members?.add(memberInvite.userId)
+                                        group?.members?.add(memberInvite.id)
                                     }
                                     intent.putExtra("token", token)
-                                    intent.putExtra("groupId", groupId)
+                                    intent.putExtra("group", groupId)
                                     startActivity(intent)
                                 }, {
                                     Log.d("COMM", "post failed: ${it}")
@@ -111,14 +99,14 @@ class InviteActivity : AppCompatActivity() {
         findViewById<Button>(R.id.return_button).setOnClickListener {
             val intent = Intent(this, MessageActivity::class.java)
             intent.putExtra("token", token)
-            intent.putExtra("groupId", groupId)
+            intent.putExtra("group", groupId)
             startActivity(intent)
         }
 
         findViewById<Button>(R.id.decide_button).setOnClickListener {
             val intent = Intent(this, MessageActivity::class.java)
             intent.putExtra("token", token)
-            intent.putExtra("groupId", groupId)
+            intent.putExtra("group", groupId)
             startActivity(intent)
         }
     }
