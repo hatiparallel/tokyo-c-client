@@ -33,8 +33,6 @@
         <activity
             android:name=".SignupActivity" />
 
-        <activity
-            android:name=".AddFriendActivity" />
 
         <activity
             android:name=".MakeGroupActivity" />
@@ -47,6 +45,9 @@
 
         <activity
             android:name=".InviteActivity"/>
+
+        <activity
+            android:name=".GroupMemberActivity" />
       
         <service android:name=".PollingService" />
     </application>
