@@ -73,7 +73,8 @@ interface Client {
 
     @Headers("Content-Type: application/json")
     @DELETE("/channels/{channel}/{person}")
-    fun withdrawFromGroup(@Path("channel") channel: Int, @Path("person") person: String): Observable<Group>
+    fun leaveGroup(@Path("channel") channel: Int, @Path("person") person: String): Observable<Group>
+
 
     @Headers("Content-Type: application/json")
     @GET("/people/{uid}")

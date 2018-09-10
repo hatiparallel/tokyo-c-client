@@ -14,6 +14,9 @@ import android.util.Log
 import android.view.KeyEvent
 import io.realm.Realm
 import io.realm.kotlin.where
+import retrofit2.adapter.rxjava.HttpException
+import rx.android.schedulers.AndroidSchedulers
+import rx.schedulers.Schedulers
 
 class GroupActivity : AppCompatActivity() {
     private lateinit var realm: Realm
@@ -51,9 +54,34 @@ class GroupActivity : AppCompatActivity() {
                 setTitle("Leave Group")
                 setMessage("Really Leave ${groupLeave.name}?")
                 setPositiveButton("OK", DialogInterface.OnClickListener { _, _ ->
-                    realm.executeTransaction {
-                        Log.d("COMM", "leaving ${groupLeave.groupId}")
-                        realm.where<Group>().equalTo("groupId", groupLeave.groupId)?.findFirst()?.deleteFromRealm()
+                    val myUid: String? = FirebaseAuth.getInstance().currentUser?.uid
+                    if (myUid == null) {
+                        Toast.makeText(applicationContext, "sorry, could not get UID", Toast.LENGTH_LONG).show()
+                        Log.d("COMM", "could not get UID")
+                    } else {
+                        Log.d("COMM", "succeeded to get UID: $myUid")
+                        client.leaveGroup(groupLeave.groupId, myUid)
+                                .subscribeOn(Schedulers.io())
+                                .observeOn(AndroidSchedulers.mainThread())
+                                .subscribe({
+                                    realm.executeTransaction {
+                                        Log.d("COMM", "leaving ${groupLeave.groupId}")
+                                        realm.where<Group>().equalTo("groupId", groupLeave.groupId)?.findFirst()?.deleteFromRealm()
+                                    }
+                                    Log.d("COMM", "delete done: ${it.name}")
+                                }, {
+                                    val httpException = it as HttpException
+                                    val httpCode = httpException.code()
+                                    if (httpCode.toInt() == 410) {
+                                        Log.d("COMM", "You were the last participant. See you.")
+                                        realm.executeTransaction {
+                                            Log.d("COMM", "leaving ${groupLeave.groupId}")
+                                            realm.where<Group>().equalTo("groupId", groupLeave.groupId)?.findFirst()?.deleteFromRealm()
+                                        }
+                                    } else {
+                                        Log.d("COMM", "delete failed: ${it.message}")
+                                    }
+                                })
                     }
                 })
                 setNegativeButton("Cancel", null)
