@@ -1,35 +1,20 @@
 package com.tokyoc.line_client
 
 import android.content.DialogInterface
-import android.support.v7.app.AppCompatActivity
-import android.os.Bundle
-import android.widget.Button
 import android.content.Intent
+import android.os.Bundle
 import android.support.v7.app.AlertDialog
 import android.util.Log
+import android.widget.Button
 import android.widget.TextView
-import android.widget.EditText
-import android.widget.Toast
-import com.google.android.gms.tasks.Task
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.AuthResult
-import com.google.firebase.auth.GetTokenResult
-import com.google.gson.FieldNamingPolicy
-import com.google.gson.GsonBuilder
 import com.trello.rxlifecycle.components.support.RxAppCompatActivity
 import com.trello.rxlifecycle.kotlin.bindToLifecycle
 import io.realm.Realm
 import io.realm.kotlin.createObject
 import io.realm.kotlin.where
-import okhttp3.Interceptor
-import okhttp3.OkHttpClient
-import retrofit2.Retrofit
-import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory
-import retrofit2.converter.gson.GsonConverterFactory
 import rx.android.schedulers.AndroidSchedulers
 import rx.schedulers.Schedulers
 import java.io.IOException
-import java.util.concurrent.TimeUnit
 
 class MakePinActivity : RxAppCompatActivity() {
     private lateinit var realm: Realm
@@ -41,31 +26,8 @@ class MakePinActivity : RxAppCompatActivity() {
         realm = Realm.getDefaultInstance()
 
         val pin_show = findViewById<TextView>(R.id.pin)
-
         val token = intent.getStringExtra("token")
-
-        val gson = GsonBuilder()
-                .setDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
-                .setFieldNamingPolicy(FieldNamingPolicy.UPPER_CAMEL_CASE)
-                .setLenient()
-                .create()
-        val authenticatedClient = OkHttpClient().newBuilder()
-                .readTimeout(0, TimeUnit.SECONDS)
-                .addInterceptor(Interceptor { chain ->
-                    chain.proceed(
-                            chain.request()
-                                    .newBuilder()
-                                    .header("Authorization", "Bearer $token")
-                                    .build())
-                })
-                .build()
-        val retrofit = Retrofit.Builder()
-                .client(authenticatedClient)
-                .baseUrl(BuildConfig.BACKEND_BASEURL)
-                .addConverterFactory(GsonConverterFactory.create(gson))
-                .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
-                .build()
-        val client = retrofit.create(Client::class.java)
+        val client = Client.build(token)
 
         client.getPIN()
                 .onBackpressureBuffer()
@@ -75,7 +37,7 @@ class MakePinActivity : RxAppCompatActivity() {
                     rx.Observable.create(rx.Observable.OnSubscribe<PinEvent> {
                         try {
                             while (!source.exhausted()) {
-                                it.onNext(gson.fromJson<PinEvent>(source.readUtf8Line(), PinEvent::class.java))
+                                it.onNext(Client.gson.fromJson<PinEvent>(source.readUtf8Line(), PinEvent::class.java))
                             }
 
                             it.onCompleted()
@@ -93,11 +55,11 @@ class MakePinActivity : RxAppCompatActivity() {
                                 pin_show.text = it.pin.toString()
                             } else if (it.type == "request") {
                                 val uid: String = it.person
-                                client.getPerson(uid)
+                                Member.lookup(uid, client)
                                         .subscribeOn(Schedulers.io())
                                         .observeOn(AndroidSchedulers.mainThread())
                                         .subscribe({
-                                            val member0: Member = it
+                                            val member: Member = it
                                             Log.d("COMM", "get person done: ${it.name}")
                                             AlertDialog.Builder(this).apply {
                                                 setTitle("Friend Request")
@@ -109,12 +71,7 @@ class MakePinActivity : RxAppCompatActivity() {
                                                             .subscribe({
                                                                 Log.d("COMM", "make friends succeeded: ${it.size}")
                                                                 realm.executeTransaction {
-                                                                    val maxId = realm.where<Member>().max("id")
-                                                                    val nextId = (maxId?.toLong() ?: 0L) + 1
-                                                                    val member = realm.createObject<Member>(nextId)
-                                                                    member.userId = member0.userId
-                                                                    member.name = member0.name
-                                                                    member.photo = member0.photo
+                                                                    realm.insert(member)
                                                                     Log.d("COMM", "registered: ${member.name}")
                                                                 }
                                                             }, {

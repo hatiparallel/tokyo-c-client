@@ -1,12 +1,11 @@
 package com.tokyoc.line_client
 
-import android.widget.FrameLayout
 import android.content.Context
 import android.util.AttributeSet
+import android.view.LayoutInflater
+import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.TextView
-import android.view.LayoutInflater
-import android.graphics.Color
 
 // FrameLayoutにより独自のViewを作っている
 class GroupView : FrameLayout {
