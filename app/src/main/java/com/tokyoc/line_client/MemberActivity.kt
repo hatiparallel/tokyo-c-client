@@ -1,17 +1,15 @@
 package com.tokyoc.line_client
 
 import android.content.DialogInterface
-import android.support.v7.app.AppCompatActivity
-import android.os.Bundle
-import android.widget.ListView
-import android.widget.Button
-import android.widget.Toast
 import android.content.Intent
+import android.os.Bundle
 import android.support.v7.app.AlertDialog
+import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import android.view.KeyEvent
-import com.google.gson.GsonBuilder
-
+import android.widget.Button
+import android.widget.ListView
+import android.widget.Toast
 import com.google.firebase.auth.FirebaseAuth
 import io.realm.Realm
 import io.realm.kotlin.where
@@ -45,8 +43,8 @@ class MemberActivity : AppCompatActivity() {
         listView.setOnItemLongClickListener { adapterView, view, position, id ->
             val memberDelete = adapterView.getItemAtPosition(position) as Member
             Log.d("COMM", "Id is ${memberDelete.id}")
-            Log.d("COMM", "userId is ${memberDelete.userId}")
-            client.deleteFriend(memberDelete.userId)
+            Log.d("COMM", "id is ${memberDelete.id}")
+            client.deleteFriend(memberDelete.id)
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe({

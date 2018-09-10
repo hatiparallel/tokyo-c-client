@@ -1,24 +1,32 @@
 package com.tokyoc.line_client
 
-import android.support.v7.app.AppCompatActivity
-import android.os.Bundle
-import android.widget.Button
 import android.content.Intent
-import android.util.Log
-import android.widget.TextView
+import android.os.Bundle
+import android.support.v7.app.AppCompatActivity
+import android.widget.Button
 import android.widget.EditText
+import android.widget.TextView
 import android.widget.Toast
 import com.google.android.gms.tasks.Task
-import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.AuthResult
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GetTokenResult
+import io.realm.Realm
 
 class SigninActivity : AppCompatActivity() {
+    private lateinit var realm: Realm
     val firebase: FirebaseAuth = FirebaseAuth.getInstance()
 
     override fun onCreate(saveInstanceState: Bundle?) {
         super.onCreate(saveInstanceState)
         setContentView(R.layout.activity_signin)
+
+        realm = Realm.getDefaultInstance()
+
+        // とりあえずデバッグ用に全部消す
+        realm.executeTransaction {
+            realm.deleteAll()
+        }
 
         val emailEditText: EditText = findViewById<EditText>(R.id.email_edit_text)
         val passwordEditText: EditText = findViewById<EditText>(R.id.password_edit_text)

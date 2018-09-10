@@ -1,17 +1,16 @@
 package com.tokyoc.line_client
 
 import android.content.DialogInterface
-import android.support.v7.app.AppCompatActivity
-import android.os.Bundle
-import android.widget.ListView
-import android.widget.Button
-import android.widget.Toast
 import android.content.Intent
-
-import com.google.firebase.auth.FirebaseAuth
+import android.os.Bundle
 import android.support.v7.app.AlertDialog
+import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import android.view.KeyEvent
+import android.widget.Button
+import android.widget.ListView
+import android.widget.Toast
+import com.google.firebase.auth.FirebaseAuth
 import io.realm.Realm
 import io.realm.kotlin.where
 import retrofit2.adapter.rxjava.HttpException
@@ -43,7 +42,7 @@ class GroupActivity : AppCompatActivity() {
         listView.setOnItemClickListener { adapterView, view, position, id ->
             val group = groups[position]
             val intent = Intent(this, MessageActivity::class.java)
-            intent.putExtra(EXTRA_GROUP, group?.groupId)
+            intent.putExtra("group", group?.id)
             intent.putExtra("token", getIntent().getStringExtra("token"))
             startActivity(intent)
         }

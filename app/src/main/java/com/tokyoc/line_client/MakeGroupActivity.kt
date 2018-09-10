@@ -2,30 +2,18 @@ package com.tokyoc.line_client
 
 import android.content.Intent
 import android.os.Bundle
-import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import android.widget.Button
 import android.widget.EditText
-import com.google.gson.FieldNamingPolicy
-import com.google.gson.GsonBuilder
 import com.trello.rxlifecycle.components.support.RxAppCompatActivity
 import io.realm.Realm
 import io.realm.kotlin.createObject
 import io.realm.kotlin.where
-import kotlinx.android.synthetic.main.activity_friend_add.*
-import kotlinx.android.synthetic.main.activity_group_make.*
-import okhttp3.Interceptor
-import okhttp3.OkHttpClient
-import retrofit2.Retrofit
-import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory
-import retrofit2.converter.gson.GsonConverterFactory
 import rx.android.schedulers.AndroidSchedulers
 import rx.schedulers.Schedulers
-import java.util.concurrent.TimeUnit
 
 
 class MakeGroupActivity: RxAppCompatActivity() {
-
     private lateinit var realm: Realm
 
     override fun onCreate(saveInstanceState: Bundle?) {
@@ -52,8 +40,8 @@ class MakeGroupActivity: RxAppCompatActivity() {
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe({
-                        Log.d("COMM", "post done: name is ${it.name}, groupId is ${it.groupId}")
-                        val groupId = it.groupId
+                        Log.d("COMM", "post done: name is ${it.name}, id is ${it.id}")
+                        val groupId = it.id
                         realm.executeTransaction {
                             val group = realm.createObject<Group>(groupId)
                             group.name = groupName

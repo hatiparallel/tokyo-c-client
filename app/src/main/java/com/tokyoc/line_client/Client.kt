@@ -15,7 +15,7 @@ import java.util.concurrent.TimeUnit
 
 interface Client {
     companion object {
-        public val gson : Gson =GsonBuilder()
+        public val gson: Gson = GsonBuilder()
                 .setDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
                 .setFieldNamingPolicy(FieldNamingPolicy.UPPER_CAMEL_CASE)
                 .setLenient()
@@ -51,7 +51,7 @@ interface Client {
     @POST("/messages/{channel}") //serverの構造依存
     fun sendMessage(@Path("channel") channel: Int, @Body message: Message): Observable<Message>
 
-
+  
     @Headers("Content-type: application/json")
     @POST("/friendships/")
     fun sendPIN(@Body pin: Int): Observable<String>
@@ -74,17 +74,15 @@ interface Client {
     @Headers("Content-Type: application/json")
     @DELETE("/channels/{channel}/{person}")
     fun leaveGroup(@Path("channel") channel: Int, @Path("person") person: String): Observable<Group>
-
-
+  
+  
     @Headers("Content-Type: application/json")
     @GET("/people/{uid}")
     fun getPerson(@Path("uid") uid: String): Observable<Member>
 
-
     @Headers("Content-Type: application/json")
     @GET("/status")
     fun getStatus(): Observable<Status>
-
 
     @GET("/pin")
     @Streaming
