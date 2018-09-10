@@ -12,6 +12,6 @@ open class Message: RealmObject() {
     var channel: Int = 0
     var author: String = ""
     var isEvent: Int = 0
-    var postedAt: Date = Date()
+    var postedAt: Date = Date(0)
     var content: String = ""
 }
