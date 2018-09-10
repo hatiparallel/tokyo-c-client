@@ -65,7 +65,7 @@ class ChangeImageActivity : AppCompatActivity() {
                                             .build()
                                     firebaseUser?.updateProfile(profileUpdates)
                                             ?.addOnCompleteListener {
-                                                Log.d("COMM", "update success: ${it.result}")
+                                                Log.d("COMM", "update success")
                                                 val intent = Intent(this, ProfileActivity::class.java)
                                                 intent.putExtra("token", token)
                                                 startActivity(intent)
