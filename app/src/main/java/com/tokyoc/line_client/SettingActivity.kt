@@ -22,10 +22,17 @@ class SettingActivity : AppCompatActivity() {
 
         val token = intent.getStringExtra("token")
 
-        //戻るボタンを押した時の処理
-        findViewById<Button>(R.id.return_button).setOnClickListener {
-            val intent = Intent(this, GroupActivity::class.java)
+        //友達ボタンを押した時の処理
+        findViewById<Button>(R.id.friend_button).setOnClickListener {
+            val intent = Intent(this, MemberActivity::class.java)
             intent.putExtra("token", token)
+            startActivity(intent)
+        }
+
+        //groupボタンを押した時にGroupActivityに遷移
+        findViewById<Button>(R.id.group_button).setOnClickListener {
+            val intent = Intent(this, GroupActivity::class.java)
+            intent.putExtra("token", getIntent().getStringExtra("token"))
             startActivity(intent)
         }
 
