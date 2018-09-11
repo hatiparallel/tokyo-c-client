@@ -72,25 +72,17 @@ class MemberActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
-        //サインアウトボタンを押した時の処理
-        findViewById<Button>(R.id.signout_button).setOnClickListener {
-            val intent = Intent(this, SigninActivity::class.java)
-            AlertDialog.Builder(this).apply {
-                setTitle("Sign Out")
-                setMessage("Really Sign Out?")
-                setPositiveButton("OK", DialogInterface.OnClickListener { _, _ ->
-                    FirebaseAuth.getInstance().signOut()
-                    startActivity(intent)
-                })
-                setNegativeButton("Cancel", null)
-                show()
-            }
-        }
-
         //groupボタンを押した時にGroupActivityに遷移
         findViewById<Button>(R.id.group_button).setOnClickListener {
             val intent = Intent(this, GroupActivity::class.java)
             intent.putExtra("token", getIntent().getStringExtra("token"))
+            startActivity(intent)
+        }
+
+        //設定ボタンを押した時の処理
+        findViewById<Button>(R.id.setting_button).setOnClickListener {
+            val intent = Intent(this, SettingActivity::class.java)
+            intent.putExtra("token", token)
             startActivity(intent)
         }
     }
