@@ -17,17 +17,20 @@ class MessageView : FrameLayout {
     constructor(context: Context?, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr)
     constructor(context: Context?, attrs: AttributeSet?, defStyleAttr: Int, defStyleRes: Int) : super(context, attrs, defStyleAttr, defStyleRes)
 
-    var messageProfileImageView: ImageView
+    var authorProfileImageView: ImageView
+    var authorNameTextView: TextView
     var messageTextView: TextView
 
     init {
         LayoutInflater.from(context).inflate(R.layout.view_message, this)
-        messageProfileImageView = findViewById<ImageView>(R.id.message_profile_image_view)
+        authorProfileImageView = findViewById<ImageView>(R.id.author_profile_image_view)
+        authorNameTextView = findViewById<TextView>(R.id.author_name_text_view)
         messageTextView = findViewById<TextView>(R.id.message_text_view)
     }
 
     fun setMessage(message: Message) {
+        authorProfileImageView.setBackgroundColor(Color.GREEN)
+        authorNameTextView.text = "author"
         messageTextView.text = message.content
-        messageProfileImageView.setBackgroundColor(Color.RED)
     }
 }

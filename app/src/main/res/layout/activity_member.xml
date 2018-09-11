@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
@@ -31,14 +32,22 @@
             android:text="設定" />
     </LinearLayout>
 
-    <ListView
-        android:id="@+id/member_list_view"
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="500dp" />
+        android:layout_height="wrap_content">
 
-    <Button
-        android:id="@+id/add_friend_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="友達追加" />
+        <ListView
+            android:id="@+id/member_list_view"
+            android:layout_width="match_parent"
+            android:layout_height="550dp" />
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/add_friend_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="350dp"
+            android:layout_marginTop="490dp"
+            android:src="@android:drawable/ic_input_add"
+            app:backgroundTint="#e2e2e2" />
+    </RelativeLayout>>
 </LinearLayout>
