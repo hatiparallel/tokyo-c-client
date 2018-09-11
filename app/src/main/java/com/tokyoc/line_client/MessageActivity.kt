@@ -22,14 +22,14 @@ class MessageActivity : RxAppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_message)
 
-        //Realmを利用するために必要なもの
-        realm = Realm.getDefaultInstance()
-        val messages = realm.where<Message>().findAll()
-        val listView: ListView = findViewById<ListView>(R.id.message_list_view)
 
         val token = intent.getStringExtra("token")
         val groupId: Int = intent.getIntExtra("groupId", 0)
 
+        //Realmを利用するために必要なもの
+        realm = Realm.getDefaultInstance()
+        val messages = realm.where<Message>().equalTo("channel", groupId).findAll()
+        val listView: ListView = findViewById<ListView>(R.id.message_list_view)
         val group = realm.where<Group>().equalTo("id", groupId).findFirst()
 
         val returnButton = findViewById<Button>(R.id.return_button)
@@ -38,6 +38,7 @@ class MessageActivity : RxAppCompatActivity() {
         val messageEditText = findViewById<EditText>(R.id.message_edit_text)
         val listAdapter = MessageListAdapter(messages)
         val groupName = findViewById<TextView>(R.id.send_user_name_text_view)
+        val memberListButton = findViewById<Button>(R.id.member_list_button)
 
         listView.adapter = listAdapter
         groupName.text = group?.name
@@ -49,6 +50,19 @@ class MessageActivity : RxAppCompatActivity() {
 
         Log.d("COMM", "token: $token")
         Log.d("COMM", "listening /streams/${group?.id}")
+        Log.d("COMM", "members of this group: ${group?.members}")
+
+        var memberList = arrayListOf<String>()
+
+        if (group != null) {
+            for (memberId in group.members) {
+                val member = realm.where<Member>().equalTo("id", memberId).findFirst()
+                Log.d("COMM", "${member?.id}")
+                if (member != null) {
+                    memberList.add(member.id)
+                }
+            }
+        }
 
         client.getMessages(groupId, sinceId.toInt())
                 .flatMap {
@@ -133,6 +147,16 @@ class MessageActivity : RxAppCompatActivity() {
             intent.putExtra("groupId", groupId)
             startActivity(intent)
         }
+
+        // メンバー一覧ボタンを押した時の処理
+        memberListButton.setOnClickListener {
+            val intent = Intent(this, GroupMemberActivity::class.java)
+            intent.putExtra("token", token)
+            intent.putExtra("groupId", groupId)
+            intent.putExtra("members", memberList)
+            startActivity(intent)
+        }
+
     }
 
     //Realmインスタンスを破棄
