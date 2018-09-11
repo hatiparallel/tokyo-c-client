@@ -58,6 +58,10 @@
         <activity
             android:name=".GroupMemberActivity"
             android:label="メンバー"/>
+
+        <activity
+            android:name=".SettingActivity"
+            android:label="設定" />
       
         <service android:name=".PollingService" />
     </application>
