@@ -58,12 +58,11 @@ dependencies {
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
 
-    // 吹き出し型のViewを用いるために必要
-    implementation 'com.daasuu:BubbleLayout:1.0.0'
-
+    // 吹き出しや円形などのUIを作成するために必要なもの
+    implementation 'com.daasuu:BubbleLayout:1.0.0' //こっち使ってないけど一応残しておく
     implementation 'de.hdodenhof:circleimageview:2.2.0'
-
     implementation 'com.android.support:design:28.0.0-rc01'
+    implementation 'com.lguipeng.bubbleview:library:1.0.0'
 
     //retrofit利用のためのもの
     implementation 'io.reactivex:rxandroid:1.2.1'

@@ -2,7 +2,6 @@
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="#c6c6c6"
@@ -10,35 +9,39 @@
     android:orientation="horizontal">
 
     <de.hdodenhof.circleimageview.CircleImageView
-        android:id="@+id/message_profile_image_view"
+        android:id="@+id/author_profile_image_view"
         android:layout_width="40dp"
         android:layout_height="40dp"
         android:layout_marginStart="4dp"
         android:src="@drawable/img001" />
 
-    <com.daasuu.bl.BubbleLayout
-        android:id="@+id/bubble_view"
+    <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="4dp"
-        android:layout_marginBottom="4dp"
-        android:baselineAligned="false"
-        android:padding="8dp"
-        app:bl_arrowDirection="left"
-        app:bl_arrowHeight="8dp"
-        app:bl_arrowPosition="12dp"
-        app:bl_arrowWidth="8dp"
-        app:bl_cornersRadius="18dp"
-        app:bl_strokeWidth="1dp">
+        android:orientation="vertical">
 
         <TextView
+            android:id="@+id/author_name_text_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:layout_marginBottom="0dp"
+            android:text="Aさん"
+            android:textSize="10dp"/>
+
+        <com.github.library.bubbleview.BubbleTextVew
             android:id="@+id/message_text_view"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="4dp"
-            android:background="#fff"
-            android:text="メッセージをここに表示"
-            android:textSize="18dp" />
-    </com.daasuu.bl.BubbleLayout>
+            android:padding="8dp"
+            android:textSize="18dp"
+            android:text="ここにメッセージを表示"
+            app:arrowWidth="10dp"
+            app:arrowHeight="5dp"
+            app:arrowPosition="10dp"
+            app:arrowLocation="left"
+            app:angle="0dp"
+            app:bubbleColor="#FFF" />
+    </LinearLayout>
 
 </LinearLayout>

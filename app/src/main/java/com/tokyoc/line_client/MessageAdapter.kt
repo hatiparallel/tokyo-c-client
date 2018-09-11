@@ -1,6 +1,5 @@
 package com.tokyoc.line_client
 
-import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -24,7 +23,7 @@ class MessageListAdapter(data: OrderedRealmCollection<Message>) : RealmBaseAdapt
         when (convertView) {
             null -> {
                 val inflater = LayoutInflater.from(parent?.context)
-                view = inflater.inflate(R.layout.view_group_message, parent, false)
+                view = inflater.inflate(R.layout.view_message, parent, false)
                 viewHolder = ViewHolder(view)
                 view.tag = viewHolder
             }
