@@ -17,6 +17,10 @@ import android.graphics.BitmapFactory
 import android.os.ParcelFileDescriptor
 import com.google.firebase.storage.StorageReference
 import retrofit2.adapter.rxjava.HttpException
+import java.io.ByteArrayOutputStream
+import android.graphics.drawable.BitmapDrawable
+import com.google.firebase.storage.StorageMetadata
+
 
 class ChangeImageActivity : AppCompatActivity() {
     val firebaseUser:FirebaseUser? = FirebaseAuth.getInstance().currentUser
@@ -25,6 +29,7 @@ class ChangeImageActivity : AppCompatActivity() {
     val image_request_code = 2700
 
     var uri: Uri? = null
+    var ba: ByteArray? = null
 
     override fun onCreate(saveInstanceState: Bundle?) {
         super.onCreate(saveInstanceState)
@@ -45,6 +50,10 @@ class ChangeImageActivity : AppCompatActivity() {
                 Toast.makeText(applicationContext, "画像を選択してください", Toast.LENGTH_LONG).show()
                 return@setOnClickListener
             }
+            if (ba == null) {
+                Toast.makeText(applicationContext, "wow!!!!", Toast.LENGTH_LONG).show()
+                return@setOnClickListener
+            }
 
             val myUid = firebaseUser?.uid
             if (myUid == null) {
@@ -53,7 +62,7 @@ class ChangeImageActivity : AppCompatActivity() {
             }
 
             val imageRef = storageRef.child("images/${myUid}.jpg")
-            imageRef.putFile(uri!!)
+            imageRef.putBytes(ba!!)
                     .addOnSuccessListener {
                         Log.d("COMM", "upload success")
                         imageRef.downloadUrl
@@ -91,7 +100,6 @@ class ChangeImageActivity : AppCompatActivity() {
     }
 
 
-
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         //super.onActivityResult(requestCode, resultCode, data)
         if (requestCode === image_request_code && resultCode === Activity.RESULT_OK) {
@@ -104,7 +112,11 @@ class ChangeImageActivity : AppCompatActivity() {
                 Log.d("COMM", "uri: ${uri.toString()}")
                 try {
                     val bmp = getBitmapFromUri(uri as Uri)
-                    findViewById<ImageView>(R.id.image_view).setImageBitmap(bmp)
+                    val imageView = findViewById<ImageView>(R.id.image_view)
+                    imageView.setImageBitmap(bmp)
+                    val baos: ByteArrayOutputStream = ByteArrayOutputStream()
+                    bmp.compress(Bitmap.CompressFormat.JPEG, 50, baos)
+                    ba = baos.toByteArray()
                 } catch (e: IOException) {
                     e.printStackTrace()
                     Log.d("COMM", "get bitmap error")

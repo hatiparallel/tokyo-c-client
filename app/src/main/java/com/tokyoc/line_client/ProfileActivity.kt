@@ -3,17 +3,17 @@ package com.tokyoc.line_client
 import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
-import android.widget.Button
-import android.widget.EditText
-import android.widget.TextView
-import android.widget.Toast
+import android.widget.*
 import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.*
 import com.google.firebase.storage.FirebaseStorage
+import com.firebase.ui.storage.images.FirebaseImageLoader
+import com.bumptech.glide.Glide
+import com.google.firebase.storage.StorageReference
 
 
 class ProfileActivity : AppCompatActivity() {
-    val storage: FirebaseStorage = FirebaseStorage.getInstance()
+    val storageRef = FirebaseStorage.getInstance().reference
 
     override fun onCreate(saveInstanceState: Bundle?) {
         super.onCreate(saveInstanceState)
@@ -26,6 +26,16 @@ class ProfileActivity : AppCompatActivity() {
             intent.putExtra("token", token)
             startActivity(intent)
         }
+
+        val photo = findViewById<ImageView>(R.id.photo_view)
+        /*
+        val imageRef = storageRef.child("images/{Uid}.jpg")
+
+        Glide.with(this /* context */)
+                .using<StorageReference>(FirebaseImageLoader())
+                .load(imageRef)
+                .into(photo)
+                */
 
         findViewById<Button>(R.id.change_image_button).setOnClickListener() {
             val intent = Intent(this, ChangeImageActivity::class.java)

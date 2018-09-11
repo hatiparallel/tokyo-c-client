@@ -17,8 +17,8 @@
         android:id="@+id/image_view"
         android:scaleType="fitStart"
         android:adjustViewBounds="true"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_width="70sp"
+        android:layout_height="70sp" />
 
 
     <Button

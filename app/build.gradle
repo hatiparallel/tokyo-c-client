@@ -77,6 +77,7 @@ dependencies {
 
     //firebase cloud storage利用のためのもの
     implementation 'com.google.firebase:firebase-storage:16.0.1'
+    implementation 'com.firebaseui:firebase-ui-storage:0.6.0'
 }
 
 apply plugin: 'com.google.gms.google-services'
