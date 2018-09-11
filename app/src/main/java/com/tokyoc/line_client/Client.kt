@@ -74,6 +74,10 @@ interface Client {
     @Headers("Content-Type: application/json")
     @DELETE("/channels/{channel}/{person}")
     fun leaveGroup(@Path("channel") channel: Int, @Path("person") person: String): Observable<Group>
+
+    @Headers("Content-Type: application/json")
+    @POST("/channels/{channel}/")
+    fun inviteMultiplePerson(@Path("channel") channel: Int, @Body people: List<String>): Observable<Group>
   
   
     @Headers("Content-Type: application/json")

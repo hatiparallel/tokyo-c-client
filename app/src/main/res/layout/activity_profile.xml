@@ -3,54 +3,55 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:gravity="center_horizontal">
+    android:gravity="center"
+    android:orientation="vertical">
+
 
     <LinearLayout
-        android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_width="match_parent"
         android:orientation="horizontal"
         android:gravity="center_horizontal">
 
-        <Button
-            android:id="@+id/friend_button"
+        <TextView
+            android:id = "@+id/name_view"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="友達" />
+            android:text="取得中" />
 
         <Button
-            android:id="@+id/group_button"
+            android:id="@+id/change_name_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="グループ" />
+            android:text="名前変更"/>
 
-        <Button
-            android:id="@+id/setting_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="設定" />
     </LinearLayout>
 
-
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:gravity="center_horizontal">
 
-        <Button
-            android:id="@+id/profile_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="500dp"
-            android:text="個人情報変更"/>
+        <ImageView
+            android:id="@+id/photo_view"
+            android:layout_width="70dp"
+            android:layout_height="70dp"
+            android:layout_marginTop="30dp"
+            android:layout_marginBottom="30dp" />
 
         <Button
-        android:id="@+id/signout_button"
+            android:id="@+id/change_image_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="画像変更"/>
+
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/return_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="500dp"
-        android:text="Sign out"/>
-    </LinearLayout>
-
+        android:layout_marginTop="12dp"
+        android:text="戻る" />
 </LinearLayout>

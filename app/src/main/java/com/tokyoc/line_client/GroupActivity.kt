@@ -67,7 +67,6 @@ class GroupActivity : AppCompatActivity() {
                                         Log.d("COMM", "leaving ${groupLeave.id}")
                                         realm.where<Group>().equalTo("id", groupLeave.id)?.findFirst()?.deleteFromRealm()
                                     }
-                                    Log.d("COMM", "delete done: ${it.name}")
                                 }, {
                                     val httpException = it as HttpException
                                     val httpCode = httpException.code()

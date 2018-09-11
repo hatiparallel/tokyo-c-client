@@ -50,6 +50,12 @@ class SettingActivity : AppCompatActivity() {
                 show()
             }
         }
+
+        findViewById<Button>(R.id.profile_button).setOnClickListener {
+            val intent = Intent(this, ProfileActivity::class.java)
+            intent.putExtra("token", token)
+            startActivity(intent)
+        }
     }
 
     override fun onKeyDown(keyCode: Int, event: KeyEvent): Boolean {
