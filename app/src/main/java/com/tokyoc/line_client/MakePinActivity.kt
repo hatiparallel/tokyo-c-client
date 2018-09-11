@@ -71,15 +71,14 @@ class MakePinActivity : RxAppCompatActivity() {
                                                             .observeOn(AndroidSchedulers.mainThread())
                                                             .subscribe({
                                                                 Log.d("COMM", "make friends succeeded: ${it.size}")
-                                                                realm.executeTransaction {
-                                                                    realm.insert(member)
-                                                                    Log.d("COMM", "registered: ${member.name}")
-                                                                }
+                                                                member.isFriend = 1
                                                             }, {
                                                                 Log.d("COMM", "make friends failed: ${it}")
                                                             })
                                                 })
-                                                setNegativeButton("Cancel", null)
+                                                setNegativeButton("Cancel", DialogInterface.OnClickListener { _, _ ->
+                                                    it.deregister()
+                                                })
                                                 show()
                                             }
                                         }, {

@@ -3,20 +3,27 @@ package com.tokyoc.line_client
 import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
+import android.util.Log
 import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
 import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.*
+import io.realm.Realm
+import io.realm.kotlin.createObject
+import java.sql.Date
 
 
 class SignupActivity : AppCompatActivity() {
+    private lateinit var realm: Realm
     val firebase: FirebaseAuth = FirebaseAuth.getInstance()
 
     override fun onCreate(saveInstanceState: Bundle?) {
         super.onCreate(saveInstanceState)
         setContentView(R.layout.activity_signup)
+
+        realm = Realm.getDefaultInstance()
 
         val nameEditText: EditText = findViewById<EditText>(R.id.name_edit_text)
         val emailEditText: EditText = findViewById<EditText>(R.id.email_edit_text)
@@ -69,9 +76,21 @@ class SignupActivity : AppCompatActivity() {
                     if (token == null) {
                         Toast.makeText(applicationContext, "token is null", Toast.LENGTH_LONG).show()
                     } else {
-                        val intent = Intent(this, GroupActivity::class.java)
-                        intent.putExtra("token", token)
-                        startActivity(intent)
+                        val user = firebase.currentUser
+                        if (user != null) {
+                            realm.executeTransaction {
+                                realm.deleteAll()
+                                val self: Member = realm.createObject<Member>(user.uid)
+                                self.name = name
+                                self.isFriend = 0
+                                self.photo = "https://firebasestorage.googleapis.com/v0/b/tokyo-c-client.appspot.com/o/a.jpg?alt=media&token=8534f22a-d164-40fa-8cd1-1d3e6b5a494c"
+                            }
+                            val intent = Intent(this, GroupActivity::class.java)
+                            intent.putExtra("token", token)
+                            startActivity(intent)
+                        } else {
+                            Log.d("COMM", "could not get current user")
+                        }
                     }
                 }
             }
