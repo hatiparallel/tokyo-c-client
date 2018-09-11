@@ -13,7 +13,9 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
-        <activity android:name=".SigninActivity">
+        <activity
+            android:name=".SigninActivity"
+            android:label="Sign In">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -25,25 +27,41 @@
             android:windowSoftInputMode="adjustResize" />
 
         <activity
-            android:name=".MemberActivity" />
+            android:name=".MemberActivity"
+            android:label="友達"/>
 
         <activity
-            android:name=".GroupActivity" />
+            android:name=".GroupActivity"
+            android:label="Group" />
 
         <activity
-            android:name=".SignupActivity" />
-      
-        <activity
-            android:name=".MakeGroupActivity" />
+            android:name=".SignupActivity"
+            android:label="Sign Up"/>
+
 
         <activity
-            android:name=".MakePinActivity" />
+            android:name=".MakeGroupActivity"
+            android:label="グループ作成"/>
 
         <activity
-            android:name=".SendPinActivity" />
+            android:name=".MakePinActivity"
+            android:label="友達追加"/>
 
         <activity
-            android:name=".InviteActivity"/>
+            android:name=".SendPinActivity"
+            android:label="友達追加"/>
+
+        <activity
+            android:name=".InviteActivity"
+            android:label="友達招待"/>
+
+        <activity
+            android:name=".GroupMemberActivity"
+            android:label="メンバー"/>
+
+        <activity
+            android:name=".SettingActivity"
+            android:label="設定" />>
 
         <activity
             android:name=".ProfileActivity" />
@@ -55,6 +73,7 @@
             android:name=".ChangeNameActivity" />
 
             android:name=".GroupMemberActivity" />
+>>>>>>> eb617187e69af1a1bde1f8d89dfceffab5ac984d
       
         <service android:name=".PollingService" />
     </application>

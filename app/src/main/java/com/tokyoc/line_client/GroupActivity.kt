@@ -88,22 +88,6 @@ class GroupActivity : AppCompatActivity() {
             return@setOnItemLongClickListener true
         }
 
-
-        //signoutボタンを押した時の処理
-        findViewById<Button>(R.id.signout_button).setOnClickListener {
-            val intent = Intent(this, SigninActivity::class.java)
-            AlertDialog.Builder(this).apply {
-                setTitle("Sign Out")
-                setMessage("Really Sign Out?")
-                setPositiveButton("OK", DialogInterface.OnClickListener { _, _ ->
-                    FirebaseAuth.getInstance().signOut()
-                    startActivity(intent)
-                })
-                setNegativeButton("Cancel", null)
-                show()
-            }
-        }
-
         //memberボタンを押した時の処理
         findViewById<Button>(R.id.member_button).setOnClickListener {
             val intent = Intent(this, MemberActivity::class.java)
@@ -114,6 +98,13 @@ class GroupActivity : AppCompatActivity() {
         //グループ作成ボタンを押した時の処理
         findViewById<Button>(R.id.make_group_button).setOnClickListener {
             val intent = Intent(this, MakeGroupActivity::class.java)
+            intent.putExtra("token", token)
+            startActivity(intent)
+        }
+
+        //設定ボタンを押した時の処理
+        findViewById<Button>(R.id.setting_button).setOnClickListener {
+            val intent = Intent(this, SettingActivity::class.java)
             intent.putExtra("token", token)
             startActivity(intent)
         }
