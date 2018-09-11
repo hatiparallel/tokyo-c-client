@@ -93,6 +93,17 @@ class MessageActivity : RxAppCompatActivity() {
                             }
                             listView.setSelection(listAdapter.messages0.size)
                             Log.d("COMM", "received")
+                            if (message.isEvent == 1) {
+                                if (message.content == "join") {
+                                    realm.executeTransaction {
+                                        group?.members?.remove(message.author)
+                                    }
+                                } else if (message.content == "leave") {
+                                    realm.executeTransaction {
+                                        group?.members?.add(message.author)
+                                    }
+                                }
+                            }
                         },
                         {
                             Log.d("COMM", "receive failed: $it")

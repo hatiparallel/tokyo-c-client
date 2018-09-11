@@ -68,7 +68,7 @@ class MemberActivity : AppCompatActivity() {
         //友達追加ボタンを押した時の処理
         findViewById<Button>(R.id.add_friend_button).setOnClickListener {
             val intent = Intent(this, SendPinActivity::class.java)
-            intent.putExtra("token", getIntent().getStringExtra("token"))
+            intent.putExtra("token", token)
             startActivity(intent)
         }
 
@@ -90,7 +90,13 @@ class MemberActivity : AppCompatActivity() {
         //groupボタンを押した時にGroupActivityに遷移
         findViewById<Button>(R.id.group_button).setOnClickListener {
             val intent = Intent(this, GroupActivity::class.java)
-            intent.putExtra("token", getIntent().getStringExtra("token"))
+            intent.putExtra("token", token)
+            startActivity(intent)
+        }
+
+        findViewById<Button>(R.id.profile_button).setOnClickListener {
+            val intent = Intent(this, ProfileActivity::class.java)
+            intent.putExtra("token", token)
             startActivity(intent)
         }
     }

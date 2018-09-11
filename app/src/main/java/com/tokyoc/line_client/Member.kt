@@ -51,4 +51,6 @@ open class Member : RealmObject() {
     open var photo: String = ""
 
     open var cached: Date = Date(0)
+
+    open var image: ByteArray = byteArrayOf()
 }
