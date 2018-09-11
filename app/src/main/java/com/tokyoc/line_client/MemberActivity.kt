@@ -3,6 +3,7 @@ package com.tokyoc.line_client
 import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
+import android.support.design.widget.FloatingActionButton
 import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
@@ -66,7 +67,7 @@ class MemberActivity : AppCompatActivity() {
         }
 
         //友達追加ボタンを押した時の処理
-        findViewById<Button>(R.id.add_friend_button).setOnClickListener {
+        findViewById<FloatingActionButton>(R.id.add_friend_button).setOnClickListener {
             val intent = Intent(this, SendPinActivity::class.java)
             intent.putExtra("token", token)
             startActivity(intent)
