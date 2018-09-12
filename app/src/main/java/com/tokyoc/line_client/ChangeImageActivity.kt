@@ -53,45 +53,28 @@ class ChangeImageActivity : AppCompatActivity() {
 
         findViewById<Button>(R.id.decide_button).setOnClickListener() {
             if (ba == null) {
-                Toast.makeText(applicationContext, "wow!!!!", Toast.LENGTH_LONG).show()
+                Toast.makeText(applicationContext, "画像が読み込めていません", Toast.LENGTH_LONG).show()
+                return@setOnClickListener
+            } else if (ba!!.size > 20000) {
+                Toast.makeText(applicationContext, "画像サイズが大きすぎます", Toast.LENGTH_LONG).show()
+                Log.d("COMM", "the image size is too big")
                 return@setOnClickListener
             }
 
-            val myUid = firebaseUser?.uid
-            if (myUid == null) {
+            val self: Member? = realm.where<Member>().equalTo("isFriend", Relation.SELF).findFirst()
+            if (self == null) {
                 Toast.makeText(applicationContext, "ユーザーが認証できていません", Toast.LENGTH_LONG).show()
                 return@setOnClickListener
             }
 
-            val imageRef = storageRef.child("images/${myUid}.jpg")
+            val imageRef = storageRef.child("images/${self.id}.jpg")
             imageRef.putBytes(ba!!)
                     .addOnSuccessListener {
                         Log.d("COMM", "upload success")
-                        imageRef.downloadUrl
-                                .addOnCompleteListener {
-                                    val downloadUrl = it.result
-                                    Log.d("COMM", "get url success: ${downloadUrl}")
-                                    val profileUpdates = UserProfileChangeRequest.Builder()
-                                            .setPhotoUri(downloadUrl)
-                                            .build()
-                                    firebaseUser?.updateProfile(profileUpdates)
-                                            ?.addOnCompleteListener {
-                                                Log.d("COMM", "update success")
-                                                val self: Member? = realm.where<Member>().equalTo("isFriend", Relation.SELF).findFirst()
-                                                realm.executeTransaction {
-                                                    self?.photo = downloadUrl.toString()
-                                                }
-                                                val intent = Intent(this, ProfileActivity::class.java)
-                                                intent.putExtra("token", token)
-                                                startActivity(intent)
-                                            }
-                                            ?.addOnFailureListener {
-                                                Log.d("COMM", "update failure: ${it.message}")
-                                            }
-                                }
-                                .addOnFailureListener {
-                                    Log.d("COMM", "get url failure: ${it.message}")
-                                }
+                        self.updateImage()
+                        val intent = Intent(this, ProfileActivity::class.java)
+                        intent.putExtra("token", token)
+                        startActivity(intent)
                     }
                     .addOnFailureListener {
                         Log.d("COMM", "upload failure: ${it.message}")
@@ -123,6 +106,11 @@ class ChangeImageActivity : AppCompatActivity() {
                     val baos: ByteArrayOutputStream = ByteArrayOutputStream()
                     bmp.compress(Bitmap.CompressFormat.JPEG, 50, baos)
                     ba = baos.toByteArray()
+                    val self = realm.where<Member>().equalTo("isFriend", Relation.SELF).findFirst()
+                    realm.executeTransaction {
+                        self?.image = ba!!
+                    }
+                    Log.d("COMM", "size: ${ba?.size}")
                 } catch (e: IOException) {
                     e.printStackTrace()
                     Log.d("COMM", "get bitmap error")

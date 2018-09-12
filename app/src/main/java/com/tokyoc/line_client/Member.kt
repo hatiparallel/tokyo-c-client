@@ -1,5 +1,7 @@
 package com.tokyoc.line_client
 
+import android.util.Log
+import com.google.firebase.storage.FirebaseStorage
 import com.google.gson.annotations.SerializedName
 import io.realm.Realm
 import io.realm.RealmObject
@@ -27,6 +29,7 @@ open class Member : RealmObject() {
                         client.getPerson(uid).subscribe{
                             cache = it
                             cache.cached = Date()
+                            cache.updateImage()
 
                             realm.insertOrUpdate(cache)
                             subscriber.onNext(cache)
@@ -45,6 +48,34 @@ open class Member : RealmObject() {
                 this.deleteFromRealm()
             }
         }
+    }
+
+    fun updateImage() {
+        val storageRef = FirebaseStorage.getInstance().reference
+        val imageRef = storageRef.child("images/${this.id}.jpg")
+        imageRef.getBytes(20000)
+                .addOnSuccessListener {
+                    Log.d("COMM", "get unique ByteArray Success")
+                    val ba = it
+                    realm.executeTransaction {
+                        this.image = ba
+                    }
+                }
+                .addOnFailureListener {
+                    Log.d("COMM", "get unique ByteArray Failure")
+                    val defaultImageRef = storageRef.child("images/yoda.jpg")
+                    defaultImageRef.getBytes(20000)
+                            .addOnSuccessListener {
+                                Log.d("COMM", "get yoda ByteArray Success")
+                                val ba = it
+                                realm.executeTransaction {
+                                    this.image = ba
+                                }
+                            }
+                            .addOnFailureListener {
+                                Log.d("COMM", "get yoda ByteArray Failure")
+                            }
+                }
     }
 
     @PrimaryKey

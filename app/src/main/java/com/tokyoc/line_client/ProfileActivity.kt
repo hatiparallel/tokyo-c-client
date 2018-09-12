@@ -1,6 +1,7 @@
 package com.tokyoc.line_client
 
 import android.content.Intent
+import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
@@ -38,16 +39,10 @@ class ProfileActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
-        val photo = findViewById<ImageView>(R.id.photo_view)
-
-        val uri = self?.photo ?: "https://firebasestorage.googleapis.com/v0/b/tokyo-c-client.appspot.com/o/a.jpg?alt=media&token=8534f22a-d164-40fa-8cd1-1d3e6b5a494c"
-        Log.d("COMM", "uri: ${uri}")
-
-        Glide.with(this)
-                .load(uri)
-                .fitCenter()
-                .into(photo)
-
+        if (self != null && self.image.size > 0) {
+            findViewById<ImageView>(R.id.photo_view)
+                    .setImageBitmap(BitmapFactory.decodeByteArray(self.image, 0, self.image.size))
+        }
 
         findViewById<Button>(R.id.change_image_button).setOnClickListener() {
             val intent = Intent(this, ChangeImageActivity::class.java)

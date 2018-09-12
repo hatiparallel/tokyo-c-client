@@ -83,7 +83,7 @@ class SignupActivity : AppCompatActivity() {
                                 val self: Member = realm.createObject<Member>(user.uid)
                                 self.name = name
                                 self.isFriend = Relation.SELF
-                                self.photo = "https://firebasestorage.googleapis.com/v0/b/tokyo-c-client.appspot.com/o/images%2Fyoda.jpg?alt=media&token=07092dc3-6ead-432f-94d5-a840be1a9fac"
+                                self.updateImage()
                             }
                             val intent = Intent(this, GroupActivity::class.java)
                             intent.putExtra("token", token)

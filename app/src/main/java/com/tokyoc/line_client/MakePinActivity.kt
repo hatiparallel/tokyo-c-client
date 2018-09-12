@@ -71,7 +71,9 @@ class MakePinActivity : RxAppCompatActivity() {
                                                             .observeOn(AndroidSchedulers.mainThread())
                                                             .subscribe({
                                                                 Log.d("COMM", "make friends succeeded: ${it.size}")
-                                                                member.isFriend = Relation.FRIEND
+                                                                realm.executeTransaction {
+                                                                    member.isFriend = Relation.FRIEND
+                                                                }
                                                             }, {
                                                                 Log.d("COMM", "make friends failed: ${it}")
                                                             })
