@@ -39,13 +39,12 @@ class ProfileActivity : AppCompatActivity() {
         }
 
         val photo = findViewById<ImageView>(R.id.photo_view)
-        //val uid = firebaseUser?.uid ?: "yoda"
-        val uid = "adafdas"
 
-        val imageRef = storageRef.child("images/${uid}.jpg")
+        val uri = self?.photo ?: "https://firebasestorage.googleapis.com/v0/b/tokyo-c-client.appspot.com/o/a.jpg?alt=media&token=8534f22a-d164-40fa-8cd1-1d3e6b5a494c"
+        Log.d("COMM", "uri: ${uri}")
+
         Glide.with(this)
-                .using<StorageReference>(FirebaseImageLoader())
-                .load(imageRef)
+                .load(uri)
                 .fitCenter()
                 .into(photo)
 

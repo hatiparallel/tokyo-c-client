@@ -20,6 +20,8 @@ import retrofit2.adapter.rxjava.HttpException
 import java.io.ByteArrayOutputStream
 import android.graphics.drawable.BitmapDrawable
 import com.google.firebase.storage.StorageMetadata
+import io.realm.Realm
+import io.realm.kotlin.where
 
 
 class ChangeImageActivity : AppCompatActivity() {
@@ -31,11 +33,15 @@ class ChangeImageActivity : AppCompatActivity() {
     var uri: Uri? = null
     var ba: ByteArray? = null
 
+    private lateinit var realm: Realm
+
     override fun onCreate(saveInstanceState: Bundle?) {
         super.onCreate(saveInstanceState)
         setContentView(R.layout.activity_image_change)
 
         val token = intent.getStringExtra("token")
+
+        realm = Realm.getDefaultInstance()
 
         findViewById<Button>(R.id.get_image_button).setOnClickListener() {
             val intent = Intent(Intent.ACTION_OPEN_DOCUMENT)
@@ -71,6 +77,10 @@ class ChangeImageActivity : AppCompatActivity() {
                                     firebaseUser?.updateProfile(profileUpdates)
                                             ?.addOnCompleteListener {
                                                 Log.d("COMM", "update success")
+                                                val self: Member? = realm.where<Member>().equalTo("isFriend", Relation.SELF).findFirst()
+                                                realm.executeTransaction {
+                                                    self?.photo = downloadUrl.toString()
+                                                }
                                                 val intent = Intent(this, ProfileActivity::class.java)
                                                 intent.putExtra("token", token)
                                                 startActivity(intent)

@@ -15,7 +15,6 @@ open class Member : RealmObject() {
     companion object {
         fun lookup(uid: String, client: Client, realm: Realm): rx.Observable<Member> {
             return rx.Observable.create<Member> {
-                val realm = Realm.getDefaultInstance()
                 val subscriber = it
 
                 realm.executeTransaction {
