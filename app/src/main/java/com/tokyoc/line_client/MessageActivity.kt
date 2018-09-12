@@ -3,6 +3,8 @@ package com.tokyoc.line_client
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.view.Menu
+import android.view.MenuItem
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ListView
@@ -157,6 +159,52 @@ class MessageActivity : RxAppCompatActivity() {
             startActivity(intent)
         }
 
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.menu_message, menu)
+        return true
+    }
+
+    // メニューをタップした時の処理
+    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+
+        val token = intent.getStringExtra("token")
+        val groupId: Int = intent.getIntExtra("groupId", 0)
+
+        realm = Realm.getDefaultInstance()
+        val messages = realm.where<Message>().equalTo("channel", groupId).findAll()
+        val listView: ListView = findViewById<ListView>(R.id.message_list_view)
+        val group = realm.where<Group>().equalTo("id", groupId).findFirst()
+
+        var memberList = arrayListOf<String>()
+
+        if (group != null) {
+            for (memberId in group.members) {
+                val member = realm.where<Member>().equalTo("id", memberId).findFirst()
+                Log.d("COMM", "${member?.id}")
+                if (member != null) {
+                    memberList.add(member.id)
+                }
+            }
+        }
+
+        when (item?.itemId) {
+            R.id.member_list -> {
+                val intent = Intent(this, GroupMemberActivity::class.java)
+                intent.putExtra("token", token)
+                intent.putExtra("groupId", groupId)
+                intent.putExtra("members", memberList)
+                startActivity(intent)
+            }
+            R.id.member_invite -> {
+                val intent = Intent(this, InviteActivity::class.java)
+                intent.putExtra("token", token)
+                intent.putExtra("groupId", groupId)
+                startActivity(intent)
+            }
+        }
+        return super.onOptionsItemSelected(item)
     }
 
     //Realmインスタンスを破棄
