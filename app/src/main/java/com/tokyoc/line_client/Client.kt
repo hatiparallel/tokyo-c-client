@@ -43,17 +43,21 @@ interface Client {
         }
     }
 
-    @GET("/messages/{channel}")
+    @GET("/messages")
     @Streaming
-    fun getMessages(@Path("channel") channel: Int, @Query("since_id") since_id: Int = 0): Observable<ResponseBody>
+    fun getMessages(@Query("channel") channel: Int, @Query("since_id") since_id: Int = 0): Observable<ResponseBody>
 
     @Headers("Content-Type: application/json")
-    @POST("/messages/{channel}") //serverの構造依存
-    fun sendMessage(@Path("channel") channel: Int, @Body message: Message): Observable<Message>
+    @POST("/messages") //serverの構造依存
+    fun sendMessage(@Body message: Message): Observable<Message>
 
-  
+    @Headers("Content-Type: application/json")
+    @GET("/messages/{id}")
+    fun getMessage(@Path("id") id: Int): Observable<Message>
+
+
     @Headers("Content-type: application/json")
-    @POST("/friendships/")
+    @POST("/friendships")
     fun sendPIN(@Body pin: Int): Observable<String>
 
     @PUT("/friendships/{person}")
@@ -64,7 +68,7 @@ interface Client {
 
 
     @Headers("Content-Type: application/json")
-    @POST("/channels/") //serverの構造依存
+    @POST("/channels") //serverの構造依存
     fun makeGroup(@Body group: Group): Observable<Group>
 
     @Headers("Content-Type: application/json")
@@ -76,10 +80,10 @@ interface Client {
     fun leaveGroup(@Path("channel") channel: Int, @Path("person") person: String): Observable<Group>
 
     @Headers("Content-Type: application/json")
-    @POST("/channels/{channel}/")
+    @POST("/channels/{channel}")
     fun inviteMultiplePerson(@Path("channel") channel: Int, @Body people: List<String>): Observable<Group>
-  
-  
+
+
     @Headers("Content-Type: application/json")
     @GET("/people/{uid}")
     fun getPerson(@Path("uid") uid: String): Observable<Member>
