@@ -1,6 +1,7 @@
 package com.tokyoc.line_client
 
 import android.util.Log
+import com.google.firebase.storage.FirebaseStorage
 import com.google.gson.annotations.SerializedName
 import io.realm.Realm
 import io.realm.RealmObject
@@ -14,9 +15,8 @@ import java.util.*
 //MemberデータFormat
 open class Member : RealmObject() {
     companion object {
-        fun lookup(uid: String, client: Client): rx.Observable<Member> {
+        fun lookup(uid: String, client: Client, realm: Realm): rx.Observable<Member> {
             return rx.Observable.create<Member> {
-                val realm = Realm.getDefaultInstance()
                 val subscriber = it
                 var cache: Member? = null
 
@@ -31,6 +31,7 @@ open class Member : RealmObject() {
                     try {
                         cache = client.getPerson(uid).toBlocking().single()
                         cache!!.cached = Date()
+                        cache.updateImage()
                         realm.insertOrUpdate(cache)
                     } catch (e: Exception) {
                     }
@@ -42,12 +43,40 @@ open class Member : RealmObject() {
         }
     }
 
-    fun deregister() {
+    fun deregister(realm: Realm) {
         if (this.isFriend == Relation.OTHER && this.groupJoin <= 0) {
             realm.executeTransaction {
                 this.deleteFromRealm()
             }
         }
+    }
+
+    fun updateImage() {
+        val storageRef = FirebaseStorage.getInstance().reference
+        val imageRef = storageRef.child("images/${this.id}.jpg")
+        imageRef.getBytes(20000)
+                .addOnSuccessListener {
+                    Log.d("COMM", "get unique ByteArray Success")
+                    val ba = it
+                    realm.executeTransaction {
+                        this.image = ba
+                    }
+                }
+                .addOnFailureListener {
+                    Log.d("COMM", "get unique ByteArray Failure")
+                    val defaultImageRef = storageRef.child("images/yoda.jpg")
+                    defaultImageRef.getBytes(20000)
+                            .addOnSuccessListener {
+                                Log.d("COMM", "get yoda ByteArray Success")
+                                val ba = it
+                                realm.executeTransaction {
+                                    this.image = ba
+                                }
+                            }
+                            .addOnFailureListener {
+                                Log.d("COMM", "get yoda ByteArray Failure")
+                            }
+                }
     }
 
     @PrimaryKey
@@ -56,9 +85,6 @@ open class Member : RealmObject() {
 
     @SerializedName("DisplayName")
     open var name: String = "Aさん"
-
-    @SerializedName("PhotoURL")
-    open var photo: String = ""
 
     open var cached: Date = Date(0)
 

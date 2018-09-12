@@ -56,7 +56,7 @@ class MakePinActivity : RxAppCompatActivity() {
                                 pin_show.text = it.pin.toString()
                             } else if (it.type == "request") {
                                 val uid: String = it.person
-                                Member.lookup(uid, client)
+                                Member.lookup(uid, client, realm)
                                         .subscribeOn(Schedulers.io())
                                         .observeOn(AndroidSchedulers.mainThread())
                                         .subscribe({
@@ -71,13 +71,15 @@ class MakePinActivity : RxAppCompatActivity() {
                                                             .observeOn(AndroidSchedulers.mainThread())
                                                             .subscribe({
                                                                 Log.d("COMM", "make friends succeeded: ${it.size}")
-                                                                member.isFriend = Relation.FRIEND
+                                                                realm.executeTransaction {
+                                                                    member.isFriend = Relation.FRIEND
+                                                                }
                                                             }, {
                                                                 Log.d("COMM", "make friends failed: ${it}")
                                                             })
                                                 })
                                                 setNegativeButton("Cancel", DialogInterface.OnClickListener { _, _ ->
-                                                    it.deregister()
+                                                    it.deregister(realm)
                                                 })
                                                 show()
                                             }

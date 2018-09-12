@@ -67,7 +67,7 @@ class SigninActivity : AppCompatActivity() {
                                 val self: Member = realm.createObject<Member>(user.uid)
                                 self.name = user?.displayName ?: "default"
                                 self.isFriend = Relation.SELF
-                                self.photo = "https://firebasestorage.googleapis.com/v0/b/tokyo-c-client.appspot.com/o/a.jpg?alt=media&token=8534f22a-d164-40fa-8cd1-1d3e6b5a494c"
+                                self.updateImage()
                             }
                         }
                         val intent = Intent(this, GroupActivity::class.java)

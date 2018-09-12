@@ -1,6 +1,7 @@
 package com.tokyoc.line_client
 
 import android.content.Intent
+import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
@@ -38,17 +39,10 @@ class ProfileActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
-        val photo = findViewById<ImageView>(R.id.photo_view)
-        //val uid = firebaseUser?.uid ?: "yoda"
-        val uid = "adafdas"
-
-        val imageRef = storageRef.child("images/${uid}.jpg")
-        Glide.with(this)
-                .using<StorageReference>(FirebaseImageLoader())
-                .load(imageRef)
-                .fitCenter()
-                .into(photo)
-
+        if (self != null && self.image.size > 0) {
+            findViewById<ImageView>(R.id.photo_view)
+                    .setImageBitmap(BitmapFactory.decodeByteArray(self.image, 0, self.image.size))
+        }
 
         findViewById<Button>(R.id.change_image_button).setOnClickListener() {
             val intent = Intent(this, ChangeImageActivity::class.java)
