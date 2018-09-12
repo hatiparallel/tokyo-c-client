@@ -40,16 +40,12 @@ class ChangeImageActivity : AppCompatActivity() {
         findViewById<Button>(R.id.get_image_button).setOnClickListener() {
             val intent = Intent(Intent.ACTION_OPEN_DOCUMENT)
             intent.addCategory(Intent.CATEGORY_OPENABLE)
-            intent.setType("image/jpeg")
+            intent.setType("image/*")
             startActivityForResult(intent, image_request_code)
         }
 
 
         findViewById<Button>(R.id.decide_button).setOnClickListener() {
-            if (uri == null) {
-                Toast.makeText(applicationContext, "画像を選択してください", Toast.LENGTH_LONG).show()
-                return@setOnClickListener
-            }
             if (ba == null) {
                 Toast.makeText(applicationContext, "wow!!!!", Toast.LENGTH_LONG).show()
                 return@setOnClickListener
