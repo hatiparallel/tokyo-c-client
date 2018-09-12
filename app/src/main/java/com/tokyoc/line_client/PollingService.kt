@@ -42,7 +42,7 @@ class PollingService : IntentService("polling_service") {
                         client.getMessage(summary.messageId)
                                 .observeOn(Schedulers.io())
                                 .subscribe({
-                                    val author = Member.lookup(it.author, client).toBlocking().single()
+                                    val author = Member.lookup(it.author, client, realm).toBlocking().single()
 
                                     var text = ""
 

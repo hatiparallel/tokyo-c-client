@@ -28,6 +28,8 @@ class SettingActivity : AppCompatActivity() {
 
         toolbar = supportActionBar!!
         val bottomNavigation: BottomNavigationView = findViewById(R.id.navigation)
+        val item = bottomNavigation.getMenu().getItem(2)
+        item.setChecked(true)
 
 //        // BottomNavigationBarのItemを押した時の処理（Fragment変更Ver.）
 //        bottomNavigation.setOnNavigationItemSelectedListener {

@@ -32,7 +32,7 @@
 
         <activity
             android:name=".GroupActivity"
-            android:label="Group" />
+            android:label="グループ" />
 
         <activity
             android:name=".SignupActivity"
@@ -61,7 +61,7 @@
 
         <activity
             android:name=".SettingActivity"
-            android:label="設定" />>
+            android:label="設定" />
 
         <activity
             android:name=".ProfileActivity" />
@@ -72,8 +72,6 @@
         <activity
             android:name=".ChangeNameActivity" />
 
-            android:name=".GroupMemberActivity" />
->>>>>>> eb617187e69af1a1bde1f8d89dfceffab5ac984d
       
         <service android:name=".PollingService" />
     </application>
