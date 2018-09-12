@@ -33,6 +33,8 @@ class MemberActivity : AppCompatActivity() {
 
         toolbar = supportActionBar!!
         val bottomNavigation: BottomNavigationView = findViewById(R.id.navigation)
+        val item = bottomNavigation.getMenu().getItem(0)
+        item.setChecked(true)
 
         //Realmを利用するために必要なもの
         realm = Realm.getDefaultInstance()
