@@ -3,7 +3,9 @@ package com.tokyoc.line_client
 import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
+import android.support.design.widget.BottomNavigationView
 import android.support.design.widget.FloatingActionButton
+import android.support.v7.app.ActionBar
 import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
@@ -19,6 +21,7 @@ import rx.schedulers.Schedulers
 
 class MemberActivity : AppCompatActivity() {
     private lateinit var realm: Realm
+    lateinit var toolbar: ActionBar
 
     companion object {
         const val EXTRA_MEMBER = "member"
@@ -27,6 +30,9 @@ class MemberActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_member)
+
+        toolbar = supportActionBar!!
+        val bottomNavigation: BottomNavigationView = findViewById(R.id.navigation)
 
         //Realmを利用するために必要なもの
         realm = Realm.getDefaultInstance()
@@ -66,23 +72,29 @@ class MemberActivity : AppCompatActivity() {
             return@setOnItemLongClickListener true
         }
 
+        bottomNavigation.setOnNavigationItemSelectedListener {
+            when (it.itemId) {
+                R.id.navigation_group -> {
+                    val intent = Intent(this, GroupActivity::class.java)
+                    intent.putExtra("token", token)
+                    startActivity(intent)
+                    Log.d("COMM", "${it.title}")
+                    return@setOnNavigationItemSelectedListener true
+                }
+                R.id.navigation_setting -> {
+                    val intent = Intent(this, SettingActivity::class.java)
+                    intent.putExtra("token", getIntent().getStringExtra("token"))
+                    startActivity(intent)
+                    Log.d("COMM", "${it.title}")
+                    return@setOnNavigationItemSelectedListener true
+                }
+            }
+            false
+        }
+
         //友達追加ボタンを押した時の処理
         findViewById<FloatingActionButton>(R.id.add_friend_button).setOnClickListener {
             val intent = Intent(this, SendPinActivity::class.java)
-            intent.putExtra("token", token)
-            startActivity(intent)
-        }
-
-        //groupボタンを押した時にGroupActivityに遷移
-        findViewById<Button>(R.id.group_button).setOnClickListener {
-            val intent = Intent(this, GroupActivity::class.java)
-            intent.putExtra("token", token)
-            startActivity(intent)
-        }
-
-        //設定ボタンを押した時の処理
-        findViewById<Button>(R.id.setting_button).setOnClickListener {
-            val intent = Intent(this, SettingActivity::class.java)
             intent.putExtra("token", token)
             startActivity(intent)
         }

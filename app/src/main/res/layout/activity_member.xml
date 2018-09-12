@@ -7,30 +7,12 @@
     android:orientation="vertical"
     android:gravity="center">
 
-    <LinearLayout
+    <android.support.design.widget.BottomNavigationView
+        android:id="@+id/navigation"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center_horizontal">
-
-        <Button
-            android:id="@+id/friend_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="友達" />
-
-        <Button
-            android:id="@+id/group_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="グループ" />
-
-        <Button
-            android:id="@+id/setting_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="設定" />
-    </LinearLayout>
+        android:background="?android:attr/windowBackground"
+        app:menu="@menu/navigation"/>
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -49,5 +31,7 @@
             android:layout_marginTop="490dp"
             android:src="@android:drawable/ic_input_add"
             app:backgroundTint="#e2e2e2" />
-    </RelativeLayout>>
+
+    </RelativeLayout>
+
 </LinearLayout>
