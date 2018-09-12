@@ -1,5 +1,6 @@
 package com.tokyoc.line_client
 
+import android.util.Log
 import com.google.gson.annotations.SerializedName
 import io.realm.Realm
 import io.realm.RealmObject
@@ -17,26 +18,24 @@ open class Member : RealmObject() {
             return rx.Observable.create<Member> {
                 val realm = Realm.getDefaultInstance()
                 val subscriber = it
+                var cache: Member? = null
 
                 realm.executeTransaction {
-                    var cache = realm.where<Member>().equalTo("id", uid).findFirst()
+                    cache = realm.where<Member>().equalTo("id", uid).findFirst()
                             ?: realm.createObject<Member>(uid)
 
-                    if (Date().getTime() - cache.cached.getTime() <= 5 * 60 * 1000) {
-                        subscriber.onNext(cache)
-                    } else {
-                        client.getPerson(uid).subscribe{
-                            cache = it
-                            cache.cached = Date()
-
-                            realm.insertOrUpdate(cache)
-                            subscriber.onNext(cache)
-                        }
+                    if (Date().getTime() - cache!!.cached.getTime() <= 5 * 60 * 1000) {
+                        return@executeTransaction
                     }
+
+                    cache = client.getPerson(uid).toBlocking().single()
+                    cache!!.cached = Date()
+                    realm.insertOrUpdate(cache)
                 }
+
+                subscriber.onNext(cache)
+                subscriber.onCompleted()
             }
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
         }
     }
 
