@@ -1,7 +1,10 @@
 package com.tokyoc.line_client
 
+import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
+import android.support.v7.app.ActionBar
+import android.support.v7.app.AlertDialog
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
@@ -19,11 +22,11 @@ import java.io.IOException
 
 class MessageActivity : RxAppCompatActivity() {
     private lateinit var realm: Realm
+    lateinit var toolbar: ActionBar
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_message)
-
 
         val token = intent.getStringExtra("token")
         val groupId: Int = intent.getIntExtra("groupId", 0)
@@ -36,15 +39,18 @@ class MessageActivity : RxAppCompatActivity() {
 
         val returnButton = findViewById<Button>(R.id.return_button)
         val sendButton = findViewById<Button>(R.id.send_button)
-        val inviteButton = findViewById<Button>(R.id.invite_button)
+//        val inviteButton = findViewById<Button>(R.id.invite_button)
         val messageEditText = findViewById<EditText>(R.id.message_edit_text)
         val listAdapter = MessageListAdapter(messages)
         val groupName = findViewById<TextView>(R.id.send_user_name_text_view)
-        val memberListButton = findViewById<Button>(R.id.member_list_button)
+//        val memberListButton = findViewById<Button>(R.id.member_list_button)
 
         listView.adapter = listAdapter
         groupName.text = group?.name
         listView.setSelection(listAdapter.messages0.size)
+
+        toolbar = supportActionBar!!
+        toolbar.title = "${group?.name}"
 
         //通信に使うものたちの定義
         val client = Client.build(token)
@@ -54,17 +60,7 @@ class MessageActivity : RxAppCompatActivity() {
         Log.d("COMM", "listening /streams/${group?.id}")
         Log.d("COMM", "members of this group: ${group?.members}")
 
-        var memberList = arrayListOf<String>()
 
-        if (group != null) {
-            for (memberId in group.members) {
-                val member = realm.where<Member>().equalTo("id", memberId).findFirst()
-                Log.d("COMM", "${member?.id}")
-                if (member != null) {
-                    memberList.add(member.id)
-                }
-            }
-        }
 
         client.getMessages(groupId, sinceId.toInt())
                 .flatMap {
@@ -95,17 +91,37 @@ class MessageActivity : RxAppCompatActivity() {
                             }
                             listView.setSelection(listAdapter.messages0.size)
                             Log.d("COMM", "received")
+
                             if (message.isEvent == 1) {
                                 if (message.content == "join") {
+                                    Member.lookup(message.author, client, realm)
+                                            .subscribeOn(Schedulers.io())
+                                            .observeOn(AndroidSchedulers.mainThread())
+                                            .subscribe({
+                                                val memberCome: Member = it
+                                                realm.executeTransaction {
+                                                    group?.members?.add(message.author)
+                                                    memberCome.groupJoin += 1
+                                                }
+                                                Log.d("COMM", "now ${group?.members?.size} members")
+                                            }, {
+                                                Log.d("COMM", "get person failed: ${it}")
+                                            })
+                                } else if (message.content == "leave") {
+                                    val memberLeft: Member? = realm.where<Member>().equalTo("id", message.author)?.findFirst()
+                                    if (memberLeft != null) {
+                                        realm.executeTransaction {
+                                            memberLeft.groupJoin -= 1
+                                        }
+                                        memberLeft.deregister(realm)
+                                    }
                                     realm.executeTransaction {
                                         group?.members?.remove(message.author)
                                     }
-                                } else if (message.content == "leave") {
-                                    realm.executeTransaction {
-                                        group?.members?.add(message.author)
-                                    }
+                                    Log.d("COMM", "now ${group?.members?.size} members")
                                 }
                             }
+
                         },
                         {
                             Log.d("COMM", "receive failed: $it")
@@ -126,13 +142,14 @@ class MessageActivity : RxAppCompatActivity() {
 
             //通信部分の準備
             val message: Message = Message()
+            message.channel = groupId
             message.content = messageEditText.text.toString()
             messageEditText.setText("", TextView.BufferType.NORMAL)
 
             //ここから通信部分！
             Log.d("COMM", Client.gson.toJson(message))
 
-            client.sendMessage(groupId, message)
+            client.sendMessage(message)
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe({
@@ -142,22 +159,28 @@ class MessageActivity : RxAppCompatActivity() {
                     })
         }
 
-        // 招待ボタンを押した時の処理
-        inviteButton.setOnClickListener {
-            val intent = Intent(this, InviteActivity::class.java)
-            intent.putExtra("token", token)
-            intent.putExtra("groupId", groupId)
-            startActivity(intent)
-        }
-
-        // メンバー一覧ボタンを押した時の処理
-        memberListButton.setOnClickListener {
-            val intent = Intent(this, GroupMemberActivity::class.java)
-            intent.putExtra("token", token)
-            intent.putExtra("groupId", groupId)
-            intent.putExtra("members", memberList)
-            startActivity(intent)
-        }
+//        // 招待ボタンを押した時の処理
+//        inviteButton.setOnClickListener {
+//            val intent = Intent(this, InviteActivity::class.java)
+//            intent.putExtra("token", token)
+//            intent.putExtra("groupId", groupId)
+//            startActivity(intent)
+//        }
+//
+//        // メンバー一覧ボタンを押した時の処理
+//        memberListButton.setOnClickListener {
+//            var memberList = arrayListOf<String>()
+//            if (group != null) {
+//                for (memberId in group.members) {
+//                    memberList.add(memberId)
+//                }
+//            }
+//            val intent = Intent(this, GroupMemberActivity::class.java)
+//            intent.putExtra("token", token)
+//            intent.putExtra("groupId", groupId)
+//            intent.putExtra("members", memberList)
+//            startActivity(intent)
+//        }
 
     }
 
@@ -173,24 +196,16 @@ class MessageActivity : RxAppCompatActivity() {
         val groupId: Int = intent.getIntExtra("groupId", 0)
 
         realm = Realm.getDefaultInstance()
-        val messages = realm.where<Message>().equalTo("channel", groupId).findAll()
-        val listView: ListView = findViewById<ListView>(R.id.message_list_view)
         val group = realm.where<Group>().equalTo("id", groupId).findFirst()
-
-        var memberList = arrayListOf<String>()
-
-        if (group != null) {
-            for (memberId in group.members) {
-                val member = realm.where<Member>().equalTo("id", memberId).findFirst()
-                Log.d("COMM", "${member?.id}")
-                if (member != null) {
-                    memberList.add(member.id)
-                }
-            }
-        }
 
         when (item?.itemId) {
             R.id.member_list -> {
+                var memberList = arrayListOf<String>()
+                if (group != null) {
+                    for (memberId in group.members) {
+                        memberList.add(memberId)
+                    }
+                }
                 val intent = Intent(this, GroupMemberActivity::class.java)
                 intent.putExtra("token", token)
                 intent.putExtra("groupId", groupId)

@@ -1,10 +1,12 @@
 package com.tokyoc.line_client
 
+import android.graphics.BitmapFactory
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import com.bumptech.glide.Glide
 import io.realm.OrderedRealmCollection
 import io.realm.RealmBaseAdapter
 
@@ -35,7 +37,10 @@ class MemberListAdapter(data: OrderedRealmCollection<Member>) : RealmBaseAdapter
         adapterData?.run {
             val member = get(position)
             viewHolder.username.text = member.name
-            viewHolder.userImage.setImageResource(R.drawable.img001)
+            if (member.image.size > 0) {
+                viewHolder.userImage
+                        .setImageBitmap(BitmapFactory.decodeByteArray(member.image, 0, member.image.size))
+            }
         }
         return view
     }

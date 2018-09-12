@@ -56,7 +56,7 @@ class MakePinActivity : RxAppCompatActivity() {
                                 pin_show.text = it.pin.toString()
                             } else if (it.type == "request") {
                                 val uid: String = it.person
-                                Member.lookup(uid, client)
+                                Member.lookup(uid, client, realm)
                                         .subscribeOn(Schedulers.io())
                                         .observeOn(AndroidSchedulers.mainThread())
                                         .subscribe({
@@ -72,14 +72,15 @@ class MakePinActivity : RxAppCompatActivity() {
                                                             .subscribe({
                                                                 Log.d("COMM", "make friends succeeded: ${it.size}")
                                                                 realm.executeTransaction {
-                                                                    realm.insert(member)
-                                                                    Log.d("COMM", "registered: ${member.name}")
+                                                                    member.isFriend = Relation.FRIEND
                                                                 }
                                                             }, {
                                                                 Log.d("COMM", "make friends failed: ${it}")
                                                             })
                                                 })
-                                                setNegativeButton("Cancel", null)
+                                                setNegativeButton("Cancel", DialogInterface.OnClickListener { _, _ ->
+                                                    it.deregister(realm)
+                                                })
                                                 show()
                                             }
                                         }, {

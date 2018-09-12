@@ -15,6 +15,7 @@ import android.widget.ListView
 import android.widget.Toast
 import com.google.firebase.auth.FirebaseAuth
 import io.realm.Realm
+import io.realm.Sort
 import io.realm.kotlin.where
 import retrofit2.adapter.rxjava.HttpException
 import rx.android.schedulers.AndroidSchedulers
@@ -39,7 +40,7 @@ class GroupActivity : AppCompatActivity() {
 
         //Realmのために必要なもの
         realm = Realm.getDefaultInstance()
-        val groups = realm.where<Group>().findAll()
+        val groups = realm.where<Group>().findAll().sort("latest", Sort.DESCENDING)
         val listView: ListView = findViewById(R.id.group_list_view)
         val listAdapter = GroupListAdapter(groups)
         listView.adapter = listAdapter
