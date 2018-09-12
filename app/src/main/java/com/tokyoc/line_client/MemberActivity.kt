@@ -36,7 +36,7 @@ class MemberActivity : AppCompatActivity() {
 
         //Realmを利用するために必要なもの
         realm = Realm.getDefaultInstance()
-        val members = realm.where<Member>().findAll()
+        val members = realm.where<Member>().equalTo("isFriend", 1.toInt()).findAll()
         val listView: ListView = findViewById(R.id.member_list_view)
         val listAdapter = MemberListAdapter(members)
         listView.adapter = listAdapter

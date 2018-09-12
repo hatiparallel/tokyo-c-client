@@ -23,6 +23,7 @@
             android:id="@+id/change_name_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
             android:text="名前変更"/>
 
     </LinearLayout>
@@ -44,6 +45,8 @@
             android:id="@+id/change_image_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginTop="40dp"
+            android:layout_marginLeft="20dp"
             android:text="画像変更"/>
 
     </LinearLayout>

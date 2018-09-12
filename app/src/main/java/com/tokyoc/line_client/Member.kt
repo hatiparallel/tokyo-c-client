@@ -40,6 +40,14 @@ open class Member : RealmObject() {
         }
     }
 
+    fun deregister() {
+        if (this.isFriend == Relation.OTHER && this.groupJoin <= 0) {
+            realm.executeTransaction {
+                this.deleteFromRealm()
+            }
+        }
+    }
+
     @PrimaryKey
     @SerializedName("UID")
     open var id: String = "A"
@@ -51,6 +59,12 @@ open class Member : RealmObject() {
     open var photo: String = ""
 
     open var cached: Date = Date(0)
+
+    open var isFriend: Int = Relation.OTHER
+    // self: 0, friend: 1, others: 2
+
+    open var groupJoin: Int = 0
+    // if isFriend == 2 and groupCommon == 0 then he should be deloted from realm
 
     open var image: ByteArray = byteArrayOf()
 }

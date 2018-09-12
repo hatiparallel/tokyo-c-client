@@ -1,7 +1,9 @@
 package com.tokyoc.line_client
 
+import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
+import android.support.v7.app.AlertDialog
 import android.util.Log
 import android.widget.Button
 import android.widget.EditText
@@ -52,17 +54,7 @@ class MessageActivity : RxAppCompatActivity() {
         Log.d("COMM", "listening /streams/${group?.id}")
         Log.d("COMM", "members of this group: ${group?.members}")
 
-        var memberList = arrayListOf<String>()
 
-        if (group != null) {
-            for (memberId in group.members) {
-                val member = realm.where<Member>().equalTo("id", memberId).findFirst()
-                Log.d("COMM", "${member?.id}")
-                if (member != null) {
-                    memberList.add(member.id)
-                }
-            }
-        }
 
         client.getMessages(groupId, sinceId.toInt())
                 .flatMap {
@@ -93,17 +85,34 @@ class MessageActivity : RxAppCompatActivity() {
                             }
                             listView.setSelection(listAdapter.messages0.size)
                             Log.d("COMM", "received")
+
                             if (message.isEvent == 1) {
                                 if (message.content == "join") {
+                                    Member.lookup(message.author, client)
+                                            .subscribeOn(Schedulers.io())
+                                            .observeOn(AndroidSchedulers.mainThread())
+                                            .subscribe({
+                                                it.groupJoin += 1
+                                                realm.executeTransaction {
+                                                    group?.members?.add(message.author)
+                                                }
+                                                Log.d("COMM", "now ${group?.members?.size} members")
+                                            }, {
+                                                Log.d("COMM", "get person failed: ${it}")
+                                            })
+                                } else if (message.content == "leave") {
+                                    val memberLeft: Member? = realm.where<Member>().equalTo("id", message.author)?.findFirst()
+                                    if (memberLeft != null) {
+                                        memberLeft.groupJoin -= 1
+                                        memberLeft.deregister()
+                                    }
                                     realm.executeTransaction {
                                         group?.members?.remove(message.author)
                                     }
-                                } else if (message.content == "leave") {
-                                    realm.executeTransaction {
-                                        group?.members?.add(message.author)
-                                    }
+                                    Log.d("COMM", "now ${group?.members?.size} members")
                                 }
                             }
+
                         },
                         {
                             Log.d("COMM", "receive failed: $it")
@@ -151,6 +160,12 @@ class MessageActivity : RxAppCompatActivity() {
 
         // メンバー一覧ボタンを押した時の処理
         memberListButton.setOnClickListener {
+            var memberList = arrayListOf<String>()
+            if (group != null) {
+                for (memberId in group.members) {
+                    memberList.add(memberId)
+                }
+            }
             val intent = Intent(this, GroupMemberActivity::class.java)
             intent.putExtra("token", token)
             intent.putExtra("groupId", groupId)
