@@ -37,20 +37,16 @@ class MessageActivity : RxAppCompatActivity() {
         val listView: ListView = findViewById<ListView>(R.id.message_list_view)
         val group = realm.where<Group>().equalTo("id", groupId).findFirst()
 
-        val returnButton = findViewById<Button>(R.id.return_button)
         val sendButton = findViewById<Button>(R.id.send_button)
-//        val inviteButton = findViewById<Button>(R.id.invite_button)
         val messageEditText = findViewById<EditText>(R.id.message_edit_text)
         val listAdapter = MessageListAdapter(messages)
-        val groupName = findViewById<TextView>(R.id.send_user_name_text_view)
-//        val memberListButton = findViewById<Button>(R.id.member_list_button)
 
         listView.adapter = listAdapter
-        groupName.text = group?.name
         listView.setSelection(listAdapter.messages0.size)
 
         toolbar = supportActionBar!!
         toolbar.title = "${group?.name}"
+        toolbar.setDisplayHomeAsUpEnabled(true)
 
         //通信に使うものたちの定義
         val client = Client.build(token)
@@ -127,13 +123,6 @@ class MessageActivity : RxAppCompatActivity() {
                             Log.d("COMM", "receive failed: $it")
                         })
 
-        // ボタンをクリックしたらGroup画面に遷移
-        returnButton.setOnClickListener {
-            val intent = Intent(this, GroupActivity::class.java)
-            intent.putExtra("token", token)
-            startActivity(intent)
-        }
-
         // 送信ボタンをタップした時の処理
         sendButton.setOnClickListener {
             if (messageEditText.text.isEmpty()) {
@@ -158,30 +147,6 @@ class MessageActivity : RxAppCompatActivity() {
                         Log.d("COMM", "post failed: ${it}")
                     })
         }
-
-//        // 招待ボタンを押した時の処理
-//        inviteButton.setOnClickListener {
-//            val intent = Intent(this, InviteActivity::class.java)
-//            intent.putExtra("token", token)
-//            intent.putExtra("groupId", groupId)
-//            startActivity(intent)
-//        }
-//
-//        // メンバー一覧ボタンを押した時の処理
-//        memberListButton.setOnClickListener {
-//            var memberList = arrayListOf<String>()
-//            if (group != null) {
-//                for (memberId in group.members) {
-//                    memberList.add(memberId)
-//                }
-//            }
-//            val intent = Intent(this, GroupMemberActivity::class.java)
-//            intent.putExtra("token", token)
-//            intent.putExtra("groupId", groupId)
-//            intent.putExtra("members", memberList)
-//            startActivity(intent)
-//        }
-
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -199,6 +164,11 @@ class MessageActivity : RxAppCompatActivity() {
         val group = realm.where<Group>().equalTo("id", groupId).findFirst()
 
         when (item?.itemId) {
+            android.R.id.home -> {
+                val intent = Intent(this, GroupActivity::class.java)
+                intent.putExtra("token", token)
+                startActivity(intent)
+            }
             R.id.member_list -> {
                 var memberList = arrayListOf<String>()
                 if (group != null) {
