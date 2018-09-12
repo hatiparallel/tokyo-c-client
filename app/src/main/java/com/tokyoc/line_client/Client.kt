@@ -52,7 +52,7 @@ interface Client {
     fun sendMessage(@Body message: Message): Observable<Message>
 
     @Headers("Content-Type: application/json")
-    @POST("/messages/{id}")
+    @GET("/messages/{id}")
     fun getMessage(@Path("id") id: Int): Observable<Message>
 
 
