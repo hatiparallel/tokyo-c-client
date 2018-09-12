@@ -9,7 +9,7 @@ android {
     compileSdkVersion 28
     defaultConfig {
         applicationId "com.tokyoc.line_client"
-        minSdkVersion 21
+        minSdkVersion 26
         targetSdkVersion 28
 
         versionCode 1
@@ -34,7 +34,6 @@ android {
             dimension "environment"
             buildConfigField "String", "BACKEND_BASEURL", "\"http://10.0.2.2/\""
         }
-
         production {
             dimension "environment"
             buildConfigField "String", "BACKEND_BASEURL", "\"http://ec2-52-192-189-123.ap-northeast-1.compute.amazonaws.com/\""
@@ -45,37 +44,32 @@ android {
 dependencies {
     implementation 'io.realm:android-adapters:2.1.1'
     implementation "org.jetbrains.anko:anko-common:$anko_version"
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation 'com.android.support:appcompat-v7:28.0.0-rc01'
     implementation 'com.android.support.constraint:constraint-layout:1.1.2'
-
     //firebase利用のため追加
-    implementation "com.google.firebase:firebase-core:16.0.1"
+    implementation 'com.google.firebase:firebase-core:16.0.1'
     implementation 'com.google.firebase:firebase-auth:16.0.3'
-
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
-
     // 吹き出しや円形などのUIを作成するために必要なもの
-    implementation 'com.daasuu:BubbleLayout:1.0.0' //こっち使ってないけど一応残しておく
+    implementation 'com.daasuu:BubbleLayout:1.0.0'
+    //こっち使ってないけど一応残しておく
     implementation 'de.hdodenhof:circleimageview:2.2.0'
     implementation 'com.android.support:design:28.0.0-rc01'
     implementation 'com.lguipeng.bubbleview:library:1.0.0'
-
     //retrofit利用のためのもの
     implementation 'io.reactivex:rxandroid:1.2.1'
     def retrofitVersion = '2.0.2'
     implementation "com.squareup.retrofit2:retrofit:$retrofitVersion"
     implementation "com.squareup.retrofit2:adapter-rxjava:$retrofitVersion"
     implementation "com.squareup.retrofit2:converter-gson:$retrofitVersion"
-
     //rxlifeycle利用のためのもの
     def rxlifecycleVersion = '0.6.1'
     implementation "com.trello:rxlifecycle-kotlin:$rxlifecycleVersion"
     implementation "com.trello:rxlifecycle-components:$rxlifecycleVersion"
-
     //firebase cloud storage利用のためのもの
     implementation 'com.google.firebase:firebase-storage:16.0.1'
     implementation 'com.firebaseui:firebase-ui-storage:0.6.0'

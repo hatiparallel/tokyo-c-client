@@ -18,27 +18,28 @@ open class Member : RealmObject() {
         fun lookup(uid: String, client: Client, realm: Realm): rx.Observable<Member> {
             return rx.Observable.create<Member> {
                 val subscriber = it
+                var cache: Member? = null
 
                 realm.executeTransaction {
-                    var cache = realm.where<Member>().equalTo("id", uid).findFirst()
+                    cache = realm.where<Member>().equalTo("id", uid).findFirst()
                             ?: realm.createObject<Member>(uid)
 
-                    if (Date().getTime() - cache.cached.getTime() <= 5 * 60 * 1000) {
-                        subscriber.onNext(cache)
-                    } else {
-                        client.getPerson(uid).subscribe{
-                            cache = it
-                            cache.cached = Date()
-                            cache.updateImage()
+                    if (Date().getTime() - cache!!.cached.getTime() <= 5 * 60 * 1000) {
+                        return@executeTransaction
+                    }
 
-                            realm.insertOrUpdate(cache)
-                            subscriber.onNext(cache)
-                        }
+                    try {
+                        cache = client.getPerson(uid).toBlocking().single()
+                        cache!!.cached = Date()
+                        cache.updateImage()
+                        realm.insertOrUpdate(cache)
+                    } catch (e: Exception) {
                     }
                 }
+
+                subscriber.onNext(cache)
+                subscriber.onCompleted()
             }
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
         }
     }
 
