@@ -1,38 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:gravity="center_horizontal">
 
-    <LinearLayout
+    <android.support.design.widget.BottomNavigationView
+        android:id="@+id/navigation"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center_horizontal">
-
-        <Button
-            android:id="@+id/friend_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="友達" />
-
-        <Button
-            android:id="@+id/group_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="グループ" />
-
-        <Button
-            android:id="@+id/setting_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="設定" />
-    </LinearLayout>
-
+        android:background="?android:attr/windowBackground"
+        app:menu="@menu/navigation"/>
 
     <LinearLayout
+        android:id="@+id/container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
@@ -51,6 +34,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="500dp"
         android:text="Sign out"/>
+
     </LinearLayout>
 
 </LinearLayout>
