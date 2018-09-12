@@ -28,9 +28,12 @@ open class Member : RealmObject() {
                         return@executeTransaction
                     }
 
-                    cache = client.getPerson(uid).toBlocking().single()
-                    cache!!.cached = Date()
-                    realm.insertOrUpdate(cache)
+                    try {
+                        cache = client.getPerson(uid).toBlocking().single()
+                        cache!!.cached = Date()
+                        realm.insertOrUpdate(cache)
+                    } catch (e: Exception) {
+                    }
                 }
 
                 subscriber.onNext(cache)
