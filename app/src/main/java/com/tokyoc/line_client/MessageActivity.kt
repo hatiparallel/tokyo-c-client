@@ -124,13 +124,14 @@ class MessageActivity : RxAppCompatActivity() {
 
             //通信部分の準備
             val message: Message = Message()
+            message.channel = groupId
             message.content = messageEditText.text.toString()
             messageEditText.setText("", TextView.BufferType.NORMAL)
 
             //ここから通信部分！
             Log.d("COMM", Client.gson.toJson(message))
 
-            client.sendMessage(groupId, message)
+            client.sendMessage(message)
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe({
