@@ -28,7 +28,7 @@ class ChangeNameActivity : AppCompatActivity() {
         val nameEditText = findViewById<EditText>(R.id.new_name_edit_text)
 
         realm = Realm.getDefaultInstance()
-        val self = realm.where<Member>().equalTo("isFriend", 0.toInt()).findFirst()
+        val self = realm.where<Member>().equalTo("isFriend", Relation.SELF).findFirst()
         findViewById<TextView>(R.id.name_view).text = self?.name ?: "取得失敗"
 
         findViewById<Button>(R.id.decide_button).setOnClickListener() {

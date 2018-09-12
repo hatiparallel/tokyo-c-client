@@ -41,7 +41,7 @@ open class Member : RealmObject() {
     }
 
     fun deregister() {
-        if (this.isFriend == 2 && this.groupJoin <= 0) {
+        if (this.isFriend == Relation.OTHER && this.groupJoin <= 0) {
             realm.executeTransaction {
                 this.deleteFromRealm()
             }
@@ -60,7 +60,7 @@ open class Member : RealmObject() {
 
     open var cached: Date = Date(0)
 
-    open var isFriend: Int = 2
+    open var isFriend: Int = Relation.OTHER
     // self: 0, friend: 1, others: 2
 
     open var groupJoin: Int = 0
