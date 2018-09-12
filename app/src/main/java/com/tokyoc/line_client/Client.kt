@@ -48,7 +48,7 @@ interface Client {
     fun getMessages(@Query("channel") channel: Int, @Query("since_id") since_id: Int = 0): Observable<ResponseBody>
 
     @Headers("Content-Type: application/json")
-    @POST("/messages") //serverの構造依存
+    @POST("/messages")
     fun sendMessage(@Body message: Message): Observable<Message>
 
     @Headers("Content-Type: application/json")
@@ -68,7 +68,7 @@ interface Client {
 
 
     @Headers("Content-Type: application/json")
-    @POST("/channels") //serverの構造依存
+    @POST("/channels")
     fun makeGroup(@Body group: Group): Observable<Group>
 
     @Headers("Content-Type: application/json")

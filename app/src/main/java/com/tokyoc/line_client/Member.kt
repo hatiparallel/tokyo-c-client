@@ -85,9 +85,6 @@ open class Member : RealmObject() {
     @SerializedName("DisplayName")
     open var name: String = "Aさん"
 
-    @SerializedName("PhotoURL")
-    open var photo: String = ""
-
     open var cached: Date = Date(0)
 
     open var isFriend: Int = Relation.OTHER
