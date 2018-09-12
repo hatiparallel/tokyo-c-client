@@ -43,7 +43,9 @@ class ChangeNameActivity : AppCompatActivity() {
             firebaseUser?.updateProfile(profileUpdates)
                     ?.addOnCompleteListener {
                         Log.d("COMM", "update success")
-                        self?.name = newName
+                        realm.executeTransaction {
+                            self?.name = newName
+                        }
                         val intent = Intent(this, ProfileActivity::class.java)
                         intent.putExtra("token", token)
                         startActivity(intent)

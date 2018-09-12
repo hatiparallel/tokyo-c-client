@@ -13,7 +13,7 @@ import java.util.*
 //MemberデータFormat
 open class Member : RealmObject() {
     companion object {
-        fun lookup(uid: String, client: Client): rx.Observable<Member> {
+        fun lookup(uid: String, client: Client, realm: Realm): rx.Observable<Member> {
             return rx.Observable.create<Member> {
                 val realm = Realm.getDefaultInstance()
                 val subscriber = it
@@ -40,7 +40,7 @@ open class Member : RealmObject() {
         }
     }
 
-    fun deregister() {
+    fun deregister(realm: Realm) {
         if (this.isFriend == Relation.OTHER && this.groupJoin <= 0) {
             realm.executeTransaction {
                 this.deleteFromRealm()

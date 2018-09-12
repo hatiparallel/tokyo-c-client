@@ -88,13 +88,14 @@ class MessageActivity : RxAppCompatActivity() {
 
                             if (message.isEvent == 1) {
                                 if (message.content == "join") {
-                                    Member.lookup(message.author, client)
+                                    Member.lookup(message.author, client, realm)
                                             .subscribeOn(Schedulers.io())
                                             .observeOn(AndroidSchedulers.mainThread())
                                             .subscribe({
-                                                it.groupJoin += 1
+                                                val memberCome: Member = it
                                                 realm.executeTransaction {
                                                     group?.members?.add(message.author)
+                                                    memberCome.groupJoin += 1
                                                 }
                                                 Log.d("COMM", "now ${group?.members?.size} members")
                                             }, {
@@ -103,8 +104,10 @@ class MessageActivity : RxAppCompatActivity() {
                                 } else if (message.content == "leave") {
                                     val memberLeft: Member? = realm.where<Member>().equalTo("id", message.author)?.findFirst()
                                     if (memberLeft != null) {
-                                        memberLeft.groupJoin -= 1
-                                        memberLeft.deregister()
+                                        realm.executeTransaction {
+                                            memberLeft.groupJoin -= 1
+                                        }
+                                        memberLeft.deregister(realm)
                                     }
                                     realm.executeTransaction {
                                         group?.members?.remove(message.author)
