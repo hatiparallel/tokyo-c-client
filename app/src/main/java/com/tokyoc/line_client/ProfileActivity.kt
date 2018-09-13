@@ -5,6 +5,8 @@ import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
+import android.view.Menu
+import android.view.MenuItem
 import android.widget.*
 import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.*
@@ -28,32 +30,43 @@ class ProfileActivity : AppCompatActivity() {
         setContentView(R.layout.activity_profile)
 
         val token = intent.getStringExtra("token")
+        val toolbar = supportActionBar!!
+        toolbar.setDisplayHomeAsUpEnabled(true)
 
         realm = Realm.getDefaultInstance()
         val self = realm.where<Member>().equalTo("isFriend", 0.toInt()).findFirst()
         findViewById<TextView>(R.id.name_view).text = self?.name ?: "取得失敗"
 
-        findViewById<Button>(R.id.change_name_button).setOnClickListener() {
-            val intent = Intent(this, ChangeNameActivity::class.java)
-            intent.putExtra("token", token)
-            startActivity(intent)
-        }
-
         if (self != null && self.image.size > 0) {
             findViewById<ImageView>(R.id.photo_view)
                     .setImageBitmap(BitmapFactory.decodeByteArray(self.image, 0, self.image.size))
         }
+    }
 
-        findViewById<Button>(R.id.change_image_button).setOnClickListener() {
-            val intent = Intent(this, ChangeImageActivity::class.java)
-            intent.putExtra("token", token)
-            startActivity(intent)
-        }
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.menu_profile, menu)
+        return super.onCreateOptionsMenu(menu)
+    }
 
-        findViewById<TextView>(R.id.return_button).setOnClickListener() {
-            val intent = Intent(this, SettingActivity::class.java)
-            intent.putExtra("token", token)
-            startActivity(intent)
+    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+        val token = intent.getStringExtra("token")
+        when (item?.itemId) {
+            android.R.id.home -> {
+                val intent = Intent(this, SettingActivity::class.java)
+                intent.putExtra("token", token)
+                startActivity(intent)
+            }
+            R.id.change_image -> {
+                val intent = Intent(this, ChangeImageActivity::class.java)
+                intent.putExtra("token", token)
+                startActivity(intent)
+            }
+            R.id.change_name -> {
+                val intent = Intent(this, ChangeNameActivity::class.java)
+                intent.putExtra("token", token)
+                startActivity(intent)
+            }
         }
+        return super.onOptionsItemSelected(item)
     }
 }

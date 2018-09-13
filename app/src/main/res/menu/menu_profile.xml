@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/change_image"
+        android:title="画像変更" />
+
+    <item
+        android:id="@+id/change_name"
+        android:title="名前変更" />
+
+</menu>

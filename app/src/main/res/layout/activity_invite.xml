@@ -26,13 +26,6 @@
         android:orientation="horizontal"
         android:gravity="center">
 
-
-        <Button
-            android:id="@+id/return_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="戻る" />
-
         <Button
             android:id="@+id/decide_button"
             android:layout_width="wrap_content"

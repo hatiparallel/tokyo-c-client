@@ -11,6 +11,7 @@ import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import android.view.KeyEvent
 import android.widget.Button
+import android.widget.ImageButton
 import android.widget.ListView
 import android.widget.Toast
 import com.google.firebase.auth.FirebaseAuth
@@ -78,7 +79,7 @@ class SettingActivity : AppCompatActivity() {
         }
 
         //サインアウトボタンを押した時の処理
-        findViewById<Button>(R.id.signout_button).setOnClickListener {
+        findViewById<ImageButton>(R.id.signout_button).setOnClickListener {
             val intent = Intent(this, SigninActivity::class.java)
             AlertDialog.Builder(this).apply {
                 setTitle("Sign Out")
@@ -93,7 +94,7 @@ class SettingActivity : AppCompatActivity() {
         }
 
         // 個人情報変更ボタンを押した時の処理
-        findViewById<Button>(R.id.profile_button).setOnClickListener {
+        findViewById<ImageButton>(R.id.profile_button).setOnClickListener {
             val intent = Intent(this, ProfileActivity::class.java)
             intent.putExtra("token", token)
             startActivity(intent)
