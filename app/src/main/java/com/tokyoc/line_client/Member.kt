@@ -31,7 +31,7 @@ open class Member : RealmObject() {
                     try {
                         cache = client.getPerson(uid).toBlocking().single()
                         cache!!.cached = Date()
-                        cache.updateImage()
+                        cache!!.updateImage()
                         realm.insertOrUpdate(cache)
                     } catch (e: Exception) {
                     }
