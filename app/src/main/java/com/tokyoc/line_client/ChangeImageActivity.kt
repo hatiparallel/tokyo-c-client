@@ -19,6 +19,7 @@ import com.google.firebase.storage.StorageReference
 import retrofit2.adapter.rxjava.HttpException
 import java.io.ByteArrayOutputStream
 import android.graphics.drawable.BitmapDrawable
+import android.view.MenuItem
 import com.google.firebase.storage.StorageMetadata
 import io.realm.Realm
 import io.realm.kotlin.where
@@ -40,6 +41,9 @@ class ChangeImageActivity : AppCompatActivity() {
         setContentView(R.layout.activity_image_change)
 
         val token = intent.getStringExtra("token")
+
+        val toolbar = supportActionBar!!
+        toolbar.setDisplayHomeAsUpEnabled(true)
 
         realm = Realm.getDefaultInstance()
 
@@ -80,12 +84,18 @@ class ChangeImageActivity : AppCompatActivity() {
                         Log.d("COMM", "upload failure: ${it.message}")
                     }
         }
+    }
 
-        findViewById<TextView>(R.id.return_button).setOnClickListener() {
-            val intent = Intent(this, ProfileActivity::class.java)
-            intent.putExtra("token", token)
-            startActivity(intent)
+    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+        val token = intent.getStringExtra("token")
+        when (item?.itemId) {
+            android.R.id.home -> {
+                val intent = Intent(this, ProfileActivity::class.java)
+                intent.putExtra("token", token)
+                startActivity(intent)
+            }
         }
+        return super.onOptionsItemSelected(item)
     }
 
 

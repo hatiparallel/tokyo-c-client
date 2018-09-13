@@ -5,6 +5,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AlertDialog
 import android.util.Log
+import android.view.MenuItem
 import android.widget.Button
 import android.widget.TextView
 import com.trello.rxlifecycle.components.support.RxAppCompatActivity
@@ -27,6 +28,9 @@ class MakePinActivity : RxAppCompatActivity() {
 
         val pin_show = findViewById<TextView>(R.id.pin)
         val token = intent.getStringExtra("token")
+
+        val toolbar = supportActionBar!!
+        toolbar.setDisplayHomeAsUpEnabled(true)
 
         val client = Client.build(token)
 
@@ -102,11 +106,17 @@ class MakePinActivity : RxAppCompatActivity() {
                                 show()
                             }
                         })
+    }
 
-        findViewById<Button>(R.id.return_button).setOnClickListener {
-            val intent = Intent(this, MemberActivity::class.java)
-            intent.putExtra("token", token)
-            startActivity(intent)
+    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+        val token = intent.getStringExtra("token")
+        when (item?.itemId) {
+            android.R.id.home -> {
+                val intent = Intent(this, MemberActivity::class.java)
+                intent.putExtra("token", token)
+                startActivity(intent)
+            }
         }
+        return super.onOptionsItemSelected(item)
     }
 }

@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
+import android.view.MenuItem
 import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
@@ -25,6 +26,9 @@ class SendPinActivity : AppCompatActivity() {
         setContentView(R.layout.activity_pin_send)
 
         val token = intent.getStringExtra("token")
+
+        val toolbar = supportActionBar!!
+        toolbar.setDisplayHomeAsUpEnabled(true)
 
         val client = Client.build(token)
 
@@ -55,11 +59,17 @@ class SendPinActivity : AppCompatActivity() {
             intent.putExtra("token", token)
             startActivity(intent)
         }
+    }
 
-        findViewById<TextView>(R.id.return_button).setOnClickListener {
-            val intent = Intent(this, MemberActivity::class.java)
-            intent.putExtra("token", token)
-            startActivity(intent)
+    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+        val token = intent.getStringExtra("token")
+        when (item?.itemId) {
+            android.R.id.home -> {
+                val intent = Intent(this, MemberActivity::class.java)
+                intent.putExtra("token", token)
+                startActivity(intent)
+            }
         }
+        return super.onOptionsItemSelected(item)
     }
 }

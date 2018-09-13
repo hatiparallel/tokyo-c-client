@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
+import android.view.MenuItem
 import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
@@ -24,6 +25,9 @@ class ChangeNameActivity : AppCompatActivity() {
         setContentView(R.layout.activity_name_change)
 
         val token = intent.getStringExtra("token")
+
+        val toolbar = supportActionBar!!
+        toolbar.setDisplayHomeAsUpEnabled(true)
 
         val nameEditText = findViewById<EditText>(R.id.new_name_edit_text)
 
@@ -54,12 +58,17 @@ class ChangeNameActivity : AppCompatActivity() {
                         Log.d("COMM", "update failure: ${it.message}")
                     }
         }
+    }
 
-
-        findViewById<TextView>(R.id.return_button).setOnClickListener() {
-            val intent = Intent(this, ProfileActivity::class.java)
-            intent.putExtra("token", token)
-            startActivity(intent)
+    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+        val token = intent.getStringExtra("token")
+        when (item?.itemId) {
+            android.R.id.home -> {
+                val intent = Intent(this, ProfileActivity::class.java)
+                intent.putExtra("token", token)
+                startActivity(intent)
+            }
         }
+        return super.onOptionsItemSelected(item)
     }
 }

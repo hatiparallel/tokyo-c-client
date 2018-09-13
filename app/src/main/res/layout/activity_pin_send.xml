@@ -6,15 +6,6 @@
     android:gravity="center"
     android:orientation="vertical">
 
-    <Button
-        android:id="@+id/return_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="戻る"
-        android:layout_marginTop="-70dp"
-        android:layout_marginBottom="70dp"
-        android:layout_marginEnd="150dp"/>
-
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
