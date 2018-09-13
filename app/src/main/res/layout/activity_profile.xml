@@ -3,52 +3,22 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:gravity="center"
+    android:gravity="center_horizontal"
     android:orientation="vertical">
 
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/photo_view"
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+        android:layout_marginTop="100dp"
+        android:layout_marginBottom="50dp"
+        android:src="@drawable/img001"/>
 
-    <LinearLayout
+    <TextView
+        android:id = "@+id/name_view"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_width="match_parent"
-        android:orientation="horizontal"
-        android:gravity="center_horizontal">
-
-        <TextView
-            android:id = "@+id/name_view"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="取得中" />
-
-        <Button
-            android:id="@+id/change_name_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="20dp"
-            android:text="名前変更"/>
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center_horizontal">
-
-        <ImageView
-            android:id="@+id/photo_view"
-            android:layout_width="70dp"
-            android:layout_height="70dp"
-            android:layout_marginTop="30dp"
-            android:layout_marginBottom="30dp" />
-
-        <Button
-            android:id="@+id/change_image_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="40dp"
-            android:layout_marginLeft="20dp"
-            android:text="画像変更"/>
-
-    </LinearLayout>
+        android:textSize="32dp"
+        android:text="取得中" />
 
 </LinearLayout>
