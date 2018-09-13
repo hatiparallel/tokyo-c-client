@@ -4,9 +4,11 @@ import android.content.DialogInterface
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
+import android.support.v7.app.ActionBar
 import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
+import android.view.MenuItem
 import android.widget.Button
 import android.widget.ListView
 import io.realm.Realm
@@ -27,6 +29,9 @@ class InviteActivity : AppCompatActivity() {
 
         val token = intent.getStringExtra("token")
         val groupId: Int = intent.getIntExtra("groupId", 0)
+
+        val toolbar = supportActionBar!!
+        toolbar.setDisplayHomeAsUpEnabled(true)
 
         //Realmを利用するために必要なもの
         realm = Realm.getDefaultInstance()
@@ -91,13 +96,6 @@ class InviteActivity : AppCompatActivity() {
 
         }
 
-        findViewById<Button>(R.id.return_button).setOnClickListener {
-            val intent = Intent(this, MessageActivity::class.java)
-            intent.putExtra("token", token)
-            intent.putExtra("groupId", groupId)
-            startActivity(intent)
-        }
-
         findViewById<Button>(R.id.decide_button).setOnClickListener {
             if (multiple_flag == false) {
                 return@setOnClickListener
@@ -122,5 +120,19 @@ class InviteActivity : AppCompatActivity() {
                         Log.d("COMM", "post failed: ${it.message}")
                     })
         }
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+        val token = intent.getStringExtra("token")
+        val groupId: Int = intent.getIntExtra("groupId", 0)
+        when (item?.itemId) {
+            android.R.id.home -> {
+                val intent = Intent(this, MessageActivity::class.java)
+                intent.putExtra("token", token)
+                intent.putExtra("groupId", groupId)
+                startActivity(intent)
+            }
+        }
+         return super.onOptionsItemSelected(item)
     }
 }

@@ -3,6 +3,7 @@ package com.tokyoc.line_client
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.view.MenuItem
 import android.widget.Button
 import android.widget.EditText
 import com.trello.rxlifecycle.components.support.RxAppCompatActivity
@@ -24,6 +25,9 @@ class MakeGroupActivity: RxAppCompatActivity() {
         val token = intent.getStringExtra("token")
 
         val groupNameEditText = findViewById<EditText>(R.id.group_name)
+
+        val toolbar = supportActionBar!!
+        toolbar.setDisplayHomeAsUpEnabled(true)
 
         val client = Client.build(token)
 
@@ -57,13 +61,18 @@ class MakeGroupActivity: RxAppCompatActivity() {
                         Log.d("COMM", "post failed: ${it}")
                     })
         }
+    }
 
-        //戻るボタンを押した時の処理
-        findViewById<Button>(R.id.to_friendship_button).setOnClickListener {
-            val intent = Intent(this, GroupActivity::class.java)
-            intent.putExtra("token", token)
-            startActivity(intent)
+    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+        val token = intent.getStringExtra("token")
+        when (item?.itemId) {
+            android.R.id.home -> {
+                val intent = Intent(this, GroupActivity::class.java)
+                intent.putExtra("token", token)
+                startActivity(intent)
+            }
         }
+        return super.onOptionsItemSelected(item)
     }
 
     //Realmインスタンスの放棄

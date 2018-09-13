@@ -5,6 +5,7 @@ import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
+import android.view.MenuItem
 import android.widget.*
 import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.*
@@ -28,6 +29,8 @@ class ProfileActivity : AppCompatActivity() {
         setContentView(R.layout.activity_profile)
 
         val token = intent.getStringExtra("token")
+        val toolbar = supportActionBar!!
+        toolbar.setDisplayHomeAsUpEnabled(true)
 
         realm = Realm.getDefaultInstance()
         val self = realm.where<Member>().equalTo("isFriend", 0.toInt()).findFirst()
@@ -49,11 +52,17 @@ class ProfileActivity : AppCompatActivity() {
             intent.putExtra("token", token)
             startActivity(intent)
         }
+    }
 
-        findViewById<TextView>(R.id.return_button).setOnClickListener() {
-            val intent = Intent(this, SettingActivity::class.java)
-            intent.putExtra("token", token)
-            startActivity(intent)
+    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+        val token = intent.getStringExtra("token")
+        when (item?.itemId) {
+            android.R.id.home -> {
+                val intent = Intent(this, SettingActivity::class.java)
+                intent.putExtra("token", token)
+                startActivity(intent)
+            }
         }
+        return super.onOptionsItemSelected(item)
     }
 }
