@@ -66,7 +66,7 @@ open class Member : RealmObject() {
 
     fun updateImage() {
         val storageRef = FirebaseStorage.getInstance().reference
-        val imageRef = storageRef.child("images/yoda.jpg")
+        val imageRef = storageRef.child("images/${this.id}.jpg")
         imageRef.getBytes(20000)
                 .addOnSuccessListener {
                     val realm = Realm.getDefaultInstance()
