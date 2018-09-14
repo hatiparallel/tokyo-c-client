@@ -7,6 +7,7 @@ import io.realm.Realm
 import io.realm.RealmObject
 import io.realm.annotations.PrimaryKey
 import io.realm.kotlin.createObject
+import io.realm.kotlin.delete
 import io.realm.kotlin.where
 import rx.android.schedulers.AndroidSchedulers
 import rx.schedulers.Schedulers
@@ -38,8 +39,17 @@ open class Member : RealmObject() {
                         Log.d("COMM", "$e")
                     }
                 }
+                Log.d("COMM", "cache: ${cache?.id}, ${cache?.name}, ${cache?.cached}, ${cache?.isValid()}, ${cache?.isManaged()}")
 
-                subscriber.onNext(realm.copyFromRealm(cache))
+                if (cache == null) {
+                    subscriber.onNext(cache)
+                } else if (cache!!.isManaged()) {
+                    subscriber.onNext(realm.copyFromRealm(cache))
+                } else {
+                    subscriber.onNext(cache)
+                }
+
+                //subscriber.onNext(realm.copyFromRealm(cache))
                 subscriber.onCompleted()
             }
         }
@@ -49,7 +59,7 @@ open class Member : RealmObject() {
         val realm = Realm.getDefaultInstance()
         if (this.isFriend == Relation.OTHER && this.groupJoin <= 0) {
             realm.executeTransaction {
-                this.deleteFromRealm()
+                realm.where<Member>().equalTo("id", this.id).findFirst()?.deleteFromRealm()
             }
         }
     }
