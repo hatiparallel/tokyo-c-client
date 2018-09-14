@@ -83,6 +83,10 @@ interface Client {
     @POST("/channels/{channel}")
     fun inviteMultiplePerson(@Path("channel") channel: Int, @Body people: List<String>): Observable<Group>
 
+    @FormUrlEncoded
+    @PATCH("/channels/{channel}")
+    fun renameGroup(@Path("channel") channel: Int, @Query("name") new_name: String): Observable<String>
+
 
     @Headers("Content-Type: application/json")
     @GET("/people/{uid}")
