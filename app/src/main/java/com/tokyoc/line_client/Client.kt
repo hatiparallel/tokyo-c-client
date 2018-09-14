@@ -55,6 +55,9 @@ interface Client {
     @GET("/messages/{id}")
     fun getMessage(@Path("id") id: Int): Observable<Message>
 
+    @Headers("Content-type: application/json")
+    @POST("/friendships")
+    fun getFriends(): Observable<List<String>>
 
     @Headers("Content-type: application/json")
     @POST("/friendships")
