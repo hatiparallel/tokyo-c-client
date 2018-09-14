@@ -96,7 +96,7 @@ class PollingService : IntentService("polling_service") {
                                         text = it.content
                                     } else if (it.content == "join") {
                                         text = "${author.name}が${groupName}に参加しました"
-                                    } else if (it.content == "join") {
+                                    } else if (it.content == "leave") {
                                         text = "${author.name}が${groupName}から退室しました"
                                     }
 
