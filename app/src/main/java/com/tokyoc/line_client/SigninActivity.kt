@@ -61,8 +61,8 @@ class SigninActivity : AppCompatActivity() {
                     val user = firebase.currentUser
                     Log.d("COMM", "a")
                     if (user != null) {
-                        val self = realm.where<Member>().equalTo("isFriend", 0.toInt()).findFirst()
-                        Log.d("COMM", "a ${self?.name}")
+                        realm = Realm.getDefaultInstance()
+                        val self = realm.where<Member>().equalTo("isFriend", Relation.SELF).findFirst()
                         if (self?.id != user.uid) {
                             realm.executeTransaction {
                                 realm.deleteAll()
@@ -70,8 +70,12 @@ class SigninActivity : AppCompatActivity() {
                                 self.name = user?.displayName ?: "default"
                                 self.isFriend = Relation.SELF
                                 self.updateImage()
-                                Log.d("COMM", "${self.id} & ${self.name}")
+                                Log.d("COMM", "missify")
                             }
+                        }
+                        val member1 = realm.where<Member>().findAll()
+                        for (i in member1) {
+                            Log.d("COMM", "${i.isFriend}, ${i.name}")
                         }
                         val intent = Intent(this, GroupActivity::class.java)
                         intent.putExtra("token", token)
@@ -86,5 +90,11 @@ class SigninActivity : AppCompatActivity() {
                 }
             }
         }
+    }
+
+    //Realmインスタンスを破棄
+    override fun onDestroy() {
+        super.onDestroy()
+        realm.close()
     }
 }
