@@ -19,6 +19,7 @@ import com.google.firebase.storage.StorageReference
 import retrofit2.adapter.rxjava.HttpException
 import java.io.ByteArrayOutputStream
 import android.graphics.drawable.BitmapDrawable
+import android.view.Menu
 import android.view.MenuItem
 import com.google.firebase.storage.StorageMetadata
 import io.realm.Realm
@@ -53,46 +54,50 @@ class ChangeImageActivity : AppCompatActivity() {
             intent.setType("image/*")
             startActivityForResult(intent, image_request_code)
         }
+    }
 
-
-        findViewById<Button>(R.id.decide_button).setOnClickListener() {
-            if (ba == null) {
-                Toast.makeText(applicationContext, "画像が読み込めていません", Toast.LENGTH_LONG).show()
-                return@setOnClickListener
-            } else if (ba!!.size > 20000) {
-                Toast.makeText(applicationContext, "画像サイズが大きすぎます", Toast.LENGTH_LONG).show()
-                Log.d("COMM", "the image size is too big")
-                return@setOnClickListener
-            }
-
-            val self: Member? = realm.where<Member>().equalTo("isFriend", Relation.SELF).findFirst()
-            if (self == null) {
-                Toast.makeText(applicationContext, "ユーザーが認証できていません", Toast.LENGTH_LONG).show()
-                return@setOnClickListener
-            }
-
-            val imageRef = storageRef.child("images/${self.id}.jpg")
-            imageRef.putBytes(ba!!)
-                    .addOnSuccessListener {
-                        Log.d("COMM", "upload success")
-                        self.updateImage()
-                        val intent = Intent(this, ProfileActivity::class.java)
-                        intent.putExtra("token", token)
-                        startActivity(intent)
-                    }
-                    .addOnFailureListener {
-                        Log.d("COMM", "upload failure: ${it.message}")
-                    }
-        }
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.menu_image_change, menu)
+        return super.onCreateOptionsMenu(menu)
     }
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
         val token = intent.getStringExtra("token")
+        realm = Realm.getDefaultInstance()
         when (item?.itemId) {
             android.R.id.home -> {
                 val intent = Intent(this, ProfileActivity::class.java)
                 intent.putExtra("token", token)
                 startActivity(intent)
+            }
+            R.id.change_image -> {
+                if (ba == null) {
+                    Toast.makeText(applicationContext, "画像が読み込めていません", Toast.LENGTH_LONG).show()
+                    return false
+                } else if (ba!!.size > 20000) {
+                    Toast.makeText(applicationContext, "画像サイズが大きすぎます", Toast.LENGTH_LONG).show()
+                    Log.d("COMM", "the image size is too big")
+                    return false
+                }
+
+                val self: Member? = realm.where<Member>().equalTo("isFriend", Relation.SELF).findFirst()
+                if (self == null) {
+                    Toast.makeText(applicationContext, "ユーザーが認証できていません", Toast.LENGTH_LONG).show()
+                    return false
+                }
+
+                val imageRef = storageRef.child("images/${self.id}.jpg")
+                imageRef.putBytes(ba!!)
+                        .addOnSuccessListener {
+                            Log.d("COMM", "upload success")
+                            self.updateImage()
+                            val intent = Intent(this, ProfileActivity::class.java)
+                            intent.putExtra("token", token)
+                            startActivity(intent)
+                        }
+                        .addOnFailureListener {
+                            Log.d("COMM", "upload failure: ${it.message}")
+                        }
             }
         }
         return super.onOptionsItemSelected(item)
