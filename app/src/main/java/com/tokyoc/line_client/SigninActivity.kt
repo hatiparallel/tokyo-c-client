@@ -59,8 +59,10 @@ class SigninActivity : AppCompatActivity() {
                     Toast.makeText(applicationContext, "sign in: token is null", Toast.LENGTH_LONG).show()
                 } else {
                     val user = firebase.currentUser
+                    Log.d("COMM", "a")
                     if (user != null) {
                         val self = realm.where<Member>().equalTo("isFriend", 0.toInt()).findFirst()
+                        Log.d("COMM", "a ${self?.name}")
                         if (self?.id != user.uid) {
                             realm.executeTransaction {
                                 realm.deleteAll()
@@ -68,6 +70,7 @@ class SigninActivity : AppCompatActivity() {
                                 self.name = user?.displayName ?: "default"
                                 self.isFriend = Relation.SELF
                                 self.updateImage()
+                                Log.d("COMM", "${self.id} & ${self.name}")
                             }
                         }
                         val intent = Intent(this, GroupActivity::class.java)
