@@ -22,21 +22,61 @@ class PollingService : IntentService("polling_service") {
         val token = intent.getStringExtra("token")
         val client = Client.build(token)
         val notification_manager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        var lastStatus: Status? = null
 
         notification_manager.createNotificationChannel(
                 NotificationChannel(CHANNEL_ID, "YODA", NotificationManager.IMPORTANCE_DEFAULT))
 
         while (true) {
-            Thread.sleep(3000)
-
             val status = client.getStatus().toBlocking().first() ?: continue
 
-            realm.executeTransaction {
-                for (summary in status.latests) {
-                    val group = realm.where<Group>().equalTo("id", summary.channelId).findFirst()
+            if (lastStatus == null ||
+                    lastStatus!!.friendshipCount != status.friendshipCount ||
+                    lastStatus!!.friendshipAddedAt != lastStatus.friendshipAddedAt) {
+
+                Log.d("COMM/POLL", "friend")
+                val friends = client.getFriends().toBlocking().single().toTypedArray()
+
+                rx.Observable.from(friends)
+                        .flatMap { return@flatMap Member.lookup(it, client) }
+                        .subscribe {
+                            val member = it
+
+                            if (member.isFriend == Relation.FRIEND) {
+                                return@subscribe
+                            }
+
+                            member.isFriend = Relation.FRIEND
+
+                            realm.executeTransaction {
+                                realm.insertOrUpdate(member)
+                            }
+
+                            notification_manager.notify(0,
+                                    NotificationCompat.Builder(applicationContext, CHANNEL_ID)
+                                            .setSmallIcon(R.drawable.img001)
+                                            .setContentTitle(getText(R.string.app_name))
+                                            .setContentText("${member.name}が友達になりました")
+                                            .setAutoCancel(true)
+                                            .build())
+                        }
+
+                realm.where<Member>()
+                        .not().beginGroup().`in`("id", friends).endGroup()
+                        .findAll().forEach {
+                            val member = it
+
+                            if (member.isFriend == Relation.FRIEND) {
+                                realm.executeTransaction { member.isFriend = Relation.OTHER }
+                            }
+                        }
+            }
+
+            for (summary in status.latests) {
+                realm.executeTransaction {
+                    var group = realm.where<Group>().equalTo("id", summary.channelId).findFirst()
                             ?: realm.createObject<Group>(summary.channelId)
 
-                    group.name = summary.channelName
                     val groupName = group.name
 
                     if (summary.messageId > group.latest) {
@@ -45,6 +85,7 @@ class PollingService : IntentService("polling_service") {
                                 .subscribe({
                                     val author = Member.lookup(it.author, client).toBlocking().single()
                                     val realm = Realm.getDefaultInstance()
+
                                     realm.executeTransaction {
                                         realm.insertOrUpdate(author)
                                     }
@@ -56,7 +97,7 @@ class PollingService : IntentService("polling_service") {
                                     } else if (it.content == "join") {
                                         text = "${author.name}が${groupName}に参加しました"
                                     } else if (it.content == "leave") {
-                                        text = "${author.name}が${groupName}から退出しました"
+                                        text = "${author.name}が${groupName}から退室しました"
                                     }
 
                                     Log.d("COMM/POLL", "notify ${it.author}")
@@ -75,13 +116,20 @@ class PollingService : IntentService("polling_service") {
                                 })
                     }
 
+                    group.name = summary.channelName
                     group.latest = summary.messageId
                 }
 
+                lastStatus = status
+
                 val deleted = realm.where<Group>().findAll().map { it.id } - status.latests.map { it.channelId }
 
-                realm.where<Group>().`in`("id", deleted.toTypedArray()).findAll().deleteAllFromRealm()
+                realm.executeTransaction {
+                    realm.where<Group>().`in`("id", deleted.toTypedArray()).findAll().deleteAllFromRealm()
+                }
             }
+
+            Thread.sleep(3000)
         }
     }
 }
