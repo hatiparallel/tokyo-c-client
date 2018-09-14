@@ -60,7 +60,7 @@ class SigninActivity : AppCompatActivity() {
                 } else {
                     val user = firebase.currentUser
                     if (user != null) {
-                        val self = realm.where<Member>().equalTo("isFriend", 0.toInt()).findFirst()
+                        val self = realm.where<Member>().equalTo("isFriend", Relation.SELF).findFirst()
                         if (self?.id != user.uid) {
                             realm.executeTransaction {
                                 realm.deleteAll()
@@ -68,6 +68,7 @@ class SigninActivity : AppCompatActivity() {
                                 self.name = user?.displayName ?: "default"
                                 self.isFriend = Relation.SELF
                                 self.updateImage()
+                                Log.d("COMM", "missify")
                             }
                         }
                         val intent = Intent(this, GroupActivity::class.java)
