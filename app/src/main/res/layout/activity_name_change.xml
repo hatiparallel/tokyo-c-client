@@ -19,10 +19,4 @@
         android:layout_height="wrap_content"
         android:hint="新しい名前を入力してください"/>
 
-    <Button
-        android:id="@+id/decide_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="決定" />
-
 </LinearLayout>
