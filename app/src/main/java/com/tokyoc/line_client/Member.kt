@@ -65,8 +65,10 @@ open class Member : RealmObject() {
     }
 
     fun updateImage() {
+        Log.d("COMM", "dsajio;as")
+        //val member = realm.copyFromRealm(this)
         val storageRef = FirebaseStorage.getInstance().reference
-        val imageRef = storageRef.child("images/yoda.jpg")
+        val imageRef = storageRef.child("images/${this.id}.jpg")
         imageRef.getBytes(20000)
                 .addOnSuccessListener {
                     val realm = Realm.getDefaultInstance()
@@ -74,6 +76,7 @@ open class Member : RealmObject() {
                     val ba = it
                     realm.executeTransaction {
                         this.image = ba
+                        realm.insertOrUpdate(this)
                     }
                 }
                 .addOnFailureListener {
@@ -86,6 +89,7 @@ open class Member : RealmObject() {
                                 val ba = it
                                 realm.executeTransaction {
                                     this.image = ba
+                                    realm.insertOrUpdate(this)
                                 }
                             }
                             .addOnFailureListener {

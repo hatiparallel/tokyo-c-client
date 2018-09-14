@@ -34,7 +34,7 @@ class PollingService : IntentService("polling_service") {
                     lastStatus!!.friendshipCount != status.friendshipCount ||
                     lastStatus!!.friendshipAddedAt != lastStatus.friendshipAddedAt) {
 
-                Log.d("COMM/POLL", "friend")
+                //Log.d("COMM/POLL", "friend")
                 val friends = client.getFriends().toBlocking().single().toTypedArray()
 
                 rx.Observable.from(friends)
@@ -100,7 +100,7 @@ class PollingService : IntentService("polling_service") {
                                         text = "${author.name}が${groupName}から退室しました"
                                     }
 
-                                    Log.d("COMM/POLL", "notify ${it.author}")
+                                    //Log.d("COMM/POLL", "notify ${it.author}")
 
                                     notification_manager.notify(summary.channelId,
                                             NotificationCompat.Builder(applicationContext, CHANNEL_ID)
@@ -112,7 +112,7 @@ class PollingService : IntentService("polling_service") {
                                                     .setAutoCancel(true)
                                                     .build())
                                 }, {
-                                    Log.d("COMM/POLL", "notify failed $it")
+                                    //Log.d("COMM/POLL", "notify failed $it")
                                 })
                     }
 
