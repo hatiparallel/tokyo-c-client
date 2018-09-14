@@ -34,7 +34,8 @@ class ProfileActivity : AppCompatActivity() {
         toolbar.setDisplayHomeAsUpEnabled(true)
 
         realm = Realm.getDefaultInstance()
-        val self = realm.where<Member>().equalTo("isFriend", 0.toInt()).findFirst()
+        val self = realm.where<Member>().equalTo("isFriend", Relation.SELF).findFirst()
+        Log.d("CHECK", "$self , ${self?.name}")
         findViewById<TextView>(R.id.name_view).text = self?.name ?: "取得失敗"
 
         if (self != null && self.image.size > 0) {

@@ -64,11 +64,12 @@ class MakePinActivity : RxAppCompatActivity() {
                                         .subscribeOn(Schedulers.io())
                                         .observeOn(AndroidSchedulers.mainThread())
                                         .subscribe({
+                                            val realm = Realm.getDefaultInstance()
                                             val member: Member = it
-                                            Log.d("COMM", "get person done: ${it.name}")
+                                            Log.d("COMM", "get person done: ${member.name}")
                                             AlertDialog.Builder(this).apply {
                                                 setTitle("Friend Request")
-                                                setMessage("Make Friends with ${it.name}?")
+                                                setMessage("Make Friends with ${member.name}?")
                                                 setPositiveButton("OK", DialogInterface.OnClickListener { _, _ ->
                                                     client.makeFriends(uid)
                                                             .subscribeOn(Schedulers.io())
@@ -77,13 +78,14 @@ class MakePinActivity : RxAppCompatActivity() {
                                                                 Log.d("COMM", "make friends succeeded: ${it.size}")
                                                                 realm.executeTransaction {
                                                                     member.isFriend = Relation.FRIEND
+                                                                    realm.insertOrUpdate(member)
                                                                 }
                                                             }, {
                                                                 Log.d("COMM", "make friends failed: ${it}")
                                                             })
                                                 })
                                                 setNegativeButton("Cancel", DialogInterface.OnClickListener { _, _ ->
-                                                    it.deregister()
+                                                    member.deregister()
                                                 })
                                                 show()
                                             }

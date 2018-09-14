@@ -95,9 +95,6 @@ class MessageActivity : RxAppCompatActivity() {
                                             .subscribe({
                                                 val realm = Realm.getDefaultInstance()
                                                 val memberCome = it
-                                                realm.executeTransaction {
-                                                    realm.insertOrUpdate(memberCome)
-                                                }
                                                 val group = realm.where<Group>().equalTo("id", groupId).findFirst()
                                                 Log.d("COMM", "zero okay")
                                                 realm.executeTransaction {
@@ -105,6 +102,7 @@ class MessageActivity : RxAppCompatActivity() {
                                                     Log.d("COMM", "one okay")
                                                     if (memberCome != null) {
                                                         memberCome.groupJoin += 1
+                                                        realm.insertOrUpdate(memberCome)
                                                     }
                                                     Log.d("COMM", "two okay")
                                                 }
