@@ -74,6 +74,7 @@ open class Member : RealmObject() {
                     val ba = it
                     realm.executeTransaction {
                         this.image = ba
+                        realm.insertOrUpdate(this)
                     }
                 }
                 .addOnFailureListener {

@@ -55,6 +55,9 @@ interface Client {
     @GET("/messages/{id}")
     fun getMessage(@Path("id") id: Int): Observable<Message>
 
+    @Headers("Content-type: application/json")
+    @GET("/friendships")
+    fun getFriends(): Observable<List<String>>
 
     @Headers("Content-type: application/json")
     @POST("/friendships")
@@ -82,6 +85,10 @@ interface Client {
     @Headers("Content-Type: application/json")
     @POST("/channels/{channel}")
     fun inviteMultiplePerson(@Path("channel") channel: Int, @Body people: List<String>): Observable<Group>
+
+    @FormUrlEncoded
+    @PATCH("/channels/{channel}")
+    fun renameGroup(@Path("channel") channel: Int, @Query("name") new_name: String): Observable<String>
 
 
     @Headers("Content-Type: application/json")
