@@ -11,27 +11,33 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="20dp"
         android:text="友達追加する人のPINを入力してください" />
-  
-    <EditText
-        android:id="@+id/pin_edit_text"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="12pt"
-        android:layout_marginStart="12pt"
-        android:hint="PINを入力してください" />
 
-    <Button
-        android:id="@+id/send_pin_button"
+    <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="12dp"
-        android:text="send PIN" />
+        android:orientation="horizontal">
+  
+        <EditText
+            android:id="@+id/pin_edit_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="PINを入力してください" />
+
+        <ImageButton
+            android:id="@+id/send_pin_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:backgroundTint="#0099FF"
+            android:background="@drawable/ic_check_black_24dp" />
+
+    </LinearLayout>>
 
     <TextView
         android:id="@+id/to_make_pin"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="12dp"
+        android:layout_marginTop="30dp"
         android:clickable="true"
         android:focusable="true"
         android:textColor="@drawable/text_color"
