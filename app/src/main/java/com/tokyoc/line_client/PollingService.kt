@@ -54,21 +54,26 @@ class PollingService : IntentService("polling_service") {
                             ?: realm.createObject<Group>(summary.channelId)
 
                     group.name = summary.channelName
+                    val groupName = group.name
 
                     if (summary.messageId > group.latest) {
                         client.getMessage(summary.messageId)
                                 .observeOn(Schedulers.io())
                                 .subscribe({
-                                    val author = Member.lookup(it.author, client, realm).toBlocking().single()
+                                    val author = Member.lookup(it.author, client).toBlocking().single()
+                                    val realm = Realm.getDefaultInstance()
+                                    realm.executeTransaction {
+                                        realm.insertOrUpdate(author)
+                                    }
 
                                     var text = ""
 
                                     if (it.isEvent == 0) {
                                         text = it.content
                                     } else if (it.content == "join") {
-                                        text = "${author.name}が${group.name}に参加しました"
+                                        text = "${author.name}が${groupName}に参加しました"
                                     } else if (it.content == "leave") {
-                                        text = "${author.name}が${group.name}から退出しました"
+                                        text = "${author.name}が${groupName}から退出しました"
                                     }
 
                                     Log.d("COMM/POLL", "notify ${it.author}")

@@ -2,16 +2,14 @@ package com.tokyoc.line_client
 
 import android.content.DialogInterface
 import android.content.Intent
+import android.graphics.Color
 import android.os.Bundle
 import android.support.v7.app.ActionBar
 import android.support.v7.app.AlertDialog
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
-import android.widget.Button
-import android.widget.EditText
-import android.widget.ListView
-import android.widget.TextView
+import android.widget.*
 import com.trello.rxlifecycle.components.support.RxAppCompatActivity
 import com.trello.rxlifecycle.kotlin.bindToLifecycle
 import io.realm.Realm
@@ -37,7 +35,7 @@ class MessageActivity : RxAppCompatActivity() {
         val listView: ListView = findViewById<ListView>(R.id.message_list_view)
         val group = realm.where<Group>().equalTo("id", groupId).findFirst()
 
-        val sendButton = findViewById<Button>(R.id.send_button)
+        val sendButton = findViewById<ImageButton>(R.id.send_button)
         val messageEditText = findViewById<EditText>(R.id.message_edit_text)
         val listAdapter = MessageListAdapter(messages)
 
@@ -80,6 +78,7 @@ class MessageActivity : RxAppCompatActivity() {
                 .subscribe(
                         {
                             val message = it
+                            val author = it.author
                             Log.d("COMM", "message ID: ${it.id}")
                             realm.executeTransaction {
                                 realm.insert(message)
@@ -90,18 +89,28 @@ class MessageActivity : RxAppCompatActivity() {
 
                             if (message.isEvent == 1) {
                                 if (message.content == "join") {
-                                    Member.lookup(message.author, client, realm)
+                                    Member.lookup(message.author, client)
                                             .subscribeOn(Schedulers.io())
                                             .observeOn(AndroidSchedulers.mainThread())
                                             .subscribe({
-                                                val memberCome: Member = it
+                                                val realm = Realm.getDefaultInstance()
+                                                val memberCome = it
                                                 realm.executeTransaction {
-                                                    group?.members?.add(message.author)
-                                                    memberCome.groupJoin += 1
+                                                    realm.insertOrUpdate(memberCome)
+                                                }
+                                                val group = realm.where<Group>().equalTo("id", groupId).findFirst()
+                                                Log.d("COMM", "zero okay")
+                                                realm.executeTransaction {
+                                                    group?.members?.add(author)
+                                                    Log.d("COMM", "one okay")
+                                                    if (memberCome != null) {
+                                                        memberCome.groupJoin += 1
+                                                    }
+                                                    Log.d("COMM", "two okay")
                                                 }
                                                 Log.d("COMM", "now ${group?.members?.size} members")
                                             }, {
-                                                Log.d("COMM", "get person failed: ${it}")
+                                                Log.d("COMM", "Message Acitivity get person failed: ${it}")
                                             })
                                 } else if (message.content == "leave") {
                                     val memberLeft: Member? = realm.where<Member>().equalTo("id", message.author)?.findFirst()
@@ -109,7 +118,7 @@ class MessageActivity : RxAppCompatActivity() {
                                         realm.executeTransaction {
                                             memberLeft.groupJoin -= 1
                                         }
-                                        memberLeft.deregister(realm)
+                                        memberLeft.deregister()
                                     }
                                     realm.executeTransaction {
                                         group?.members?.remove(message.author)
