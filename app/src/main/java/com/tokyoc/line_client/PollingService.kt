@@ -22,14 +22,31 @@ class PollingService : IntentService("polling_service") {
         val token = intent.getStringExtra("token")
         val client = Client.build(token)
         val notification_manager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        var lastStatus: Status? = null
 
         notification_manager.createNotificationChannel(
                 NotificationChannel(CHANNEL_ID, "YODA", NotificationManager.IMPORTANCE_DEFAULT))
 
         while (true) {
-            Thread.sleep(3000)
-
             val status = client.getStatus().toBlocking().first() ?: continue
+
+            if (lastStatus == null ||
+                    lastStatus!!.friendshipCount != status.friendshipCount ||
+                    lastStatus!!.friendshipAddedAt != lastStatus.friendshipAddedAt) {
+
+                client.getFriends().subscribe {
+                    rx.Observable.from(it)
+                            .flatMap { return@flatMap Member.lookup(it, client, realm) }
+                            .subscribe {
+                                if (it.isFriend == Relation.FRIEND) {
+                                    return@subscribe
+                                }
+
+                                it.isFriend = Relation.FRIEND
+                                realm.insertOrUpdate(it)
+                            }
+                }
+            }
 
             realm.executeTransaction {
                 for (summary in status.latests) {
@@ -71,6 +88,9 @@ class PollingService : IntentService("polling_service") {
                     }
 
                     group.latest = summary.messageId
+                    lastStatus = status
+
+                    Thread.sleep(3000)
                 }
 
                 val deleted = realm.where<Group>().findAll().map { it.id } - status.latests.map { it.channelId }
