@@ -60,7 +60,7 @@ class MakePinActivity : RxAppCompatActivity() {
                                 pin_show.text = it.pin.toString()
                             } else if (it.type == "request") {
                                 val uid: String = it.person
-                                Member.lookup(uid, client, realm)
+                                Member.lookup(uid, client)
                                         .subscribeOn(Schedulers.io())
                                         .observeOn(AndroidSchedulers.mainThread())
                                         .subscribe({
@@ -83,7 +83,7 @@ class MakePinActivity : RxAppCompatActivity() {
                                                             })
                                                 })
                                                 setNegativeButton("Cancel", DialogInterface.OnClickListener { _, _ ->
-                                                    it.deregister(realm)
+                                                    it.deregister()
                                                 })
                                                 show()
                                             }
