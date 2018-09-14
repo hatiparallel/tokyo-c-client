@@ -1,6 +1,7 @@
 package com.tokyoc.line_client
 
 import android.graphics.BitmapFactory
+import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup

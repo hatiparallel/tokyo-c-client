@@ -15,10 +15,11 @@ import java.util.*
 //MemberデータFormat
 open class Member : RealmObject() {
     companion object {
-        fun lookup(uid: String, client: Client, realm: Realm): rx.Observable<Member> {
+        fun lookup(uid: String, client: Client): rx.Observable<Member> {
             return rx.Observable.create<Member> {
                 val subscriber = it
                 var cache: Member? = null
+                val realm: Realm = Realm.getDefaultInstance()
 
                 realm.executeTransaction {
                     cache = realm.where<Member>().equalTo("id", uid).findFirst()
@@ -34,16 +35,18 @@ open class Member : RealmObject() {
                         cache!!.updateImage()
                         realm.insertOrUpdate(cache)
                     } catch (e: Exception) {
+                        Log.d("COMM", "$e")
                     }
                 }
 
-                subscriber.onNext(cache)
+                subscriber.onNext(realm.copyFromRealm(cache))
                 subscriber.onCompleted()
             }
         }
     }
 
-    fun deregister(realm: Realm) {
+    fun deregister() {
+        val realm = Realm.getDefaultInstance()
         if (this.isFriend == Relation.OTHER && this.groupJoin <= 0) {
             realm.executeTransaction {
                 this.deleteFromRealm()
@@ -53,9 +56,10 @@ open class Member : RealmObject() {
 
     fun updateImage() {
         val storageRef = FirebaseStorage.getInstance().reference
-        val imageRef = storageRef.child("images/${this.id}.jpg")
+        val imageRef = storageRef.child("images/yoda.jpg")
         imageRef.getBytes(20000)
                 .addOnSuccessListener {
+                    val realm = Realm.getDefaultInstance()
                     Log.d("COMM", "get unique ByteArray Success")
                     val ba = it
                     realm.executeTransaction {
@@ -67,6 +71,7 @@ open class Member : RealmObject() {
                     val defaultImageRef = storageRef.child("images/yoda.jpg")
                     defaultImageRef.getBytes(20000)
                             .addOnSuccessListener {
+                                val realm = Realm.getDefaultInstance()
                                 Log.d("COMM", "get yoda ByteArray Success")
                                 val ba = it
                                 realm.executeTransaction {
