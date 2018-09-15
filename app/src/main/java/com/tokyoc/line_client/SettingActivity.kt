@@ -16,6 +16,7 @@ import android.widget.ListView
 import android.widget.Toast
 import com.google.firebase.auth.FirebaseAuth
 import io.realm.Realm
+import io.realm.kotlin.where
 
 class SettingActivity : AppCompatActivity() {
     private lateinit var realm: Realm
@@ -26,6 +27,8 @@ class SettingActivity : AppCompatActivity() {
         setContentView(R.layout.activity_setting)
 
         val token = intent.getStringExtra("token")
+
+        realm = Realm.getDefaultInstance()
 
         toolbar = supportActionBar!!
         val bottomNavigation: BottomNavigationView = findViewById(R.id.navigation)
@@ -98,6 +101,11 @@ class SettingActivity : AppCompatActivity() {
             val intent = Intent(this, ProfileActivity::class.java)
             intent.putExtra("token", token)
             startActivity(intent)
+        }
+
+        val member1 = realm.where<Member>().findAll()
+        for (i in member1) {
+            Log.d("COMM", "${i.isFriend}, ${i.name}")
         }
     }
 

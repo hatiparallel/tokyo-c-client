@@ -108,6 +108,12 @@ class MakePinActivity : RxAppCompatActivity() {
                                 show()
                             }
                         })
+
+        findViewById<TextView>(R.id.to_send_pin).setOnClickListener {
+            val intent = Intent(this, SendPinActivity::class.java)
+            intent.putExtra("token", token)
+            startActivity(intent)
+        }
     }
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {

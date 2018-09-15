@@ -124,6 +124,11 @@ class GroupActivity : AppCompatActivity() {
             intent.putExtra("token", token)
             startActivity(intent)
         }
+
+        val member1 = realm.where<Member>().findAll()
+        for (i in member1) {
+            Log.d("COMM", "${i.isFriend}, ${i.name}")
+        }
     }
 
     override fun onKeyDown(keyCode: Int, event: KeyEvent): Boolean {

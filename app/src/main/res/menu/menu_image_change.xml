@@ -4,10 +4,7 @@
 
     <item
         android:id="@+id/change_image"
-        android:title="画像変更" />
-
-    <item
-        android:id="@+id/change_name"
-        android:title="名前変更" />
+        android:title="完了"
+        app:showAsAction="ifRoom" />
 
 </menu>

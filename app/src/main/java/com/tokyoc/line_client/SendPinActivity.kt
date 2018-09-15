@@ -5,10 +5,7 @@ import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import android.view.MenuItem
-import android.widget.Button
-import android.widget.EditText
-import android.widget.TextView
-import android.widget.Toast
+import android.widget.*
 import com.google.gson.FieldNamingPolicy
 import com.google.gson.GsonBuilder
 import okhttp3.Interceptor
@@ -34,7 +31,7 @@ class SendPinActivity : AppCompatActivity() {
 
         val pinEditText: EditText = findViewById<EditText>(R.id.pin_edit_text)
 
-        findViewById<Button>(R.id.send_pin_button).setOnClickListener {
+        findViewById<ImageButton>(R.id.send_pin_button).setOnClickListener {
             val pin = pinEditText.text.toString()
             if (pin.length == 8) {
                 client.sendPIN(pin.toInt())
