@@ -84,12 +84,16 @@ class SettingActivity : AppCompatActivity() {
         //サインアウトボタンを押した時の処理
         findViewById<ImageButton>(R.id.signout_button).setOnClickListener {
             val intent = Intent(this, SigninActivity::class.java)
+            val service = Intent(this, PollingService::class.java)
             AlertDialog.Builder(this).apply {
                 setTitle("Sign Out")
                 setMessage("Really Sign Out?")
                 setPositiveButton("OK", DialogInterface.OnClickListener { _, _ ->
                     FirebaseAuth.getInstance().signOut()
                     startActivity(intent)
+                    service.putExtra("token", token)
+                    stopService(service)
+                    Log.d("DDDD", "stop")
                 })
                 setNegativeButton("Cancel", null)
                 show()
@@ -105,7 +109,7 @@ class SettingActivity : AppCompatActivity() {
 
         val member1 = realm.where<Member>().findAll()
         for (i in member1) {
-            Log.d("COMM", "${i.isFriend}, ${i.name}")
+            Log.d("COMM", "setting activity: ${i.isFriend}, ${i.name}")
         }
     }
 

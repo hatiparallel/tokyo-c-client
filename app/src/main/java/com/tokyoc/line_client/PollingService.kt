@@ -41,10 +41,13 @@ class PollingService : IntentService("polling_service") {
                         .flatMap { return@flatMap Member.lookup(it, client) }
                         .subscribe {
                             val member = it
+                            Log.d("DDDDD", "got it ! ${member.name}, ${member.isFriend}")
 
-                            if (member.isFriend == Relation.FRIEND) {
+                            if (member.isFriend != Relation.OTHER) {
                                 return@subscribe
                             }
+
+                            Log.d("DDDDD", "it'll be friend ${member.name}, ${member.isFriend}")
 
                             member.isFriend = Relation.FRIEND
 
@@ -65,8 +68,10 @@ class PollingService : IntentService("polling_service") {
                         .not().beginGroup().`in`("id", friends).endGroup()
                         .findAll().forEach {
                             val member = it
+                            Log.d("DDDD", "it'll be other ${member.name}, ${member.isFriend}")
 
                             if (member.isFriend == Relation.FRIEND) {
+                                Log.d("DDDD", "good bye ${member.name}, ${member.isFriend}")
                                 realm.executeTransaction { member.isFriend = Relation.OTHER }
                             }
                         }

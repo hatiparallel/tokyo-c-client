@@ -127,7 +127,7 @@ class GroupActivity : AppCompatActivity() {
 
         val member1 = realm.where<Member>().findAll()
         for (i in member1) {
-            Log.d("COMM", "${i.isFriend}, ${i.name}")
+            Log.d("COMM", "group activity: ${i.isFriend}, ${i.name}")
         }
     }
 
