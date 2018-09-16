@@ -20,4 +20,14 @@
         android:text="取得中"
         android:textSize="24sp"/>
 
+    <TextView
+        android:id="@+id/to_send_pin"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30dp"
+        android:clickable="true"
+        android:focusable="true"
+        android:textColor="@drawable/text_color"
+        android:text="友達のPINを入力する場合はこちら" />
+
 </LinearLayout>

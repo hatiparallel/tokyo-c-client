@@ -40,6 +40,11 @@ class ProfileActivity : AppCompatActivity() {
             findViewById<ImageView>(R.id.photo_view)
                     .setImageBitmap(BitmapFactory.decodeByteArray(self.image, 0, self.image.size))
         }
+
+        val member1 = realm.where<Member>().findAll()
+        for (i in member1) {
+            Log.d("COMM", "${i.isFriend}, ${i.name}")
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {

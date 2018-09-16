@@ -12,10 +12,4 @@
         android:layout_height="wrap_content"
         android:hint="グループ名を入力してください" />
 
-    <Button
-        android:id="@+id/make_group"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="作成" />
-
 </LinearLayout>
