@@ -20,30 +20,26 @@ import io.realm.Realm
 import io.realm.kotlin.where
 
 
-class ProfileActivity : AppCompatActivity() {
+class MemberProfileActivity : AppCompatActivity() {
     private lateinit var realm: Realm
 
     override fun onCreate(saveInstanceState: Bundle?) {
         super.onCreate(saveInstanceState)
-        setContentView(R.layout.activity_profile)
+        setContentView(R.layout.activity_profile_member)
 
         val token = intent.getStringExtra("token")
+        val memberId = intent.getStringExtra("memberId")
         val toolbar = supportActionBar!!
         toolbar.setDisplayHomeAsUpEnabled(true)
 
         realm = Realm.getDefaultInstance()
-        val self = realm.where<Member>().equalTo("isFriend", Relation.SELF).findFirst()
-        Log.d("CHECK", "$self , ${self?.name}")
-        findViewById<TextView>(R.id.name_view).text = self?.name ?: "取得失敗"
+        val member = realm.where<Member>().equalTo("id", memberId).findFirst()
+        Log.d("CHECK", "$member , ${member?.name}")
+        findViewById<TextView>(R.id.name_view).text = member?.name ?: "取得失敗"
 
-        if (self != null && self.image.size > 0) {
+        if (member != null && member.image.size > 0) {
             findViewById<ImageView>(R.id.photo_view)
-                    .setImageBitmap(BitmapFactory.decodeByteArray(self.image, 0, self.image.size))
-        }
-
-        val member1 = realm.where<Member>().findAll()
-        for (i in member1) {
-            Log.d("COMM", "${i.isFriend}, ${i.name}")
+                    .setImageBitmap(BitmapFactory.decodeByteArray(member.image, 0, member.image.size))
         }
     }
 

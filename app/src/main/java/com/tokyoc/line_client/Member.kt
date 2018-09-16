@@ -25,21 +25,23 @@ open class Member : RealmObject() {
                 realm.executeTransaction {
                     cache = realm.where<Member>().equalTo("id", uid).findFirst()
                             ?: realm.createObject<Member>(uid)
+                    val isFriend = cache?.isFriend
 
                     if (Date().getTime() - cache!!.cached.getTime() <= 5 * 60 * 1000) {
                         return@executeTransaction
                     }
 
                     try {
-                        cache = client.getPerson(uid).toBlocking().single()
+                        val cache = client.getPerson(uid).toBlocking().single()
                         cache!!.cached = Date()
                         cache!!.updateImage()
+                        cache!!.isFriend = isFriend ?: Relation.OTHER
                         realm.insertOrUpdate(cache)
                     } catch (e: Exception) {
                         Log.d("COMM", "$e")
                     }
                 }
-                Log.d("COMM", "cache: ${cache?.id}, ${cache?.name}, ${cache?.cached}, ${cache?.isValid()}, ${cache?.isManaged()}")
+                Log.d("CACHE", "cache: ${cache?.id}, ${cache?.name}, ${cache?.cached}, ${cache?.isValid()}, ${cache?.isManaged()}")
 
                 if (cache == null) {
                     subscriber.onNext(cache)
@@ -65,35 +67,36 @@ open class Member : RealmObject() {
     }
 
     fun updateImage() {
-        Log.d("COMM", "dsajio;as")
-        //val member = realm.copyFromRealm(this)
+        Log.d("updater", "before: ${this.name}, ${this.isFriend}")
         val storageRef = FirebaseStorage.getInstance().reference
         val imageRef = storageRef.child("images/${this.id}.jpg")
         imageRef.getBytes(20000)
                 .addOnSuccessListener {
                     val realm = Realm.getDefaultInstance()
-                    Log.d("COMM", "get unique ByteArray Success")
+                    Log.d("COMM", "${this.name}: get unique ByteArray Success")
                     val ba = it
                     realm.executeTransaction {
                         this.image = ba
                         realm.insertOrUpdate(this)
+                        Log.d("updater", "after: ${this.name}, ${this.isFriend}")
                     }
                 }
                 .addOnFailureListener {
-                    Log.d("COMM", "get unique ByteArray Failure")
+                    Log.d("COMM", "${this.name}: get unique ByteArray Failure")
                     val defaultImageRef = storageRef.child("images/yoda.jpg")
                     defaultImageRef.getBytes(20000)
                             .addOnSuccessListener {
                                 val realm = Realm.getDefaultInstance()
-                                Log.d("COMM", "get yoda ByteArray Success")
+                                Log.d("COMM", "${this.name}: get yoda ByteArray Success")
                                 val ba = it
                                 realm.executeTransaction {
                                     this.image = ba
                                     realm.insertOrUpdate(this)
+                                    Log.d("updater", "after: ${this.name}, ${this.isFriend}")
                                 }
                             }
                             .addOnFailureListener {
-                                Log.d("COMM", "get yoda ByteArray Failure")
+                                Log.d("COMM", "${this.name}: get yoda ByteArray Failure")
                             }
                 }
     }
