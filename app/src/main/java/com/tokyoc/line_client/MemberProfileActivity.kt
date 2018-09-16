@@ -44,7 +44,7 @@ class MemberProfileActivity : AppCompatActivity() {
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        menuInflater.inflate(R.menu.menu_profile, menu)
+        menuInflater.inflate(R.menu.menu_profile_member, menu)
         return super.onCreateOptionsMenu(menu)
     }
 
@@ -52,17 +52,12 @@ class MemberProfileActivity : AppCompatActivity() {
         val token = intent.getStringExtra("token")
         when (item?.itemId) {
             android.R.id.home -> {
-                val intent = Intent(this, SettingActivity::class.java)
+                val intent = Intent(this, MemberActivity::class.java)
                 intent.putExtra("token", token)
                 startActivity(intent)
             }
-            R.id.change_image -> {
-                val intent = Intent(this, ChangeImageActivity::class.java)
-                intent.putExtra("token", token)
-                startActivity(intent)
-            }
-            R.id.change_name -> {
-                val intent = Intent(this, ChangeNameActivity::class.java)
+            R.id.start_talk -> {
+                val intent = Intent(this, GroupActivity::class.java)
                 intent.putExtra("token", token)
                 startActivity(intent)
             }

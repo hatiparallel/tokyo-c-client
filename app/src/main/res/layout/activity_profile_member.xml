@@ -21,9 +21,4 @@
         android:textSize="32dp"
         android:text="取得中" />
 
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="個人トーク開始"/>
-
 </LinearLayout>
