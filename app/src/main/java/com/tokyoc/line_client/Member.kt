@@ -9,8 +9,11 @@ import io.realm.annotations.PrimaryKey
 import io.realm.kotlin.createObject
 import io.realm.kotlin.delete
 import io.realm.kotlin.where
+import retrofit2.adapter.rxjava.HttpException
 import rx.android.schedulers.AndroidSchedulers
+import rx.exceptions.OnErrorNotImplementedException
 import rx.schedulers.Schedulers
+import java.lang.RuntimeException
 import java.util.*
 
 //MemberデータFormat
@@ -25,33 +28,40 @@ open class Member : RealmObject() {
                 realm.executeTransaction {
                     cache = realm.where<Member>().equalTo("id", uid).findFirst()
                             ?: realm.createObject<Member>(uid)
-                    val isFriend = cache?.isFriend
 
                     if (Date().getTime() - cache!!.cached.getTime() <= 5 * 60 * 1000) {
                         return@executeTransaction
                     }
 
                     try {
-                        val cache = client.getPerson(uid).toBlocking().single()
-                        cache!!.cached = Date()
-                        cache!!.updateImage()
-                        cache!!.isFriend = isFriend ?: Relation.OTHER
-                        realm.insertOrUpdate(cache)
-                    } catch (e: Exception) {
-                        Log.d("COMM", "$e")
+                        val fetched = client.getPerson(uid).toBlocking().single()
+                                ?: return@executeTransaction
+                        fetched.cached = Date()
+                        fetched.updateImage()
+                        fetched.isFriend = cache?.isFriend ?: Relation.OTHER
+                        realm.insertOrUpdate(fetched)
+                    } catch (e: RuntimeException) {
+                        val cause = e.cause
+
+                        when(cause){
+                            is HttpException->{
+                                Log.d("COMM", "failed to get person: ${cause.response().errorBody().string()}")
+                            }
+                        }
                     }
                 }
                 Log.d("CACHE", "cache: ${cache?.id}, ${cache?.name}, ${cache?.cached}, ${cache?.isValid()}, ${cache?.isManaged()}")
 
                 if (cache == null) {
-                    subscriber.onNext(cache)
-                } else if (cache!!.isManaged()) {
-                    subscriber.onNext(realm.copyFromRealm(cache))
-                } else {
-                    subscriber.onNext(cache)
+                    subscriber.onCompleted()
+                    return@create
                 }
 
-                //subscriber.onNext(realm.copyFromRealm(cache))
+                if (cache!!.isManaged()) {
+                    cache = realm.copyFromRealm(cache)
+                }
+
+                subscriber.onNext(cache)
                 subscriber.onCompleted()
             }
         }

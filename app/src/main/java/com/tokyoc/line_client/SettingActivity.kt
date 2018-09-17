@@ -84,15 +84,14 @@ class SettingActivity : AppCompatActivity() {
         //サインアウトボタンを押した時の処理
         findViewById<ImageButton>(R.id.signout_button).setOnClickListener {
             val intent = Intent(this, SigninActivity::class.java)
-            val service = Intent(this, PollingService::class.java)
+
             AlertDialog.Builder(this).apply {
                 setTitle("Sign Out")
                 setMessage("Really Sign Out?")
                 setPositiveButton("OK", DialogInterface.OnClickListener { _, _ ->
                     FirebaseAuth.getInstance().signOut()
+                    intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
                     startActivity(intent)
-                    service.putExtra("token", token)
-                    stopService(service)
                     Log.d("DDDD", "stop")
                 })
                 setNegativeButton("Cancel", null)

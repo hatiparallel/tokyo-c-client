@@ -169,9 +169,7 @@ class MessageActivity : RxAppCompatActivity() {
 
         when (item?.itemId) {
             android.R.id.home -> {
-                val intent = Intent(this, GroupActivity::class.java)
-                intent.putExtra("token", token)
-                startActivity(intent)
+                finish()
             }
             R.id.member_list -> {
                 var memberList = arrayListOf<String>()

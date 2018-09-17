@@ -5,16 +5,48 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
 import android.content.Intent
+import android.os.Binder
+import android.os.IBinder
 import android.support.v4.app.NotificationCompat
 import android.util.Log
 import io.realm.Realm
 import io.realm.kotlin.createObject
 import io.realm.kotlin.where
+import retrofit2.adapter.rxjava.HttpException
 import rx.schedulers.Schedulers
 
 class PollingService : IntentService("polling_service") {
     companion object {
         const val CHANNEL_ID = "YODA_POLLING_SERVICE"
+    }
+
+    private val binder = Binder()
+    private var bound = false
+    private val suppressedGroups: Set<Int> = setOf()
+
+    inner class Binder : android.os.Binder() {
+        fun getService(): PollingService {
+            return this@PollingService
+        }
+    }
+
+    fun suppressNotification(groupId: Int) {
+        suppressedGroups.plus(groupId)
+    }
+
+    fun clearSuppressions() {
+        suppressedGroups.minus(suppressedGroups)
+    }
+
+    override fun onBind(intent: Intent?): IBinder? {
+        bound = true
+        return binder
+    }
+
+    override fun onUnbind(intent: Intent?): Boolean {
+        clearSuppressions()
+        bound = false
+        return super.onUnbind(intent)
     }
 
     override fun onHandleIntent(intent: Intent) {
@@ -27,14 +59,15 @@ class PollingService : IntentService("polling_service") {
         notification_manager.createNotificationChannel(
                 NotificationChannel(CHANNEL_ID, "YODA", NotificationManager.IMPORTANCE_DEFAULT))
 
-        while (true) {
+        while (bound) {
+            Log.d("POLL", "tick")
+
             val status = client.getStatus().toBlocking().first() ?: continue
 
             if (lastStatus == null ||
                     lastStatus!!.friendshipCount != status.friendshipCount ||
                     lastStatus!!.friendshipAddedAt != lastStatus.friendshipAddedAt) {
 
-                //Log.d("COMM/POLL", "friend")
                 val friends = client.getFriends().toBlocking().single().toTypedArray()
 
                 rx.Observable.from(friends)
@@ -84,7 +117,7 @@ class PollingService : IntentService("polling_service") {
 
                     val groupName = group.name
 
-                    if (summary.messageId > group.latest) {
+                    if (!suppressedGroups.contains(group.id) && summary.messageId > group.latest) {
                         client.getMessage(summary.messageId)
                                 .observeOn(Schedulers.io())
                                 .subscribe({
@@ -105,7 +138,8 @@ class PollingService : IntentService("polling_service") {
                                         text = "${author.name}が${groupName}から退室しました"
                                     }
 
-                                    //Log.d("COMM/POLL", "notify ${it.author}")
+                                    Log.d("POLL", "notify ${it.author}")
+
 
                                     notification_manager.notify(summary.channelId,
                                             NotificationCompat.Builder(applicationContext, CHANNEL_ID)
@@ -117,7 +151,7 @@ class PollingService : IntentService("polling_service") {
                                                     .setAutoCancel(true)
                                                     .build())
                                 }, {
-                                    //Log.d("COMM/POLL", "notify failed $it")
+                                    Log.d("POLL", "notify failed $it")
                                 })
                     }
 
@@ -136,5 +170,10 @@ class PollingService : IntentService("polling_service") {
 
             Thread.sleep(3000)
         }
+    }
+
+    override fun onDestroy() {
+        Log.d("POLL", "PollingService destroyed")
+        super.onDestroy()
     }
 }
