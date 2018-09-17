@@ -65,6 +65,7 @@ class MakeGroupActivity: RxAppCompatActivity() {
                         .subscribe({
                             Log.d("COMM", "post done: name is ${it.name}, id is ${it.id}")
                             val group = it
+                            group.updateImage()
                             realm.executeTransaction {
                                 realm.insertOrUpdate(group)
                             }
