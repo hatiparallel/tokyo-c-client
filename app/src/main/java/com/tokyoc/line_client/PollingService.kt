@@ -5,14 +5,12 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
 import android.content.Intent
-import android.os.Binder
 import android.os.IBinder
 import android.support.v4.app.NotificationCompat
 import android.util.Log
 import io.realm.Realm
 import io.realm.kotlin.createObject
 import io.realm.kotlin.where
-import retrofit2.adapter.rxjava.HttpException
 import rx.schedulers.Schedulers
 
 class PollingService : IntentService("polling_service") {
@@ -20,31 +18,27 @@ class PollingService : IntentService("polling_service") {
         const val CHANNEL_ID = "YODA_POLLING_SERVICE"
     }
 
-    private val binder = Binder()
     private var bound = false
-    private val suppressedGroups: Set<Int> = setOf()
+    private lateinit var pollingStatus: PollingStatus
 
-    inner class Binder : android.os.Binder() {
-        fun getService(): PollingService {
-            return this@PollingService
+    override fun onCreate() {
+        val realm = Realm.getDefaultInstance()
+
+        pollingStatus = PollingStatus()
+
+        realm.executeTransaction {
+            realm.insertOrUpdate(pollingStatus)
         }
-    }
 
-    fun suppressNotification(groupId: Int) {
-        suppressedGroups.plus(groupId)
-    }
-
-    fun clearSuppressions() {
-        suppressedGroups.minus(suppressedGroups)
+        super.onCreate()
     }
 
     override fun onBind(intent: Intent?): IBinder? {
         bound = true
-        return binder
+        return android.os.Binder()
     }
 
     override fun onUnbind(intent: Intent?): Boolean {
-        clearSuppressions()
         bound = false
         return super.onUnbind(intent)
     }
@@ -60,7 +54,7 @@ class PollingService : IntentService("polling_service") {
                 NotificationChannel(CHANNEL_ID, "YODA", NotificationManager.IMPORTANCE_DEFAULT))
 
         while (bound) {
-            Log.d("POLL", "tick")
+            Log.d("POLL", "tick suppressing ${pollingStatus.suppressedGroup}")
 
             val status = client.getStatus().toBlocking().first() ?: continue
 
@@ -117,7 +111,7 @@ class PollingService : IntentService("polling_service") {
 
                     val groupName = group.name
 
-                    if (!suppressedGroups.contains(group.id) && summary.messageId > group.latest) {
+                    if (pollingStatus.suppressedGroup != group.id && summary.messageId > group.latest) {
                         client.getMessage(summary.messageId)
                                 .observeOn(Schedulers.io())
                                 .subscribe({

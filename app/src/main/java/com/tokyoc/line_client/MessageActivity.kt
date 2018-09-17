@@ -54,8 +54,6 @@ class MessageActivity : RxAppCompatActivity() {
         Log.d("COMM", "listening /streams/${group?.id}")
         Log.d("COMM", "members of this group: ${group?.members}")
 
-
-
         client.getMessages(groupId, sinceId.toInt())
                 .flatMap {
                     val source = it.source()
