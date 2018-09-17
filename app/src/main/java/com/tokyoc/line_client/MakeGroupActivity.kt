@@ -63,14 +63,9 @@ class MakeGroupActivity: RxAppCompatActivity() {
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe({
                             Log.d("COMM", "post done: name is ${it.name}, id is ${it.id}")
-                            val groupId = it.id
-                            val self = realm.where<Member>().equalTo("isFriend", Relation.SELF).findFirst()
+                            val group = it
                             realm.executeTransaction {
-                                val group = realm.createObject<Group>(groupId)
-                                group.name = groupName
-                                if (self != null) {
-                                    group.members.add(self.id)
-                                }
+                                realm.insertOrUpdate(group)
                             }
                             val intent = Intent(this, GroupActivity::class.java)
                             intent.putExtra("token", token)
