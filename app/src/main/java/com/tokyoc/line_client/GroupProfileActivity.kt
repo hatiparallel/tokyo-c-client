@@ -20,29 +20,25 @@ import io.realm.Realm
 import io.realm.kotlin.where
 
 
-class ProfileActivity : AppCompatActivity() {
+class GroupProfileActivity : AppCompatActivity() {
     private lateinit var realm: Realm
+    private var groupId: Int = 0
 
     override fun onCreate(saveInstanceState: Bundle?) {
         super.onCreate(saveInstanceState)
         setContentView(R.layout.activity_profile)
 
-        val token = intent.getStringExtra("token")
+        groupId = intent.getIntExtra("groupId", 0)
         val toolbar = supportActionBar!!
         toolbar.setDisplayHomeAsUpEnabled(true)
 
         realm = Realm.getDefaultInstance()
-        val self = realm.where<Member>().equalTo("isFriend", Relation.SELF).findFirst()
-        findViewById<TextView>(R.id.name_view).text = self?.name ?: "取得失敗"
+        val group = realm.where<Group>().equalTo("id", groupId).findFirst()
+        findViewById<TextView>(R.id.name_view).text = group?.name ?: "取得失敗"
 
-        if (self != null && self.image.size > 0) {
+        if (group != null && group.image.size > 0) {
             findViewById<ImageView>(R.id.photo_view)
-                    .setImageBitmap(BitmapFactory.decodeByteArray(self.image, 0, self.image.size))
-        }
-
-        val member1 = realm.where<Member>().findAll()
-        for (i in member1) {
-            Log.d("COMM", "${i.isFriend}, ${i.name}")
+                    .setImageBitmap(BitmapFactory.decodeByteArray(group.image, 0, group.image.size))
         }
     }
 
@@ -60,13 +56,15 @@ class ProfileActivity : AppCompatActivity() {
                 startActivity(intent)
             }
             R.id.change_image -> {
-                val intent = Intent(this, ChangeImageActivity::class.java)
+                val intent = Intent(this, ChangeGroupImageActivity::class.java)
                 intent.putExtra("token", token)
+                intent.putExtra("groupId", groupId)
                 startActivity(intent)
             }
             R.id.change_name -> {
-                val intent = Intent(this, ChangeNameActivity::class.java)
+                val intent = Intent(this, ChangeGroupNameActivity::class.java)
                 intent.putExtra("token", token)
+                intent.putExtra("groupId", groupId)
                 startActivity(intent)
             }
         }

@@ -55,6 +55,7 @@ interface Client {
     @GET("/messages/{id}")
     fun getMessage(@Path("id") id: Int): Observable<Message>
 
+
     @Headers("Content-type: application/json")
     @GET("/friendships")
     fun getFriends(): Observable<List<String>>
@@ -88,7 +89,7 @@ interface Client {
 
     @FormUrlEncoded
     @PATCH("/channels/{channel}")
-    fun renameGroup(@Path("channel") channel: Int, @Query("name") new_name: String): Observable<String>
+    fun renameGroup(@Path("channel") channel: Int, @Field("name") new_name: String): Observable<String>
 
 
     @Headers("Content-Type: application/json")

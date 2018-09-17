@@ -26,20 +26,16 @@ import rx.schedulers.Schedulers
 
 class MemberProfileActivity : AppCompatActivity() {
     private lateinit var realm: Realm
-    private lateinit var client: Client
     private lateinit var memberId: String
 
     override fun onCreate(saveInstanceState: Bundle?) {
         super.onCreate(saveInstanceState)
-        setContentView(R.layout.activity_profile_member)
+        setContentView(R.layout.activity_profile)
 
-        val token = intent.getStringExtra("token")
         memberId = intent.getStringExtra("memberId")
 
         val toolbar = supportActionBar!!
         toolbar.setDisplayHomeAsUpEnabled(true)
-
-        client = Client.build(token)
 
         realm = Realm.getDefaultInstance()
         val member = realm.where<Member>().equalTo("id", memberId).findFirst()
@@ -59,6 +55,7 @@ class MemberProfileActivity : AppCompatActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
         val token = intent.getStringExtra("token")
+        val client = Client.build(token)
         when (item?.itemId) {
             android.R.id.home -> {
                 val intent = Intent(this, MemberActivity::class.java)
@@ -66,7 +63,9 @@ class MemberProfileActivity : AppCompatActivity() {
                 startActivity(intent)
             }
             R.id.start_talk -> {
-                client.makeGroup(Group(name = "", members = RealmList(memberId)))
+                val newGroup = Group()
+                newGroup.members = RealmList(memberId)
+                client.makeGroup(newGroup)
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe({

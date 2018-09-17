@@ -56,7 +56,8 @@ class MakeGroupActivity: RxAppCompatActivity() {
                 }
 
                 val groupName = groupNameEditText.text.toString()
-                val new_group = Group(name = groupName)
+                val new_group = Group()
+                new_group.name = groupName
 
                 client.makeGroup(new_group)
                         .subscribeOn(Schedulers.io())

@@ -192,6 +192,12 @@ class MessageActivity : RxAppCompatActivity() {
                 intent.putExtra("groupId", groupId)
                 startActivity(intent)
             }
+            R.id.group_profile -> {
+                val intent = Intent(this, GroupProfileActivity::class.java)
+                intent.putExtra("token", token)
+                intent.putExtra("groupId", groupId)
+                startActivity(intent)
+            }
         }
         return super.onOptionsItemSelected(item)
     }

@@ -73,7 +73,16 @@
             android:name=".ChangeNameActivity" />
 
         <activity
-            android:name=".MemberProfileActivity"/>
+            android:name=".MemberProfileActivity" />
+
+        <activity
+            android:name=".GroupProfileActivity" />
+
+        <activity
+            android:name=".ChangeGroupImageActivity" />
+
+        <activity
+            android:name=".ChangeGroupNameActivity" />
 
       
         <service android:name=".PollingService" />
