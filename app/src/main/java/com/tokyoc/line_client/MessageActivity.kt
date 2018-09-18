@@ -170,7 +170,7 @@ class MessageActivity : RxAppCompatActivity() {
                 finish()
             }
             R.id.member_list -> {
-                var memberList = arrayListOf<String>()
+                val memberList = arrayListOf<String>()
                 if (group != null) {
                     for (memberId in group.members) {
                         memberList.add(memberId)
@@ -193,9 +193,19 @@ class MessageActivity : RxAppCompatActivity() {
                         show()
                     }
                 } else {
+                    val invitableList = arrayListOf<String>()
+                    val friends = realm.where<Member>().equalTo("isFriend", Relation.FRIEND).findAll()
+                    if (group != null) {
+                        for (friend in friends) {
+                            if (group.members.all { m -> m != friend.id }) {
+                                invitableList.add(friend.id)
+                            }
+                        }
+                    }
                     val intent = Intent(this, InviteActivity::class.java)
                     intent.putExtra("token", token)
                     intent.putExtra("groupId", groupId)
+                    intent.putExtra("invitable", invitableList)
                     startActivity(intent)
                 }
             }
