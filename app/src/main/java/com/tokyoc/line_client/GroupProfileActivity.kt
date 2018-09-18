@@ -34,12 +34,7 @@ class GroupProfileActivity : AppCompatActivity() {
 
         realm = Realm.getDefaultInstance()
         val group = realm.where<Group>().equalTo("id", groupId).findFirst()
-        findViewById<TextView>(R.id.name_view).text = group?.name ?: "取得失敗"
-
-        if (group != null && group.image.size > 0) {
-            findViewById<ImageView>(R.id.photo_view)
-                    .setImageBitmap(BitmapFactory.decodeByteArray(group.image, 0, group.image.size))
-        }
+        group?.display(findViewById<TextView>(R.id.name_view), findViewById<ImageView>(R.id.photo_view))
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {

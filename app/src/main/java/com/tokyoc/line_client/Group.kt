@@ -1,6 +1,7 @@
 package com.tokyoc.line_client
 
 import android.graphics.BitmapFactory
+import android.graphics.Color
 import android.util.Log
 import android.widget.ImageView
 import android.widget.TextView
@@ -50,6 +51,7 @@ open class Group() : RealmObject() {
             nameView.text = this.name
             imageView.setImageBitmap(BitmapFactory.decodeByteArray(this.image, 0, this.image.size))
         } else {
+            nameView.setTextColor(Color.DKGRAY)
             val realm = Realm.getDefaultInstance()
             val member = realm.where<Member>().equalTo("id", this.members[0]).findFirst()
             if (member != null) {

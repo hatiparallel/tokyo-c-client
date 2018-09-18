@@ -123,6 +123,7 @@ class PollingService : IntentService("polling_service") {
 
                     group.name = summary.channelName
                     group.latest = summary.messageId
+                    realm.copyFromRealm(group).updateImage()
                 }
 
                 lastStatus = status
