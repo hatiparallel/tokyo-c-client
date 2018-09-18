@@ -39,6 +39,8 @@ class MessageActivity : RxAppCompatActivity() {
         val messageEditText = findViewById<EditText>(R.id.message_edit_text)
         val listAdapter = MessageListAdapter(messages)
 
+        var isImportant: Boolean = false
+
         listView.adapter = listAdapter
         listView.setSelection(listAdapter.messages0.size)
 
@@ -83,7 +85,7 @@ class MessageActivity : RxAppCompatActivity() {
                                 Log.d("COMM", "registered: ${message.id}")
                             }
                             listView.setSelection(listAdapter.messages0.size)
-                            Log.d("COMM", "received")
+                            Log.d("COMM", "received ${message.isEvent}")
 
                             if (message.isEvent == 1) {
                                 if (message.content == "join") {
@@ -125,6 +127,16 @@ class MessageActivity : RxAppCompatActivity() {
                             Log.d("COMM", "receive failed: $it")
                         })
 
+        sendButton.setOnLongClickListener {
+            if (isImportant) {
+                isImportant = false
+                messageEditText.setBackgroundColor(Color.WHITE)
+            } else {
+                isImportant = true
+                messageEditText.setBackgroundColor(Color.MAGENTA)
+            }
+            return@setOnLongClickListener true
+        }
         // 送信ボタンをタップした時の処理
         sendButton.setOnClickListener {
             if (messageEditText.text.isEmpty()) {
@@ -135,7 +147,12 @@ class MessageActivity : RxAppCompatActivity() {
             val message: Message = Message()
             message.channel = groupId
             message.content = messageEditText.text.toString()
+            if (isImportant) {
+                message.isEvent = 2
+            }
             messageEditText.setText("", TextView.BufferType.NORMAL)
+            isImportant = false
+            messageEditText.setBackgroundColor(Color.WHITE)
 
             //ここから通信部分！
             Log.d("COMM", Client.gson.toJson(message))

@@ -51,9 +51,11 @@ class MessageListAdapter(data: OrderedRealmCollection<Message>) : RealmBaseAdapt
                         .setImageBitmap(BitmapFactory.decodeByteArray(author.image, 0, author.image.size))
             }
             if (message.isEvent == 1) {
-                viewHolder.messageContent.setTextColor(Color.CYAN)
+                viewHolder.messageContent.setTextColor(Color.BLUE)
             } else if (message.isEvent == 2) {
                 viewHolder.messageContent.setTextColor(Color.MAGENTA)
+            } else {
+                viewHolder.messageContent.setTextColor(Color.BLACK)
             }
         }
         return view
