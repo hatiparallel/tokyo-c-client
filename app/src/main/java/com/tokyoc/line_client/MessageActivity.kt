@@ -135,6 +135,7 @@ class MessageActivity : RxAppCompatActivity() {
             val message: Message = Message()
             message.channel = groupId
             message.content = messageEditText.text.toString()
+            Log.d("COMM", "Posted at ${message.postedAt}")
             messageEditText.setText("", TextView.BufferType.NORMAL)
 
             //ここから通信部分！
