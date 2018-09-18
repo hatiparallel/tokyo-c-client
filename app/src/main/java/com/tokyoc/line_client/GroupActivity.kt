@@ -1,8 +1,8 @@
 package com.tokyoc.line_client
 
-import android.content.DialogInterface
-import android.content.Intent
+import android.content.*
 import android.os.Bundle
+import android.os.IBinder
 import android.support.design.widget.BottomNavigationView
 import android.support.design.widget.FloatingActionButton
 import android.support.v7.app.ActionBar
@@ -10,7 +10,6 @@ import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import android.view.KeyEvent
-import android.widget.Button
 import android.widget.ListView
 import android.widget.Toast
 import com.google.firebase.auth.FirebaseAuth
@@ -23,6 +22,9 @@ import rx.schedulers.Schedulers
 
 class GroupActivity : AppCompatActivity() {
     private lateinit var realm: Realm
+    private lateinit var pollingConnection: ServiceConnection
+    private lateinit var pollingStatus: PollingStatus
+
     lateinit var toolbar: ActionBar
 
     companion object {
@@ -48,11 +50,29 @@ class GroupActivity : AppCompatActivity() {
         val token = intent.getStringExtra("token")
         val client = Client.build(token)
 
+        pollingConnection = object : ServiceConnection {
+            override fun onServiceConnected(name: ComponentName?, binder0: IBinder?) {
+                pollingStatus = realm.where<PollingStatus>().findFirst() ?: return
+            }
+
+            override fun onServiceDisconnected(p0: ComponentName?) {}
+        }
+
+        val intent = Intent(applicationContext, PollingService::class.java)
+        intent.putExtra("token", token)
+        bindService(intent, pollingConnection, Context.BIND_AUTO_CREATE)
+        startService(intent)
+
         //Groupをクリックした時の処理
         listView.setOnItemClickListener { adapterView, view, position, id ->
-            val group = groups[position]
+            val group = groups[position] ?: return@setOnItemClickListener
+
+            realm.executeTransaction {
+                pollingStatus.suppressedGroup = group.id
+            }
+
             val intent = Intent(this, MessageActivity::class.java)
-            intent.putExtra("groupId", group?.id)
+            intent.putExtra("groupId", group.id)
             intent.putExtra("token", getIntent().getStringExtra("token"))
             startActivity(intent)
         }
@@ -131,6 +151,14 @@ class GroupActivity : AppCompatActivity() {
         }
     }
 
+    override fun onPause() {
+        realm.executeTransaction {
+            pollingStatus.suppressedGroup = null
+        }
+
+        super.onPause()
+    }
+
     override fun onKeyDown(keyCode: Int, event: KeyEvent): Boolean {
         when (keyCode) {
             KeyEvent.KEYCODE_BACK -> {
@@ -141,5 +169,11 @@ class GroupActivity : AppCompatActivity() {
             }
             else -> return super.onKeyDown(keyCode, event)
         }
+    }
+
+    override fun onDestroy() {
+        unbindService(pollingConnection)
+        stopService(Intent(applicationContext, PollingService::class.java))
+        super.onDestroy()
     }
 }

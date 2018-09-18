@@ -21,7 +21,7 @@ interface Client {
                 .setLenient()
                 .create()
 
-        fun build(token: String): Client {
+        fun build(token: String, endpoint: String = BuildConfig.BACKEND_BASEURL): Client {
             val authenticatedClient = OkHttpClient().newBuilder()
                     .readTimeout(0, TimeUnit.SECONDS)
                     .addInterceptor(Interceptor { chain ->
@@ -34,7 +34,7 @@ interface Client {
                     .build()
             val retrofit = Retrofit.Builder()
                     .client(authenticatedClient)
-                    .baseUrl(BuildConfig.BACKEND_BASEURL)
+                    .baseUrl(endpoint)
                     .addConverterFactory(GsonConverterFactory.create(gson))
                     .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
                     .build()
@@ -71,8 +71,16 @@ interface Client {
 
 
     @Headers("Content-Type: application/json")
+    @GET("/channels")
+    fun getMemberships(): Observable<Group>
+
+    @Headers("Content-Type: application/json")
     @POST("/channels")
     fun makeGroup(@Body group: Group): Observable<Group>
+
+    @Headers("Content-Type: application/json")
+    @GET("/channels/{channel}")
+    fun getGroup(@Path("channel") channel: Int): Observable<Group>
 
     @Headers("Content-Type: application/json")
     @PUT("/channels/{channel}/{person}")

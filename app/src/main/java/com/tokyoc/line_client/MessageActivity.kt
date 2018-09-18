@@ -54,8 +54,6 @@ class MessageActivity : RxAppCompatActivity() {
         Log.d("COMM", "listening /streams/${group?.id}")
         Log.d("COMM", "members of this group: ${group?.members}")
 
-
-
         client.getMessages(groupId, sinceId.toInt())
                 .flatMap {
                     val source = it.source()
@@ -169,9 +167,7 @@ class MessageActivity : RxAppCompatActivity() {
 
         when (item?.itemId) {
             android.R.id.home -> {
-                val intent = Intent(this, GroupActivity::class.java)
-                intent.putExtra("token", token)
-                startActivity(intent)
+                finish()
             }
             R.id.member_list -> {
                 var memberList = arrayListOf<String>()
