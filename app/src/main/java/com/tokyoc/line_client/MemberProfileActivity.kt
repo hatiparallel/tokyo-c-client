@@ -17,18 +17,23 @@ import com.bumptech.glide.load.resource.drawable.GlideDrawable
 import com.bumptech.glide.request.RequestListener
 import com.google.firebase.storage.StorageReference
 import io.realm.Realm
+import io.realm.RealmList
+import io.realm.kotlin.createObject
 import io.realm.kotlin.where
+import rx.android.schedulers.AndroidSchedulers
+import rx.schedulers.Schedulers
 
 
 class MemberProfileActivity : AppCompatActivity() {
     private lateinit var realm: Realm
+    private lateinit var memberId: String
 
     override fun onCreate(saveInstanceState: Bundle?) {
         super.onCreate(saveInstanceState)
-        setContentView(R.layout.activity_profile_member)
+        setContentView(R.layout.activity_profile)
 
-        val token = intent.getStringExtra("token")
-        val memberId = intent.getStringExtra("memberId")
+        memberId = intent.getStringExtra("memberId")
+
         val toolbar = supportActionBar!!
         toolbar.setDisplayHomeAsUpEnabled(true)
 
@@ -44,27 +49,37 @@ class MemberProfileActivity : AppCompatActivity() {
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        menuInflater.inflate(R.menu.menu_profile, menu)
+        menuInflater.inflate(R.menu.menu_profile_member, menu)
         return super.onCreateOptionsMenu(menu)
     }
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
         val token = intent.getStringExtra("token")
+        val client = Client.build(token)
         when (item?.itemId) {
             android.R.id.home -> {
-                val intent = Intent(this, SettingActivity::class.java)
+                val intent = Intent(this, MemberActivity::class.java)
                 intent.putExtra("token", token)
                 startActivity(intent)
             }
-            R.id.change_image -> {
-                val intent = Intent(this, ChangeImageActivity::class.java)
-                intent.putExtra("token", token)
-                startActivity(intent)
-            }
-            R.id.change_name -> {
-                val intent = Intent(this, ChangeNameActivity::class.java)
-                intent.putExtra("token", token)
-                startActivity(intent)
+            R.id.start_talk -> {
+                val newGroup = Group()
+                newGroup.members = RealmList(memberId)
+                client.makeGroup(newGroup)
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe({
+                            Log.d("COMM", "post done: name is ${it.name}, id is ${it.id}, size is ${it.members.size}")
+                            val group = it
+                            realm.executeTransaction {
+                                realm.insertOrUpdate(group)
+                            }
+                            val intent = Intent(this, GroupActivity::class.java)
+                            intent.putExtra("token", token)
+                            startActivity(intent)
+                        }, {
+                            Log.d("COMM", "post failed: ${it}")
+                        })
             }
         }
         return super.onOptionsItemSelected(item)

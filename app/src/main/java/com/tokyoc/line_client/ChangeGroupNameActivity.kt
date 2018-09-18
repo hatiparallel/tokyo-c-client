@@ -15,11 +15,14 @@ import com.google.firebase.auth.*
 import com.google.firebase.storage.FirebaseStorage
 import io.realm.Realm
 import io.realm.kotlin.where
+import rx.android.schedulers.AndroidSchedulers
+import rx.schedulers.Schedulers
 
 
-class ChangeNameActivity : AppCompatActivity() {
+class ChangeGroupNameActivity : AppCompatActivity() {
     val firebaseUser = FirebaseAuth.getInstance().currentUser
     private lateinit var realm: Realm
+    private var groupId: Int = 0
 
     override fun onCreate(saveInstanceState: Bundle?) {
         super.onCreate(saveInstanceState)
@@ -28,10 +31,10 @@ class ChangeNameActivity : AppCompatActivity() {
         val toolbar = supportActionBar!!
         toolbar.setDisplayHomeAsUpEnabled(true)
 
+        groupId = intent.getIntExtra("groupId", 0)
         realm = Realm.getDefaultInstance()
-        val self = realm.where<Member>().equalTo("isFriend", Relation.SELF).findFirst()
-        Log.d("COMM", "$self , ${self?.name}")
-        findViewById<TextView>(R.id.name_view).text = self?.name ?: "取得失敗"
+        val group = realm.where<Group>().equalTo("id", groupId).findFirst()
+        findViewById<TextView>(R.id.name_view).text = group?.name ?: "取得失敗"
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -43,14 +46,14 @@ class ChangeNameActivity : AppCompatActivity() {
         val token = intent.getStringExtra("token")
         val nameEditText = findViewById<EditText>(R.id.new_name_edit_text)
 
-        realm = Realm.getDefaultInstance()
-        val self = realm.where<Member>().equalTo("isFriend", Relation.SELF).findFirst()
-        findViewById<TextView>(R.id.name_view).text = self?.name ?: "取得失敗"
+        val group = realm.where<Group>().equalTo("id", groupId).findFirst()
+        findViewById<TextView>(R.id.name_view).text = group?.name ?: "取得失敗"
 
         when (item?.itemId) {
             android.R.id.home -> {
-                val intent = Intent(this, ProfileActivity::class.java)
+                val intent = Intent(this, GroupProfileActivity::class.java)
                 intent.putExtra("token", token)
+                intent.putExtra("groupId", groupId)
                 startActivity(intent)
             }
             R.id.change_name -> {
@@ -58,23 +61,24 @@ class ChangeNameActivity : AppCompatActivity() {
                 if (newName.isEmpty()) {
                     return false
                 }
-
-                val profileUpdates = UserProfileChangeRequest.Builder()
-                        .setDisplayName(newName)
-                        .build()
-                firebaseUser?.updateProfile(profileUpdates)
-                        ?.addOnCompleteListener {
-                            Log.d("COMM", "update success")
+                val client = Client.build(token)
+                client.renameGroup(groupId, newName)
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe({
+                            Log.d("COMM", "change group name success: ${it}")
+                            realm = Realm.getDefaultInstance()
+                            val group = realm.where<Group>().equalTo("id", groupId).findFirst()
                             realm.executeTransaction {
-                                self?.name = newName
+                                group?.name = newName
                             }
-                            val intent = Intent(this, ProfileActivity::class.java)
+                            val intent = Intent(this, GroupProfileActivity::class.java)
                             intent.putExtra("token", token)
+                            intent.putExtra("groupId", groupId)
                             startActivity(intent)
-                        }
-                        ?.addOnFailureListener {
-                            Log.d("COMM", "update failure: ${it.message}")
-                        }
+                        }, {
+                            Log.d("COMM", "change group name failure: ${it}")
+                        })
             }
         }
         return super.onOptionsItemSelected(item)

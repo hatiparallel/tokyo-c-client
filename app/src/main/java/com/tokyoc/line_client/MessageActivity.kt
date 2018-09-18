@@ -183,7 +183,24 @@ class MessageActivity : RxAppCompatActivity() {
                 startActivity(intent)
             }
             R.id.member_invite -> {
-                val intent = Intent(this, InviteActivity::class.java)
+                if (group == null) {
+                    return false
+                } else if (group.name.isEmpty()) {
+                    AlertDialog.Builder(this).apply {
+                        setTitle("Alert")
+                        setMessage("Not a group.\n You'd set the group's name if you wanna invite.")
+                        setPositiveButton("OK", null)
+                        show()
+                    }
+                } else {
+                    val intent = Intent(this, InviteActivity::class.java)
+                    intent.putExtra("token", token)
+                    intent.putExtra("groupId", groupId)
+                    startActivity(intent)
+                }
+            }
+            R.id.group_profile -> {
+                val intent = Intent(this, GroupProfileActivity::class.java)
                 intent.putExtra("token", token)
                 intent.putExtra("groupId", groupId)
                 startActivity(intent)

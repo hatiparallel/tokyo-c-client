@@ -54,6 +54,14 @@ class MemberActivity : AppCompatActivity() {
         // 通信の準備
         val client = Client.build(token)
 
+        listView.setOnItemClickListener { adapterView, view, position, id ->
+            val memberChosen = adapterView.getItemAtPosition(position) as Member
+            intent = Intent(this, MemberProfileActivity::class.java)
+            intent.putExtra("token", token)
+            intent.putExtra("memberId", memberChosen.id)
+            startActivity(intent)
+        }
+
         //Memberを長押しした時に友達削除
         listView.setOnItemLongClickListener { adapterView, view, position, id ->
             val memberDelete = adapterView.getItemAtPosition(position) as Member
