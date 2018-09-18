@@ -34,8 +34,7 @@ class GroupListAdapter(data: OrderedRealmCollection<Group>) : RealmBaseAdapter<G
 
         adapterData?.run {
             val member = get(position)
-            viewHolder.groupName.text = member.name
-            viewHolder.groupImage.setImageResource(R.drawable.img001)
+            member.display(viewHolder.groupName, viewHolder.groupImage)
         }
         return view
     }

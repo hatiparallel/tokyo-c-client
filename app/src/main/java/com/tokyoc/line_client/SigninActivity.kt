@@ -61,29 +61,25 @@ class SigninActivity : AppCompatActivity() {
                     val user = firebase.currentUser
                     Log.d("COMM", "a")
                     if (user != null) {
-                        realm = Realm.getDefaultInstance()
+                        val realm = Realm.getDefaultInstance()
                         val self = realm.where<Member>().equalTo("isFriend", Relation.SELF).findFirst()
                         if (self?.id != user.uid) {
                             realm.executeTransaction {
                                 realm.deleteAll()
-                                val self: Member = realm.createObject<Member>(user.uid)
-                                self.name = user?.displayName ?: "default"
-                                self.isFriend = Relation.SELF
-                                self.updateImage()
-                                Log.d("COMM", "missify")
+                                val selfNew: Member = realm.createObject<Member>(user.uid)
+                                selfNew.name = user.displayName ?: "default"
+                                selfNew.isFriend = Relation.SELF
+                                selfNew.updateImage()
+                                Log.d("COMM", "new self updated")
                             }
                         }
                         val member1 = realm.where<Member>().findAll()
                         for (i in member1) {
-                            Log.d("COMM", "${i.isFriend}, ${i.name}")
+                            Log.d("COMM", "sign in: ${i.isFriend}, ${i.name}")
                         }
                         val intent = Intent(this, GroupActivity::class.java)
                         intent.putExtra("token", token)
                         startActivity(intent)
-
-                        val service = Intent(this, PollingService::class.java)
-                        service.putExtra("token", token)
-                        startService(service)
                     } else {
                         Log.d("COMM", "could not get current user")
                     }

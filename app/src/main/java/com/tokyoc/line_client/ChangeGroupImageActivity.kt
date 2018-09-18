@@ -26,21 +26,18 @@ import io.realm.Realm
 import io.realm.kotlin.where
 
 
-class ChangeImageActivity : AppCompatActivity() {
-    val firebaseUser:FirebaseUser? = FirebaseAuth.getInstance().currentUser
-
-    val image_request_code = 2700
+class ChangeGroupImageActivity : AppCompatActivity() {
+    val image_request_code = 2800
 
     var uri: Uri? = null
     var ba: ByteArray? = null
 
     private lateinit var realm: Realm
+    private var groupId: Int = 0
 
     override fun onCreate(saveInstanceState: Bundle?) {
         super.onCreate(saveInstanceState)
         setContentView(R.layout.activity_image_change)
-
-        val token = intent.getStringExtra("token")
 
         val toolbar = supportActionBar!!
         toolbar.setDisplayHomeAsUpEnabled(true)
@@ -63,10 +60,14 @@ class ChangeImageActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
         val token = intent.getStringExtra("token")
         realm = Realm.getDefaultInstance()
+        groupId = intent.getIntExtra("groupId", 0)
+        val group = realm.where<Group>().equalTo("id", groupId).findFirst()
+
         when (item?.itemId) {
             android.R.id.home -> {
-                val intent = Intent(this, ProfileActivity::class.java)
+                val intent = Intent(this, GroupProfileActivity::class.java)
                 intent.putExtra("token", token)
+                intent.putExtra("groupId", groupId)
                 startActivity(intent)
             }
             R.id.change_image -> {
@@ -79,19 +80,17 @@ class ChangeImageActivity : AppCompatActivity() {
                     Log.d("COMM", "the image size is too big")
                     return false
                 }
-
-                val self: Member? = realm.where<Member>().equalTo("isFriend", Relation.SELF).findFirst()
-                if (self == null) {
-                    Toast.makeText(applicationContext, "ユーザーが認証できていません", Toast.LENGTH_LONG).show()
+                if (group == null) {
+                    Log.d("COMM", "Group Image Changer: could not find the group in realm")
                     return false
                 }
 
-                val imageRef = storageRef.child("images/${self.id}.jpg")
+                val imageRef = storageRef.child("images/groups/${groupId}.jpg")
                 imageRef.putBytes(ba!!)
                         .addOnSuccessListener {
                             Log.d("COMM", "upload success")
-                            self.updateImage()
-                            val intent = Intent(this, ProfileActivity::class.java)
+                            group.updateImage()
+                            val intent = Intent(this, GroupProfileActivity::class.java)
                             intent.putExtra("token", token)
                             startActivity(intent)
                         }
@@ -121,9 +120,9 @@ class ChangeImageActivity : AppCompatActivity() {
                     val baos: ByteArrayOutputStream = ByteArrayOutputStream()
                     bmp.compress(Bitmap.CompressFormat.JPEG, 50, baos)
                     ba = baos.toByteArray()
-                    val self = realm.where<Member>().equalTo("isFriend", Relation.SELF).findFirst()
+                    val group = realm.where<Group>().equalTo("id", groupId).findFirst()
                     realm.executeTransaction {
-                        self?.image = ba!!
+                        group?.image = ba!!
                     }
                 } catch (e: IOException) {
                     e.printStackTrace()

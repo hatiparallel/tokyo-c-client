@@ -9,8 +9,11 @@ import io.realm.annotations.PrimaryKey
 import io.realm.kotlin.createObject
 import io.realm.kotlin.delete
 import io.realm.kotlin.where
+import retrofit2.adapter.rxjava.HttpException
 import rx.android.schedulers.AndroidSchedulers
+import rx.exceptions.OnErrorNotImplementedException
 import rx.schedulers.Schedulers
+import java.lang.RuntimeException
 import java.util.*
 
 //MemberデータFormat
@@ -31,25 +34,34 @@ open class Member : RealmObject() {
                     }
 
                     try {
-                        cache = client.getPerson(uid).toBlocking().single()
-                        cache!!.cached = Date()
-                        cache!!.updateImage()
-                        realm.insertOrUpdate(cache)
-                    } catch (e: Exception) {
-                        Log.d("COMM", "$e")
+                        val fetched = client.getPerson(uid).toBlocking().single()
+                                ?: return@executeTransaction
+                        fetched.cached = Date()
+                        fetched.updateImage()
+                        fetched.isFriend = cache?.isFriend ?: Relation.OTHER
+                        realm.insertOrUpdate(fetched)
+                    } catch (e: RuntimeException) {
+                        val cause = e.cause
+
+                        when(cause){
+                            is HttpException->{
+                                Log.d("COMM", "failed to get person: ${cause.response().errorBody().string()}")
+                            }
+                        }
                     }
                 }
-                Log.d("COMM", "cache: ${cache?.id}, ${cache?.name}, ${cache?.cached}, ${cache?.isValid()}, ${cache?.isManaged()}")
+                Log.d("CACHE", "cache: ${cache?.id}, ${cache?.name}, ${cache?.cached}, ${cache?.isValid()}, ${cache?.isManaged()}")
 
                 if (cache == null) {
-                    subscriber.onNext(cache)
-                } else if (cache!!.isManaged()) {
-                    subscriber.onNext(realm.copyFromRealm(cache))
-                } else {
-                    subscriber.onNext(cache)
+                    subscriber.onCompleted()
+                    return@create
                 }
 
-                //subscriber.onNext(realm.copyFromRealm(cache))
+                if (cache!!.isManaged()) {
+                    cache = realm.copyFromRealm(cache)
+                }
+
+                subscriber.onNext(cache)
                 subscriber.onCompleted()
             }
         }
@@ -65,35 +77,36 @@ open class Member : RealmObject() {
     }
 
     fun updateImage() {
-        Log.d("COMM", "dsajio;as")
-        //val member = realm.copyFromRealm(this)
+        Log.d("updater", "before: ${this.name}, ${this.isFriend}")
         val storageRef = FirebaseStorage.getInstance().reference
         val imageRef = storageRef.child("images/${this.id}.jpg")
         imageRef.getBytes(20000)
                 .addOnSuccessListener {
                     val realm = Realm.getDefaultInstance()
-                    Log.d("COMM", "get unique ByteArray Success")
+                    Log.d("COMM", "${this.name}: get unique ByteArray Success")
                     val ba = it
                     realm.executeTransaction {
                         this.image = ba
                         realm.insertOrUpdate(this)
+                        Log.d("updater", "after: ${this.name}, ${this.isFriend}")
                     }
                 }
                 .addOnFailureListener {
-                    Log.d("COMM", "get unique ByteArray Failure")
+                    Log.d("COMM", "${this.name}: get unique ByteArray Failure")
                     val defaultImageRef = storageRef.child("images/yoda.jpg")
                     defaultImageRef.getBytes(20000)
                             .addOnSuccessListener {
                                 val realm = Realm.getDefaultInstance()
-                                Log.d("COMM", "get yoda ByteArray Success")
+                                Log.d("COMM", "${this.name}: get yoda ByteArray Success")
                                 val ba = it
                                 realm.executeTransaction {
                                     this.image = ba
                                     realm.insertOrUpdate(this)
+                                    Log.d("updater", "after: ${this.name}, ${this.isFriend}")
                                 }
                             }
                             .addOnFailureListener {
-                                Log.d("COMM", "get yoda ByteArray Failure")
+                                Log.d("COMM", "${this.name}: get yoda ByteArray Failure")
                             }
                 }
     }

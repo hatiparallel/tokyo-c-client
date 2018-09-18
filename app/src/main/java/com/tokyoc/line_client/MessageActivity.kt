@@ -54,8 +54,6 @@ class MessageActivity : RxAppCompatActivity() {
         Log.d("COMM", "listening /streams/${group?.id}")
         Log.d("COMM", "members of this group: ${group?.members}")
 
-
-
         client.getMessages(groupId, sinceId.toInt())
                 .flatMap {
                     val source = it.source()
@@ -96,15 +94,12 @@ class MessageActivity : RxAppCompatActivity() {
                                                 val realm = Realm.getDefaultInstance()
                                                 val memberCome = it
                                                 val group = realm.where<Group>().equalTo("id", groupId).findFirst()
-                                                Log.d("COMM", "zero okay")
                                                 realm.executeTransaction {
                                                     group?.members?.add(author)
-                                                    Log.d("COMM", "one okay")
                                                     if (memberCome != null) {
                                                         memberCome.groupJoin += 1
                                                         realm.insertOrUpdate(memberCome)
                                                     }
-                                                    Log.d("COMM", "two okay")
                                                 }
                                                 Log.d("COMM", "now ${group?.members?.size} members")
                                             }, {
@@ -175,6 +170,7 @@ class MessageActivity : RxAppCompatActivity() {
                 val intent = Intent(this, GroupActivity::class.java)
                 intent.putExtra("token", token)
                 startActivity(intent)
+                finishAndRemoveTask()
             }
             R.id.member_list -> {
                 var memberList = arrayListOf<String>()
@@ -190,7 +186,24 @@ class MessageActivity : RxAppCompatActivity() {
                 startActivity(intent)
             }
             R.id.member_invite -> {
-                val intent = Intent(this, InviteActivity::class.java)
+                if (group == null) {
+                    return false
+                } else if (group.name.isEmpty()) {
+                    AlertDialog.Builder(this).apply {
+                        setTitle("Alert")
+                        setMessage("Not a group.\n You'd set the group's name if you wanna invite.")
+                        setPositiveButton("OK", null)
+                        show()
+                    }
+                } else {
+                    val intent = Intent(this, InviteActivity::class.java)
+                    intent.putExtra("token", token)
+                    intent.putExtra("groupId", groupId)
+                    startActivity(intent)
+                }
+            }
+            R.id.group_profile -> {
+                val intent = Intent(this, GroupProfileActivity::class.java)
                 intent.putExtra("token", token)
                 intent.putExtra("groupId", groupId)
                 startActivity(intent)

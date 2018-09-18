@@ -5,6 +5,7 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
 import android.content.Intent
+import android.os.IBinder
 import android.support.v4.app.NotificationCompat
 import android.util.Log
 import io.realm.Realm
@@ -17,6 +18,31 @@ class PollingService : IntentService("polling_service") {
         const val CHANNEL_ID = "YODA_POLLING_SERVICE"
     }
 
+    private var bound = false
+    private lateinit var pollingStatus: PollingStatus
+
+    override fun onCreate() {
+        val realm = Realm.getDefaultInstance()
+
+        pollingStatus = PollingStatus()
+
+        realm.executeTransaction {
+            realm.insertOrUpdate(pollingStatus)
+        }
+
+        super.onCreate()
+    }
+
+    override fun onBind(intent: Intent?): IBinder? {
+        bound = true
+        return android.os.Binder()
+    }
+
+    override fun onUnbind(intent: Intent?): Boolean {
+        bound = false
+        return super.onUnbind(intent)
+    }
+
     override fun onHandleIntent(intent: Intent) {
         val realm = Realm.getDefaultInstance()
         val token = intent.getStringExtra("token")
@@ -27,24 +53,28 @@ class PollingService : IntentService("polling_service") {
         notification_manager.createNotificationChannel(
                 NotificationChannel(CHANNEL_ID, "YODA", NotificationManager.IMPORTANCE_DEFAULT))
 
-        while (true) {
+        while (bound) {
+            Log.d("POLL", "tick suppressing ${pollingStatus.suppressedGroup}")
+
             val status = client.getStatus().toBlocking().first() ?: continue
 
             if (lastStatus == null ||
                     lastStatus!!.friendshipCount != status.friendshipCount ||
                     lastStatus!!.friendshipAddedAt != lastStatus.friendshipAddedAt) {
 
-                //Log.d("COMM/POLL", "friend")
                 val friends = client.getFriends().toBlocking().single().toTypedArray()
 
                 rx.Observable.from(friends)
                         .flatMap { return@flatMap Member.lookup(it, client) }
                         .subscribe {
                             val member = it
+                            Log.d("DDDDD", "got it ! ${member.name}, ${member.isFriend}")
 
-                            if (member.isFriend == Relation.FRIEND) {
+                            if (member.isFriend != Relation.OTHER) {
                                 return@subscribe
                             }
+
+                            Log.d("DDDDD", "it'll be friend ${member.name}, ${member.isFriend}")
 
                             member.isFriend = Relation.FRIEND
 
@@ -65,8 +95,10 @@ class PollingService : IntentService("polling_service") {
                         .not().beginGroup().`in`("id", friends).endGroup()
                         .findAll().forEach {
                             val member = it
+                            Log.d("DDDD", "it'll be other ${member.name}, ${member.isFriend}")
 
                             if (member.isFriend == Relation.FRIEND) {
+                                Log.d("DDDD", "good bye ${member.name}, ${member.isFriend}")
                                 realm.executeTransaction { member.isFriend = Relation.OTHER }
                             }
                         }
@@ -79,7 +111,7 @@ class PollingService : IntentService("polling_service") {
 
                     val groupName = group.name
 
-                    if (summary.messageId > group.latest) {
+                    if (pollingStatus.suppressedGroup != group.id && summary.messageId > group.latest) {
                         client.getMessage(summary.messageId)
                                 .observeOn(Schedulers.io())
                                 .subscribe({
@@ -100,7 +132,8 @@ class PollingService : IntentService("polling_service") {
                                         text = "${author.name}が${groupName}から退室しました"
                                     }
 
-                                    //Log.d("COMM/POLL", "notify ${it.author}")
+                                    Log.d("POLL", "notify ${it.author}")
+
 
                                     notification_manager.notify(summary.channelId,
                                             NotificationCompat.Builder(applicationContext, CHANNEL_ID)
@@ -112,12 +145,13 @@ class PollingService : IntentService("polling_service") {
                                                     .setAutoCancel(true)
                                                     .build())
                                 }, {
-                                    //Log.d("COMM/POLL", "notify failed $it")
+                                    Log.d("POLL", "notify failed $it")
                                 })
                     }
 
                     group.name = summary.channelName
                     group.latest = summary.messageId
+                    realm.copyFromRealm(group).updateImage()
                 }
 
                 lastStatus = status
@@ -131,5 +165,10 @@ class PollingService : IntentService("polling_service") {
 
             Thread.sleep(3000)
         }
+    }
+
+    override fun onDestroy() {
+        Log.d("POLL", "PollingService destroyed")
+        super.onDestroy()
     }
 }
