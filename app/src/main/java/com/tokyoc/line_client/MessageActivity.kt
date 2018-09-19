@@ -147,6 +147,7 @@ class MessageActivity : RxAppCompatActivity() {
             val message: Message = Message()
             message.channel = groupId
             message.content = messageEditText.text.toString()
+            Log.d("COMM", "Posted at ${message.postedAt}")
             if (isImportant) {
                 message.isEvent = 2
             }
@@ -184,7 +185,10 @@ class MessageActivity : RxAppCompatActivity() {
 
         when (item?.itemId) {
             android.R.id.home -> {
-                finish()
+                val intent = Intent(this, GroupActivity::class.java)
+                intent.putExtra("token", token)
+                startActivity(intent)
+                finishAndRemoveTask()
             }
             R.id.member_list -> {
                 val memberList = arrayListOf<String>()

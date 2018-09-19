@@ -2,6 +2,7 @@ package com.tokyoc.line_client
 
 import android.graphics.BitmapFactory
 import android.graphics.Color
+import android.text.format.DateFormat
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -22,6 +23,7 @@ class MessageListAdapter(data: OrderedRealmCollection<Message>) : RealmBaseAdapt
         val messageContent = cell.findViewById<TextView>(R.id.message_text_view)
         val messageAuthor = cell.findViewById<TextView>(R.id.author_name_text_view)
         val messageImage = cell.findViewById<ImageView>(R.id.author_profile_image_view)
+        val messagePostedAt = cell.findViewById<TextView>(R.id.message_send_time)
     }
 
     override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
@@ -50,6 +52,8 @@ class MessageListAdapter(data: OrderedRealmCollection<Message>) : RealmBaseAdapt
                 viewHolder.messageImage
                         .setImageBitmap(BitmapFactory.decodeByteArray(author.image, 0, author.image.size))
             }
+            val messageSendTime = DateFormat.format("yyyy/MM/dd kk:mm:ss", message.postedAt).toString()
+            viewHolder.messagePostedAt.text = messageSendTime
             if (message.isEvent == 1) {
                 viewHolder.messageContent.setTextColor(Color.BLUE)
             } else if (message.isEvent == 2) {

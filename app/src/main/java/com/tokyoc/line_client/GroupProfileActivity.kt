@@ -46,8 +46,9 @@ class GroupProfileActivity : AppCompatActivity() {
         val token = intent.getStringExtra("token")
         when (item?.itemId) {
             android.R.id.home -> {
-                val intent = Intent(this, SettingActivity::class.java)
+                val intent = Intent(this, MessageActivity::class.java)
                 intent.putExtra("token", token)
+                intent.putExtra("groupId", groupId)
                 startActivity(intent)
             }
             R.id.change_image -> {

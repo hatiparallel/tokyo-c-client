@@ -4,7 +4,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="#c6c6c6"
+    android:padding="4dp"
+    android:background="@color/colorMessageBack"
     android:gravity="center_vertical"
     android:orientation="horizontal">
 
@@ -27,14 +28,19 @@
             android:layout_marginStart="10dp"
             android:layout_marginBottom="0dp"
             android:text="Aさん"
-            android:textSize="10dp"/>
+            android:textSize="14dp"/>
+
+        <!--<LinearLayout-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:orientation="horizontal">-->
 
         <com.github.library.bubbleview.BubbleTextVew
             android:id="@+id/message_text_view"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:padding="8dp"
-            android:textSize="18dp"
+            android:textSize="20dp"
             android:text="ここにメッセージを表示"
             app:arrowWidth="10dp"
             app:arrowHeight="5dp"
@@ -42,6 +48,15 @@
             app:arrowLocation="left"
             app:angle="0dp"
             app:bubbleColor="#FFF" />
+
+        <TextView
+            android:id="@+id/message_send_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:textSize="10dp"
+            android:text="time" />
+
     </LinearLayout>
 
 </LinearLayout>

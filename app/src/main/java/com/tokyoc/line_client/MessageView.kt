@@ -20,17 +20,20 @@ class MessageView : FrameLayout {
     var authorProfileImageView: ImageView
     var authorNameTextView: TextView
     var messageTextView: TextView
+    var messagePostedAt: TextView
 
     init {
         LayoutInflater.from(context).inflate(R.layout.view_message, this)
         authorProfileImageView = findViewById<ImageView>(R.id.author_profile_image_view)
         authorNameTextView = findViewById<TextView>(R.id.author_name_text_view)
         messageTextView = findViewById<TextView>(R.id.message_text_view)
+        messagePostedAt = findViewById<TextView>(R.id.message_send_time)
     }
 
     fun setMessage(message: Message) {
         authorProfileImageView.setBackgroundColor(Color.GREEN)
         authorNameTextView.text = "author"
         messageTextView.text = message.content
+        messagePostedAt.text = message.postedAt.toString()
     }
 }
