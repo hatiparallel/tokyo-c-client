@@ -14,6 +14,11 @@ import io.realm.kotlin.where
 
 //GroupデータFormat
 open class Group() : RealmObject() {
+    constructor(name: String, members: RealmList<String>) : this() {
+        this.name = name
+        this.members = members
+    }
+
     fun updateImage() {
         val storageRef = FirebaseStorage.getInstance().reference
         val imageRef = storageRef.child("images/groups/${this.id}.jpg")
