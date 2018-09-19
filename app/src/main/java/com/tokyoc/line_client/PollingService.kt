@@ -1,10 +1,13 @@
 package com.tokyoc.line_client
 
+import android.app.Application
 import android.app.IntentService
 import android.app.NotificationChannel
 import android.app.NotificationManager
+import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.os.IBinder
 import android.support.v4.app.NotificationCompat
 import android.util.Log
@@ -19,18 +22,21 @@ class PollingService : IntentService("polling_service") {
     }
 
     private var bound = false
-    private lateinit var pollingStatus: PollingStatus
+    private var suppressedGroup = -1
+
+    inner class Receiver : BroadcastReceiver() {
+        override fun onReceive(context: Context, intent: Intent) {
+            suppressedGroup = intent.extras.getInt("suppress")
+            Log.d("POLL", "suppress $suppressedGroup")
+        }
+    }
 
     override fun onCreate() {
-        val realm = Realm.getDefaultInstance()
-
-        pollingStatus = PollingStatus()
-
-        realm.executeTransaction {
-            realm.insertOrUpdate(pollingStatus)
-        }
-
         super.onCreate()
+
+        val intentFilter = IntentFilter()
+        intentFilter.addAction("POLLING_CONTROL")
+        registerReceiver(Receiver(), intentFilter)
     }
 
     override fun onBind(intent: Intent?): IBinder? {
@@ -54,7 +60,7 @@ class PollingService : IntentService("polling_service") {
                 NotificationChannel(CHANNEL_ID, "YODA", NotificationManager.IMPORTANCE_DEFAULT))
 
         while (bound) {
-            Log.d("POLL", "tick suppressing ${pollingStatus.suppressedGroup}")
+            Log.d("POLL", "tick suppressing ${suppressedGroup}")
 
             val status = client.getStatus().toBlocking().first() ?: continue
 
@@ -111,7 +117,7 @@ class PollingService : IntentService("polling_service") {
 
                     val groupName = group.name
 
-                    if (pollingStatus.suppressedGroup != group.id && summary.messageId > group.latest) {
+                    if (suppressedGroup != group.id && summary.messageId > group.latest) {
                         client.getMessage(summary.messageId)
                                 .observeOn(Schedulers.io())
                                 .subscribe({
