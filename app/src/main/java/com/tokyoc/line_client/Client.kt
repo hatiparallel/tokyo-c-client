@@ -73,7 +73,7 @@ interface Client {
 
     @Headers("Content-Type: application/json")
     @GET("/channels")
-    fun getMemberships(): Observable<Group>
+    fun getMemberships(): Observable<List<Group>>
 
     @Headers("Content-Type: application/json")
     @POST("/channels")
