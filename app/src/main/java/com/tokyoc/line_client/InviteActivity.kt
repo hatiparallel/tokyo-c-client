@@ -29,6 +29,7 @@ class InviteActivity : AppCompatActivity() {
 
         val token = intent.getStringExtra("token")
         val groupId: Int = intent.getIntExtra("groupId", 0)
+        val invitable: Array<String>? = intent.getStringArrayExtra("invitable")
 
         val toolbar = supportActionBar!!
         toolbar.setDisplayHomeAsUpEnabled(true)
@@ -36,9 +37,9 @@ class InviteActivity : AppCompatActivity() {
         //Realmを利用するために必要なもの
         realm = Realm.getDefaultInstance()
         val group = realm.where<Group>().equalTo("id", groupId).findFirst()
-        val members = realm.where<Member>().findAll()
+        val invitableFriends = realm.where<Member>().`in`("id", invitable).findAll()
         val listView: ListView = findViewById(R.id.member_list_view)
-        val listAdapter = MemberListAdapter(members)
+        val listAdapter = MemberListAdapter(invitableFriends)
         listView.adapter = listAdapter
 
         val client = Client.build(token)

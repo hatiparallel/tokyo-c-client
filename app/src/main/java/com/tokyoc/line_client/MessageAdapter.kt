@@ -54,6 +54,13 @@ class MessageListAdapter(data: OrderedRealmCollection<Message>) : RealmBaseAdapt
             }
             val messageSendTime = DateFormat.format("yyyy/MM/dd kk:mm:ss", message.postedAt).toString()
             viewHolder.messagePostedAt.text = messageSendTime
+            if (message.isEvent == 1) {
+                viewHolder.messageContent.setTextColor(Color.BLUE)
+            } else if (message.isEvent == 2) {
+                viewHolder.messageContent.setTextColor(Color.MAGENTA)
+            } else {
+                viewHolder.messageContent.setTextColor(Color.BLACK)
+            }
         }
         return view
     }
