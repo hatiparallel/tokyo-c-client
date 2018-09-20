@@ -58,8 +58,7 @@
         android:id="@+id/message_list_view"
         android:layout_width="match_parent"
         android:layout_height="560dp"
-        android:background="@color/colorMessageBack"
-        android:divider="@null" />
+        android:background="@color/colorMessageBack" />
 
 
 </LinearLayout>

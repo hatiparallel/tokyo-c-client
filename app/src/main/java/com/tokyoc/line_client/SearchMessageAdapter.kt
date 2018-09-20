@@ -24,6 +24,7 @@ class SearchMessageListAdapter(data: OrderedRealmCollection<Message>) : RealmBas
         val messageAuthor = cell.findViewById<TextView>(R.id.author_name_text_view)
         val messageImage = cell.findViewById<ImageView>(R.id.author_profile_image_view)
         val messageGroup = cell.findViewById<TextView>(R.id.group_name_text_view)
+        val messagePostedAt = cell.findViewById<TextView>(R.id.time_text_view)
     }
 
     override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
@@ -47,9 +48,13 @@ class SearchMessageListAdapter(data: OrderedRealmCollection<Message>) : RealmBas
             val message = get(position)
             val author = realm.where<Member>().equalTo("id", message.author).findFirst()
             val group = realm.where<Group>().equalTo("id", message.channel).findFirst()
+
             viewHolder.messageContent.text = message.content
             viewHolder.messageAuthor.text = author?.name ?: "取得失敗"
             group?.display(viewHolder.messageGroup, viewHolder.messageImage)
+            val messageSendTime = DateFormat.format("yyyy/MM/dd", message.postedAt).toString()
+            viewHolder.messagePostedAt.text = messageSendTime
+
             if (message.isEvent == 1) {
                 viewHolder.messageContent.setTextColor(Color.BLUE)
             } else if (message.isEvent == 2) {

@@ -5,7 +5,6 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:padding="4dp"
-    android:background="@color/colorMessageBack"
     android:gravity="center_vertical"
     android:orientation="horizontal">
 
@@ -45,21 +44,24 @@
                 android:text="Aさん"
                 android:textSize="16dp"/>
 
+            <TextView
+                android:id="@+id/time_text_view"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:textSize="16dp"/>
+
         </LinearLayout>
 
-        <com.github.library.bubbleview.BubbleTextVew
+        <TextView
             android:id="@+id/message_text_view"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:padding="8dp"
+            android:layout_marginTop="4dp"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="10dp"
             android:textSize="20dp"
-            android:text="ここにメッセージを表示"
-            app:arrowWidth="10dp"
-            app:arrowHeight="5dp"
-            app:arrowPosition="10dp"
-            app:arrowLocation="left"
-            app:angle="0dp"
-            app:bubbleColor="#FFF" />
+            android:text="ここにメッセージを表示" />
 
     </LinearLayout>
 
