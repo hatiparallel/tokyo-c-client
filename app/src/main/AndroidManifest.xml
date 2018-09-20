@@ -84,6 +84,9 @@
         <activity
             android:name=".ChangeGroupNameActivity" />
 
+        <activity
+            android:name=".SearchMessageActivity" />
+
       
         <service android:name=".PollingService" />
     </application>

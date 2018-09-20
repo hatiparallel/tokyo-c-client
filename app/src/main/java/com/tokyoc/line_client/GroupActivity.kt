@@ -10,6 +10,9 @@ import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import android.view.KeyEvent
+import android.view.Menu
+import android.view.MenuItem
+import android.widget.EditText
 import android.widget.ListView
 import android.widget.Toast
 import com.google.firebase.auth.FirebaseAuth
@@ -149,6 +152,24 @@ class GroupActivity : AppCompatActivity() {
         for (i in member1) {
             Log.d("COMM", "group activity: ${i.isFriend}, ${i.name}")
         }
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.menu_group, menu)
+        return super.onCreateOptionsMenu(menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+        val token = intent.getStringExtra("token")
+
+        when (item?.itemId) {
+            R.id.search -> {
+                val intent = Intent(this, SearchMessageActivity::class.java)
+                intent.putExtra("token", token)
+                startActivity(intent)
+            }
+        }
+        return super.onOptionsItemSelected(item)
     }
 
     override fun onPause() {
