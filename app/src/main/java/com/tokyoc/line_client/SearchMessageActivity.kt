@@ -94,19 +94,11 @@ class SearchMessageActivity : RxAppCompatActivity() {
 
     }
 
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        menuInflater.inflate(R.menu.menu_message, menu)
-        return true
-    }
-
     // メニューをタップした時の処理
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
 
         val token = intent.getStringExtra("token")
         val groupId: Int = intent.getIntExtra("groupId", 0)
-
-        realm = Realm.getDefaultInstance()
-        val group = realm.where<Group>().equalTo("id", groupId).findFirst()
 
         when (item?.itemId) {
             android.R.id.home -> {
