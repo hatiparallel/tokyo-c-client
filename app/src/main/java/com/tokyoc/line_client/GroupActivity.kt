@@ -26,7 +26,6 @@ import rx.schedulers.Schedulers
 class GroupActivity : AppCompatActivity() {
     private lateinit var realm: Realm
     private lateinit var pollingConnection: ServiceConnection
-    private lateinit var pollingStatus: PollingStatus
 
     lateinit var toolbar: ActionBar
 
@@ -54,10 +53,7 @@ class GroupActivity : AppCompatActivity() {
         val client = Client.build(token)
 
         pollingConnection = object : ServiceConnection {
-            override fun onServiceConnected(name: ComponentName?, binder0: IBinder?) {
-                pollingStatus = realm.where<PollingStatus>().findFirst() ?: return
-            }
-
+            override fun onServiceConnected(name: ComponentName?, binder: IBinder?) {}
             override fun onServiceDisconnected(p0: ComponentName?) {}
         }
 
@@ -70,9 +66,10 @@ class GroupActivity : AppCompatActivity() {
         listView.setOnItemClickListener { adapterView, view, position, id ->
             val group = groups[position] ?: return@setOnItemClickListener
 
-            realm.executeTransaction {
-                pollingStatus.suppressedGroup = group.id
-            }
+            val message = Intent()
+            message.action = "POLLING_CONTROL"
+            message.putExtra("suppress", group.id)
+            sendBroadcast(message)
 
             val intent = Intent(this, MessageActivity::class.java)
             intent.putExtra("groupId", group.id)
@@ -172,12 +169,13 @@ class GroupActivity : AppCompatActivity() {
         return super.onOptionsItemSelected(item)
     }
 
-    override fun onPause() {
-        realm.executeTransaction {
-            pollingStatus.suppressedGroup = null
-        }
+    override fun onResume() {
+        super.onResume()
 
-        super.onPause()
+        val message = Intent()
+        message.action = "POLLING_CONTROL"
+        message.putExtra("suppress", -1)
+        sendBroadcast(message)
     }
 
     override fun onKeyDown(keyCode: Int, event: KeyEvent): Boolean {
