@@ -32,12 +32,41 @@ class SearchMessageActivity : RxAppCompatActivity() {
         //Realmを利用するために必要なもの
         realm = Realm.getDefaultInstance()
         var messages = realm.where<Message>().findAll()
-        Log.d("SEARCH", "${messages.size}")
         val listView: ListView = findViewById<ListView>(R.id.message_list_view)
 
         val searchButton = findViewById<Button>(R.id.search_button)
         val searchEditText = findViewById<EditText>(R.id.search_edit_text)
-        val listAdapter = MessageListAdapter(messages)
+
+        val radioGroup = findViewById<RadioGroup>(R.id.radio_group)
+        radioGroup.check(R.id.radio_all)
+        var searchFilter = 0
+
+        radioGroup.setOnCheckedChangeListener { radioGroup, checked ->
+            val radioButton = findViewById<RadioButton>(checked)
+            Log.d("SEARCH", "${radioButton.id}")
+            searchFilter = when(radioButton.id) {
+                R.id.radio_all -> 0
+                R.id.radio_notEvent -> 1
+                R.id.radio_onlyImportant -> 2
+                else -> 0
+            }
+            if (searchEditText.text.isEmpty()) {
+                return@setOnCheckedChangeListener
+            }
+            val keyWord = searchEditText.text.toString()
+            if (searchFilter == 0) {
+                messages = realm.where<Message>().contains("content", keyWord, Case.INSENSITIVE).findAll()
+            } else if (searchFilter == 1) {
+                messages = realm.where<Message>().notEqualTo("isEvent", 1.toInt())
+                        .contains("content", keyWord, Case.INSENSITIVE).findAll()
+            } else if (searchFilter == 2) {
+                messages = realm.where<Message>().equalTo("isEvent", 2.toInt())
+                        .contains("content", keyWord, Case.INSENSITIVE).findAll()
+            }
+            listView.adapter = MessageListAdapter(messages)
+        }
+
+        val listAdapter = SearchMessageListAdapter(messages)
 
         listView.adapter = listAdapter
         listView.setSelection(listAdapter.messages0.size)
@@ -50,7 +79,15 @@ class SearchMessageActivity : RxAppCompatActivity() {
                 return@setOnClickListener
             }
             val keyWord = searchEditText.text.toString()
-            messages = realm.where<Message>().contains("content", keyWord, Case.INSENSITIVE).findAll()
+            if (searchFilter == 0) {
+                messages = realm.where<Message>().contains("content", keyWord, Case.INSENSITIVE).findAll()
+            } else if (searchFilter == 1) {
+                messages = realm.where<Message>().notEqualTo("isEvent", 1.toInt())
+                        .contains("content", keyWord, Case.INSENSITIVE).findAll()
+            } else if (searchFilter == 2) {
+                messages = realm.where<Message>().equalTo("isEvent", 2.toInt())
+                        .contains("content", keyWord, Case.INSENSITIVE).findAll()
+            }
             listView.adapter = MessageListAdapter(messages)
         }
 

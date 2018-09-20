@@ -30,6 +30,30 @@
 
     </LinearLayout>
 
+    <RadioGroup
+        android:id="@+id/radio_group"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <RadioButton
+            android:id="@+id/radio_all"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="全て表示" />
+
+        <RadioButton
+            android:id="@+id/radio_notEvent"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="参加・退会のメッセージは除く"/>
+
+        <RadioButton
+            android:id="@+id/radio_onlyImportant"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="重要なメッセージのみ"/>
+    </RadioGroup>
+
     <ListView
         android:id="@+id/message_list_view"
         android:layout_width="match_parent"
