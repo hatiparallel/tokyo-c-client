@@ -63,7 +63,7 @@ class SearchMessageActivity : RxAppCompatActivity() {
                 messages = realm.where<Message>().equalTo("isEvent", 2.toInt())
                         .contains("content", keyWord, Case.INSENSITIVE).findAll()
             }
-            listView.adapter = MessageListAdapter(messages)
+            listView.adapter = SearchMessageListAdapter(messages)
         }
 
         val listAdapter = SearchMessageListAdapter(messages)
@@ -88,7 +88,7 @@ class SearchMessageActivity : RxAppCompatActivity() {
                 messages = realm.where<Message>().equalTo("isEvent", 2.toInt())
                         .contains("content", keyWord, Case.INSENSITIVE).findAll()
             }
-            listView.adapter = MessageListAdapter(messages)
+            listView.adapter = SearchMessageListAdapter(messages)
         }
 
 
