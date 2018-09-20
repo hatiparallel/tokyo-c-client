@@ -43,7 +43,6 @@ class SearchMessageActivity : RxAppCompatActivity() {
 
         radioGroup.setOnCheckedChangeListener { radioGroup, checked ->
             val radioButton = findViewById<RadioButton>(checked)
-            Log.d("SEARCH", "${radioButton.id}")
             searchFilter = when(radioButton.id) {
                 R.id.radio_all -> 0
                 R.id.radio_notEvent -> 1
