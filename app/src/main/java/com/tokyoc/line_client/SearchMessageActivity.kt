@@ -91,12 +91,26 @@ class SearchMessageActivity : RxAppCompatActivity() {
             listView.adapter = SearchMessageListAdapter(messages)
         }
 
+        listView.setOnItemClickListener { adapterView, view, position, id ->
+            val group = realm.where<Group>()
+                    .equalTo("id", messages[position]?.channel).findFirst() ?: return@setOnItemClickListener
+
+            val message = Intent()
+            message.action = "POLLING_CONTROL"
+            message.putExtra("suppress", group.id)
+            sendBroadcast(message)
+
+            val intent = Intent(this, MessageActivity::class.java)
+            intent.putExtra("groupId", group.id)
+            intent.putExtra("token", getIntent().getStringExtra("token"))
+            intent.putExtra("target", messages[position]?.id)
+            startActivity(intent)
+        }
 
     }
 
     // メニューをタップした時の処理
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
-
         val token = intent.getStringExtra("token")
         val groupId: Int = intent.getIntExtra("groupId", 0)
 
@@ -109,6 +123,15 @@ class SearchMessageActivity : RxAppCompatActivity() {
             }
         }
         return super.onOptionsItemSelected(item)
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        val message = Intent()
+        message.action = "POLLING_CONTROL"
+        message.putExtra("suppress", -1)
+        sendBroadcast(message)
     }
 
     //Realmインスタンスを破棄

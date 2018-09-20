@@ -13,6 +13,7 @@ import android.widget.*
 import com.trello.rxlifecycle.components.support.RxAppCompatActivity
 import com.trello.rxlifecycle.kotlin.bindToLifecycle
 import io.realm.Realm
+import io.realm.RealmResults
 import io.realm.kotlin.where
 import rx.android.schedulers.AndroidSchedulers
 import rx.schedulers.Schedulers
@@ -28,6 +29,7 @@ class MessageActivity : RxAppCompatActivity() {
 
         val token = intent.getStringExtra("token")
         val groupId: Int = intent.getIntExtra("groupId", 0)
+        val target: Int = intent.getIntExtra("target", -1)
 
         //Realmを利用するために必要なもの
         realm = Realm.getDefaultInstance()
@@ -42,7 +44,16 @@ class MessageActivity : RxAppCompatActivity() {
         var isImportant: Boolean = false
 
         listView.adapter = listAdapter
-        listView.setSelection(listAdapter.messages0.size)
+        if (target < 0) {
+            listView.setSelection(messages.size)
+        } else {
+            for ((index, value) in messages.withIndex()) {
+                if (value.id == target) {
+                    listView.setSelection(index)
+                    break
+                }
+            }
+        }
 
         toolbar = supportActionBar!!
         toolbar.title = "${group?.name}"
