@@ -50,17 +50,24 @@ class SearchMessageActivity : RxAppCompatActivity() {
                 else -> 0
             }
             if (searchEditText.text.isEmpty()) {
-                return@setOnCheckedChangeListener
-            }
-            val keyWord = searchEditText.text.toString()
-            if (searchFilter == 0) {
-                messages = realm.where<Message>().contains("content", keyWord, Case.INSENSITIVE).findAll()
-            } else if (searchFilter == 1) {
-                messages = realm.where<Message>().notEqualTo("isEvent", 1.toInt())
-                        .contains("content", keyWord, Case.INSENSITIVE).findAll()
-            } else if (searchFilter == 2) {
-                messages = realm.where<Message>().equalTo("isEvent", 2.toInt())
-                        .contains("content", keyWord, Case.INSENSITIVE).findAll()
+                if (searchFilter == 0) {
+                    messages = realm.where<Message>().findAll()
+                } else if (searchFilter == 1) {
+                    messages = realm.where<Message>().notEqualTo("isEvent", 1.toInt()).findAll()
+                } else if (searchFilter == 2) {
+                    messages = realm.where<Message>().equalTo("isEvent", 2.toInt()).findAll()
+                }
+            } else {
+                val keyWord = searchEditText.text.toString()
+                if (searchFilter == 0) {
+                    messages = realm.where<Message>().contains("content", keyWord, Case.INSENSITIVE).findAll()
+                } else if (searchFilter == 1) {
+                    messages = realm.where<Message>().notEqualTo("isEvent", 1.toInt())
+                            .contains("content", keyWord, Case.INSENSITIVE).findAll()
+                } else if (searchFilter == 2) {
+                    messages = realm.where<Message>().equalTo("isEvent", 2.toInt())
+                            .contains("content", keyWord, Case.INSENSITIVE).findAll()
+                }
             }
             listView.adapter = SearchMessageListAdapter(messages)
         }
@@ -75,17 +82,24 @@ class SearchMessageActivity : RxAppCompatActivity() {
 
         searchButton.setOnClickListener {
             if (searchEditText.text.isEmpty()) {
-                return@setOnClickListener
-            }
-            val keyWord = searchEditText.text.toString()
-            if (searchFilter == 0) {
-                messages = realm.where<Message>().contains("content", keyWord, Case.INSENSITIVE).findAll()
-            } else if (searchFilter == 1) {
-                messages = realm.where<Message>().notEqualTo("isEvent", 1.toInt())
-                        .contains("content", keyWord, Case.INSENSITIVE).findAll()
-            } else if (searchFilter == 2) {
-                messages = realm.where<Message>().equalTo("isEvent", 2.toInt())
-                        .contains("content", keyWord, Case.INSENSITIVE).findAll()
+                if (searchFilter == 0) {
+                    messages = realm.where<Message>().findAll()
+                } else if (searchFilter == 1) {
+                    messages = realm.where<Message>().notEqualTo("isEvent", 1.toInt()).findAll()
+                } else if (searchFilter == 2) {
+                    messages = realm.where<Message>().equalTo("isEvent", 2.toInt()).findAll()
+                }
+            } else {
+                val keyWord = searchEditText.text.toString()
+                if (searchFilter == 0) {
+                    messages = realm.where<Message>().contains("content", keyWord, Case.INSENSITIVE).findAll()
+                } else if (searchFilter == 1) {
+                    messages = realm.where<Message>().notEqualTo("isEvent", 1.toInt())
+                            .contains("content", keyWord, Case.INSENSITIVE).findAll()
+                } else if (searchFilter == 2) {
+                    messages = realm.where<Message>().equalTo("isEvent", 2.toInt())
+                            .contains("content", keyWord, Case.INSENSITIVE).findAll()
+                }
             }
             listView.adapter = SearchMessageListAdapter(messages)
         }
