@@ -121,6 +121,17 @@ class SearchMessageActivity : RxAppCompatActivity() {
             startActivity(intent)
         }
 
+        listView.setOnItemLongClickListener { adapterView, view, position, id ->
+            if (messages[position] != null) {
+                if (messages[position]!!.isEvent < 3) {
+                    messages[position]!!.isEvent += 3
+                } else {
+                    messages[position]!!.isEvent -= 3
+                }
+            }
+            return@setOnItemLongClickListener true
+        }
+
     }
 
     // メニューをタップした時の処理

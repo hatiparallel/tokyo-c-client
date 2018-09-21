@@ -59,6 +59,8 @@ class SearchMessageListAdapter(data: OrderedRealmCollection<Message>) : RealmBas
                 viewHolder.messageContent.setTextColor(Color.BLUE)
             } else if (message.isEvent == 2) {
                 viewHolder.messageContent.setTextColor(Color.MAGENTA)
+            } else if (message.isEvent > 2) {
+                viewHolder.messageContent.setTextColor(Color.RED)
             } else {
                 viewHolder.messageContent.setTextColor(Color.BLACK)
             }
