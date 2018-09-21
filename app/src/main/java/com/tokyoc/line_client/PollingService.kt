@@ -71,8 +71,7 @@ class PollingService : IntentService("polling_service") {
                 val friends = client.getFriends().toBlocking().single().toTypedArray()
 
                 rx.Observable.from(friends)
-                        .subscribeOn(Schedulers.io())
-                        .flatMap { return@flatMap Member.lookup(it, client) }
+                        .flatMap { Member.lookup(it, client) }
                         .subscribe {
                             val member = it
                             val realm = Realm.getDefaultInstance()
