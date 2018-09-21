@@ -117,6 +117,7 @@ class SearchMessageActivity : RxAppCompatActivity() {
             intent.putExtra("groupId", group.id)
             intent.putExtra("token", getIntent().getStringExtra("token"))
             intent.putExtra("target", messages[position]?.id)
+            intent.putExtra("flag", 1)
             startActivity(intent)
         }
 

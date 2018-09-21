@@ -197,9 +197,16 @@ class MessageActivity : RxAppCompatActivity() {
 
         when (item?.itemId) {
             android.R.id.home -> {
-                val intent = Intent(this, GroupActivity::class.java)
-                intent.putExtra("token", token)
-                startActivity(intent)
+                val flag = intent.getIntExtra("flag", 0)
+                if (flag == 0) {
+                    val intent = Intent(this, GroupActivity::class.java)
+                    intent.putExtra("token", token)
+                    startActivity(intent)
+                } else {
+                    val intent = Intent(this, SearchMessageActivity::class.java)
+                    intent.putExtra("token", token)
+                    startActivity(intent)
+                }
                 finishAndRemoveTask()
             }
             R.id.member_list -> {
