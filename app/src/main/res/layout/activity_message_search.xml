@@ -50,10 +50,16 @@
             android:text="参加・退会のメッセージは除く"/>
 
         <RadioButton
-            android:id="@+id/radio_onlyImportant"
+            android:id="@+id/radio_importantOrFavorite"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="重要なメッセージのみ"/>
+            android:text="重要なメッセージとお気に入りメッセージ"/>
+
+        <RadioButton
+            android:id="@+id/radio_onlyFavorite"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="お気に入りメッセージのみ" />
     </RadioGroup>
 
     <ListView

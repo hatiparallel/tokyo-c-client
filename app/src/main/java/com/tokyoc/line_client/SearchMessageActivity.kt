@@ -41,12 +41,13 @@ class SearchMessageActivity : RxAppCompatActivity() {
         radioGroup.check(R.id.radio_all)
         var searchFilter = 0
 
-        radioGroup.setOnCheckedChangeListener { radioGroup, checked ->
+        radioGroup.setOnCheckedChangeListener { _, checked ->
             val radioButton = findViewById<RadioButton>(checked)
             searchFilter = when(radioButton.id) {
                 R.id.radio_all -> 0
                 R.id.radio_notEvent -> 1
-                R.id.radio_onlyImportant -> 2
+                R.id.radio_importantOrFavorite -> 2
+                R.id.radio_onlyFavorite -> 3
                 else -> 0
             }
             if (searchEditText.text.isEmpty()) {
@@ -55,7 +56,9 @@ class SearchMessageActivity : RxAppCompatActivity() {
                 } else if (searchFilter == 1) {
                     messages = realm.where<Message>().notEqualTo("isEvent", 1.toInt()).findAll()
                 } else if (searchFilter == 2) {
-                    messages = realm.where<Message>().equalTo("isEvent", 2.toInt()).findAll()
+                    messages = realm.where<Message>().greaterThanOrEqualTo("isEvent", 2.toInt()).findAll()
+                } else if (searchFilter == 3) {
+                    messages = realm.where<Message>().greaterThan("isEvent", 2.toInt()).findAll()
                 }
             } else {
                 val keyWord = searchEditText.text.toString()
@@ -65,7 +68,10 @@ class SearchMessageActivity : RxAppCompatActivity() {
                     messages = realm.where<Message>().notEqualTo("isEvent", 1.toInt())
                             .contains("content", keyWord, Case.INSENSITIVE).findAll()
                 } else if (searchFilter == 2) {
-                    messages = realm.where<Message>().equalTo("isEvent", 2.toInt())
+                    messages = realm.where<Message>().greaterThanOrEqualTo("isEvent", 2.toInt())
+                            .contains("content", keyWord, Case.INSENSITIVE).findAll()
+                } else if (searchFilter == 3) {
+                    messages = realm.where<Message>().greaterThan("isEvent", 2.toInt())
                             .contains("content", keyWord, Case.INSENSITIVE).findAll()
                 }
             }
@@ -87,7 +93,9 @@ class SearchMessageActivity : RxAppCompatActivity() {
                 } else if (searchFilter == 1) {
                     messages = realm.where<Message>().notEqualTo("isEvent", 1.toInt()).findAll()
                 } else if (searchFilter == 2) {
-                    messages = realm.where<Message>().equalTo("isEvent", 2.toInt()).findAll()
+                    messages = realm.where<Message>().greaterThanOrEqualTo("isEvent", 2.toInt()).findAll()
+                } else if (searchFilter == 3) {
+                    messages = realm.where<Message>().greaterThan("isEvent", 2.toInt()).findAll()
                 }
             } else {
                 val keyWord = searchEditText.text.toString()
@@ -97,7 +105,10 @@ class SearchMessageActivity : RxAppCompatActivity() {
                     messages = realm.where<Message>().notEqualTo("isEvent", 1.toInt())
                             .contains("content", keyWord, Case.INSENSITIVE).findAll()
                 } else if (searchFilter == 2) {
-                    messages = realm.where<Message>().equalTo("isEvent", 2.toInt())
+                    messages = realm.where<Message>().greaterThanOrEqualTo("isEvent", 2.toInt())
+                            .contains("content", keyWord, Case.INSENSITIVE).findAll()
+                } else if (searchFilter == 3) {
+                    messages = realm.where<Message>().greaterThan("isEvent", 2.toInt())
                             .contains("content", keyWord, Case.INSENSITIVE).findAll()
                 }
             }
