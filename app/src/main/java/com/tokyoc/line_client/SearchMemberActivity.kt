@@ -52,6 +52,16 @@ class SearchMemberActivity : RxAppCompatActivity() {
             members = realm.where<Member>().contains("name", keyWord, Case.INSENSITIVE).findAll()
             listView.adapter = MemberListAdapter(members)
         }
+
+        listView.setOnItemClickListener { adapterView, view, position, id ->
+            val memberChosen = adapterView.getItemAtPosition(position) as Member
+            intent = Intent(this, MemberProfileActivity::class.java)
+            intent.putExtra("token", token)
+            intent.putExtra("memberId", memberChosen.id)
+            val flag = 1
+            intent.putExtra("flag", flag)
+            startActivity(intent)
+        }
     }
 
     // メニューをタップした時の処理

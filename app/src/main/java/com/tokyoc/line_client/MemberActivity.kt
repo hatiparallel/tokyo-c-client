@@ -59,6 +59,8 @@ class MemberActivity : AppCompatActivity() {
             intent = Intent(this, MemberProfileActivity::class.java)
             intent.putExtra("token", token)
             intent.putExtra("memberId", memberChosen.id)
+            val flag = 0
+            intent.putExtra("flag", flag)
             startActivity(intent)
         }
 
