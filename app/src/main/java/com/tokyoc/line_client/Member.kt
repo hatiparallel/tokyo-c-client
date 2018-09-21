@@ -22,48 +22,40 @@ open class Member : RealmObject() {
         fun lookup(uid: String, client: Client): rx.Observable<Member> {
             return rx.Observable.create<Member> {
                 val subscriber = it
-                var cache: Member? = null
+                lateinit var cache: Member
                 val realm: Realm = Realm.getDefaultInstance()
 
                 realm.executeTransaction {
                     cache = realm.where<Member>().equalTo("id", uid).findFirst()
                             ?: realm.createObject<Member>(uid)
-
-                    if (Date().getTime() - cache!!.cached.getTime() <= 5 * 60 * 1000) {
-                        return@executeTransaction
-                    }
-
-                    try {
-                        val fetched = client.getPerson(uid).toBlocking().single()
-                                ?: return@executeTransaction
-                        fetched.cached = Date()
-                        fetched.updateImage()
-                        fetched.isFriend = cache?.isFriend ?: Relation.OTHER
-                        fetched.groupJoin = cache?.groupJoin ?: 0
-                        realm.insertOrUpdate(fetched)
-                    } catch (e: RuntimeException) {
-                        val cause = e.cause
-
-                        when(cause){
-                            is HttpException->{
-                                Log.d("COMM", "failed to get person: ${cause.response().errorBody().string()}")
-                            }
-                        }
-                    }
                 }
-                Log.d("CACHE", "cache: ${cache?.id}, ${cache?.name}, ${cache?.cached}, ${cache?.isValid()}, ${cache?.isManaged()}")
 
-                if (cache == null) {
+                if (Date().getTime() - cache.cached.getTime() <= 5 * 60 * 1000) {
+                    subscriber.onNext(realm.copyFromRealm(cache))
                     subscriber.onCompleted()
                     return@create
                 }
 
-                if (cache!!.isManaged()) {
-                    cache = realm.copyFromRealm(cache)
-                }
+                try {
+                    val fetched = client.getPerson(uid).toBlocking().single()
 
-                subscriber.onNext(cache)
-                subscriber.onCompleted()
+                    fetched.cached = Date()
+                    fetched.updateImage()
+                    fetched.isFriend = cache.isFriend ?: Relation.OTHER
+                    fetched.groupJoin = cache.groupJoin ?: 0
+                    realm.insertOrUpdate(fetched)
+
+                    subscriber.onNext(fetched)
+                    subscriber.onCompleted()
+                } catch (e: RuntimeException) {
+                    val cause = e.cause
+
+                    when (cause) {
+                        is HttpException -> {
+                            Log.d("COMM", "failed to get person: ${cause.response().errorBody().string()}")
+                        }
+                    }
+                }
             }
         }
     }
