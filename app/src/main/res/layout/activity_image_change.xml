@@ -20,6 +20,7 @@
         android:layout_height="wrap_content"
         android:clickable="true"
         android:focusable="true"
+        android:gravity="center"
         android:text="こちらから新しい画像を選択してください"
         android:textColor="@drawable/text_color" />
 

@@ -124,6 +124,7 @@ class ChangeGroupImageActivity : AppCompatActivity() {
                     realm.executeTransaction {
                         group?.image = ba!!
                     }
+                    findViewById<TextView>(R.id.get_image).setText(R.string.got_image)
                 } catch (e: IOException) {
                     e.printStackTrace()
                     Log.d("COMM", "get bitmap error")

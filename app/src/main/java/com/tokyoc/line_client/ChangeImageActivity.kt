@@ -53,6 +53,10 @@ class ChangeImageActivity : AppCompatActivity() {
             intent.setType("image/*")
             startActivityForResult(intent, image_request_code)
         }
+
+//        if (ba != null) {
+//            findViewById<TextView>(R.id.get_image).setText(R.string.got_image)
+//        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -125,6 +129,7 @@ class ChangeImageActivity : AppCompatActivity() {
                     realm.executeTransaction {
                         self?.image = ba!!
                     }
+                    findViewById<TextView>(R.id.get_image).setText(R.string.got_image)
                 } catch (e: IOException) {
                     e.printStackTrace()
                     Log.d("COMM", "get bitmap error")
