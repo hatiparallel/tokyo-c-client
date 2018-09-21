@@ -46,17 +46,17 @@ class SigninActivity : AppCompatActivity() {
 
     fun signIn(email: String, password: String) {
         firebase.signInWithEmailAndPassword(email, password).addOnCompleteListener { task: Task<AuthResult> ->
+            findViewById<EditText>(R.id.email_edit_text).setEnabled(true)
+            findViewById<EditText>(R.id.password_edit_text).setEnabled(true)
+            findViewById<Button>(R.id.signin_button).setEnabled(true)
+            findViewById<TextView>(R.id.to_signup).setEnabled(true)
+
             if (!task.isSuccessful) {
                 Toast.makeText(applicationContext, "sign in error: ${task.exception?.message}", Toast.LENGTH_LONG).show()
                 return@addOnCompleteListener
             }
 
             firebase.currentUser?.getIdToken(true)?.addOnCompleteListener { tokenTask: Task<GetTokenResult> ->
-                findViewById<EditText>(R.id.email_edit_text).setEnabled(true)
-                findViewById<EditText>(R.id.password_edit_text).setEnabled(true)
-                findViewById<Button>(R.id.signin_button).setEnabled(true)
-                findViewById<TextView>(R.id.to_signup).setEnabled(true)
-
                 if (!tokenTask.isSuccessful) {
                     Toast.makeText(applicationContext, "sign in token error: ${tokenTask.exception?.message}", Toast.LENGTH_LONG).show()
                     return@addOnCompleteListener
