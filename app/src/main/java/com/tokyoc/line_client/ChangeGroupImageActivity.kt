@@ -141,5 +141,4 @@ class ChangeGroupImageActivity : AppCompatActivity() {
         parcelFileDescriptor.close()
         return image
     }
-
 }

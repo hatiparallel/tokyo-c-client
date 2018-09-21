@@ -14,4 +14,18 @@
         android:layout_height="wrap_content"
         android:hint="グループ名を入力してください" />
 
+    <Button
+        android:id="@+id/get_image_button"
+        android:text="get image"
+        android:layout_margin="10dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+    <ImageView
+        android:id="@+id/image_view"
+        android:scaleType="fitStart"
+        android:adjustViewBounds="true"
+        android:layout_width="70sp"
+        android:layout_height="70sp" />
+
 </LinearLayout>
