@@ -52,26 +52,20 @@ class ServerTest {
         client3.sendPIN(pinMessage.pin).toBlocking().last()
 
         // TEST_USER1が(TEST_USER2|TEST_USER3)のリクエストを受信
-        var requestMessage = pinStream.next()
+        var request = pinStream.next()
 
-        assertEquals("request", requestMessage.type)
-
-        val requestedBy1 = requestMessage.person
+        assertEquals("request", request.type)
+        assertTrue(setOf("TEST_USER2", "TEST_USER3").contains(request.person))
 
         // TEST_USER1が(TEST_USER2|TEST_USER3)のリクエストを受信
-        requestMessage = pinStream.next()
+        request = pinStream.next()
 
-        assertEquals("request", requestMessage.type)
-
-        val requestedBy2 = requestMessage.person
-
-        // TEST_USER2とTEST_USER3のいずれからもリクエストが来ていることを確認
-        assertTrue(setOf("TEST_USER2", "TEST_USER3") == setOf(requestedBy1, requestedBy2))
-
+        assertEquals("request", request.type)
+        assertTrue(setOf("TEST_USER2", "TEST_USER3").contains(request.person))
 
         // TEST_USER2とTEST_USER3からのリクエストを承認
-        client1.makeFriends(requestedBy1).toBlocking().last()
-        client1.makeFriends(requestedBy2).toBlocking().last()
+        client1.makeFriends("TEST_USER2").toBlocking().last()
+        client1.makeFriends("TEST_USER3").toBlocking().last()
 
         // {TEST_USER1,TEST_USER2,TEST_USER3}の友達リストを取得
         var friends1 = client1.getFriends().toBlocking().single().toSet()
@@ -100,7 +94,7 @@ class ServerTest {
         group1 = client1.getGroup(group1.id).toBlocking().last()
 
         // グループ"Jesus Christ"のメンバーを確認
-        assert(group1.members == setOf(
+        assert(group1.members.toSet() == setOf(
                 "TEST_USER1",
                 "TEST_USER2",
                 "TEST_USER3",
@@ -113,7 +107,6 @@ class ServerTest {
         // TEST_USER4がグループ"JHVH"にTEST_USER5を招待
         client4.invitePerson(group2.id, "TEST_USER5").toBlocking().last()
 
-
         // 各ユーザーのグループ参加状況を確認
         assert(client1.getMemberships().toBlocking().last().map { it.id }.toSet() == setOf(group1.id))
         assert(client2.getMemberships().toBlocking().last().map { it.id }.toSet() == setOf(group1.id))
@@ -121,9 +114,47 @@ class ServerTest {
         assert(client4.getMemberships().toBlocking().last().map { it.id }.toSet() == setOf(group1.id, group2.id))
         assert(client5.getMemberships().toBlocking().last().map { it.id }.toSet() == setOf(group1.id, group2.id))
 
+        // TEST_USER5としてグループ"JHVH"のメッセージを受信
+        val group2StreamOfClient5 = client5.getMessages(group2.id, -1)
+                .subscribeOn(Schedulers.io())
+                .flatMap {
+                    val source = it.source()
+
+                    rx.Observable.create(rx.Observable.OnSubscribe<Message> {
+                        try {
+                            while (!source.exhausted()) {
+                                it.onNext(Client.gson.fromJson<Message>(source.readUtf8Line(), Message::class.java))
+                            }
+
+                            it.onCompleted()
+                        } catch (e: IOException) {
+                            it.onError(e)
+                        }
+                    })
+                }.toBlocking().iterator
+
+        var message = group2StreamOfClient5.next()
+
+        // joinメッセージがあることを確認
+        assert(message.isEvent == 1 && message.content == "join" && setOf("TEST_USER4", "TEST_USER5").contains(message.author))
+        assert(message.isEvent == 1 && message.content == "join" && setOf("TEST_USER4", "TEST_USER5").contains(message.author))
+
+        // TEST_USER4がグループ"JHVH"にメッセージ"hello"を投稿
+        client4.sendMessage(Message(group2.id, "hello")).toBlocking().last()
+
+        // メッセージが配信されていることを確認
+        message = group2StreamOfClient5.next()
+        assert(message.isEvent == 0 && message.content == "hello" && message.author == "TEST_USER4")
+
+        // TEST_USER5がグループ"JHVH"にメッセージ"whoa"を投稿
+        client5.sendMessage(Message(group2.id, "whoa")).toBlocking().last()
+
+        // メッセージが配信されていることを確認
+        message = group2StreamOfClient5.next()
+        assert(message.isEvent == 0 && message.content == "whoa" && message.author == "TEST_USER5")
+
         // TEST_USER4がTEST_USER5をグループ"JHVH"から退出させる
         client4.leaveGroup(group2.id, "TEST_USER5").toBlocking().last()
-
 
         // TEST_USER4が自身をグループ"JHVH"から退出させ、グループは消滅する
         mustCatch(410) {
@@ -186,7 +217,7 @@ class ServerTest {
         friends2 = client2.getFriends().toBlocking().single().toSet()
         friends3 = client3.getFriends().toBlocking().single().toSet()
 
-        // {TEST_USER1,TEST_USER2}の友達リストを確認
+        // {TEST_USER1,TEST_USER2,TEST_USER3}の友達リストを確認
         assert(friends1.isEmpty())
         assert(friends2.isEmpty())
         assert(friends3.isEmpty())
