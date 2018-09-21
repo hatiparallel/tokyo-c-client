@@ -47,7 +47,7 @@ class ChangeImageActivity : AppCompatActivity() {
 
         realm = Realm.getDefaultInstance()
 
-        findViewById<Button>(R.id.get_image_button).setOnClickListener() {
+        findViewById<TextView>(R.id.get_image).setOnClickListener() {
             val intent = Intent(Intent.ACTION_OPEN_DOCUMENT)
             intent.addCategory(Intent.CATEGORY_OPENABLE)
             intent.setType("image/*")
