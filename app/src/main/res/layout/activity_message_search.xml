@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:fitsSystemWindows="true"
+    tools:context=".MessageActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingTop="0dp"
+        android:background="#FFF"
+        android:orientation="horizontal">
+
+        <EditText
+            android:id="@+id/search_edit_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:hint="検索する語句"/>
+
+        <Button
+            android:id="@+id/search_button"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:text="検索"/>
+
+    </LinearLayout>
+
+    <RadioGroup
+        android:id="@+id/radio_group"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <RadioButton
+            android:id="@+id/radio_all"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="全て表示" />
+
+        <RadioButton
+            android:id="@+id/radio_notEvent"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="参加・退会のメッセージは除く"/>
+
+        <RadioButton
+            android:id="@+id/radio_onlyImportant"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="重要なメッセージのみ"/>
+    </RadioGroup>
+
+    <ListView
+        android:id="@+id/message_list_view"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:background="@color/colorMessageBack" />
+
+
+</LinearLayout>
