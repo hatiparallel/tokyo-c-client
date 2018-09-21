@@ -39,6 +39,7 @@ open class Member : RealmObject() {
                         fetched.cached = Date()
                         fetched.updateImage()
                         fetched.isFriend = cache?.isFriend ?: Relation.OTHER
+                        fetched.groupJoin = cache?.groupJoin ?: 0
                         realm.insertOrUpdate(fetched)
                     } catch (e: RuntimeException) {
                         val cause = e.cause

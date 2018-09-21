@@ -14,6 +14,7 @@ import com.trello.rxlifecycle.components.support.RxAppCompatActivity
 import com.trello.rxlifecycle.kotlin.bindToLifecycle
 import io.realm.Realm
 import io.realm.RealmResults
+import io.realm.kotlin.createObject
 import io.realm.kotlin.where
 import rx.android.schedulers.AndroidSchedulers
 import rx.schedulers.Schedulers
@@ -202,17 +203,43 @@ class MessageActivity : RxAppCompatActivity() {
                 finishAndRemoveTask()
             }
             R.id.member_list -> {
-                val memberList = arrayListOf<String>()
-                if (group != null) {
+                if (group == null) {
+                    return false
+                } else {
+                    val memberList = arrayListOf<String>()
                     for (memberId in group.members) {
                         memberList.add(memberId)
                     }
+                    val client = Client.build(token)
+                    client.getGroup(groupId)
+                            .subscribeOn(Schedulers.io())
+                            .observeOn(AndroidSchedulers.mainThread())
+                            .subscribe({
+                                if (memberList.size < it.members.size) {
+                                    Toast.makeText(applicationContext, "情報取得中です。お待ちください。", Toast.LENGTH_LONG).show()
+                                    for (member in it.members) {
+                                        if (memberList.all { m -> m != member }) {
+                                            memberList.add(member)
+                                            val newMember = Member.lookup(member, client).toBlocking().single()
+                                            realm.executeTransaction {
+                                                if (newMember != null) {
+                                                    newMember.groupJoin += 1
+                                                    realm.insertOrUpdate(newMember)
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                                val intent = Intent(this, GroupMemberActivity::class.java)
+                                intent.putExtra("token", token)
+                                intent.putExtra("groupId", groupId)
+                                intent.putExtra("members", memberList)
+                                startActivity(intent)
+                                Log.d("COMM", "group information get done: ${it}")
+                            }, {
+                                Log.d("COMM", "group information get failed: ${it}")
+                            })
                 }
-                val intent = Intent(this, GroupMemberActivity::class.java)
-                intent.putExtra("token", token)
-                intent.putExtra("groupId", groupId)
-                intent.putExtra("members", memberList)
-                startActivity(intent)
             }
             R.id.member_invite -> {
                 if (group == null) {

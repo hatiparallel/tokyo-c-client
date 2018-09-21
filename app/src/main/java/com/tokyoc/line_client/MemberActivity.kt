@@ -76,8 +76,13 @@ class MemberActivity : AppCompatActivity() {
                             setMessage("Really Delete ${memberDelete.name}?")
                             setPositiveButton("OK", DialogInterface.OnClickListener { _, _ ->
                                 realm.executeTransaction {
-                                    realm.where<Member>().equalTo("id", memberDelete.id)?.findFirst()?.deleteFromRealm()
+                                    val deleteMember = realm.where<Member>().equalTo("id", memberDelete.id)?.findFirst()
+                                    if (deleteMember != null) {
+                                        deleteMember.isFriend = Relation.OTHER
+                                        realm.copyFromRealm(deleteMember).deregister()
+                                    }
                                 }
+
                             })
                             setNegativeButton("Cancel", null)
                             show()
