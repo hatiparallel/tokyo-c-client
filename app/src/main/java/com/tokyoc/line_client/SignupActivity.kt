@@ -4,10 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
-import android.widget.Button
-import android.widget.EditText
-import android.widget.TextView
-import android.widget.Toast
+import android.widget.*
 import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.*
 import io.realm.Realm
@@ -25,19 +22,20 @@ class SignupActivity : AppCompatActivity() {
 
         realm = Realm.getDefaultInstance()
 
-        val nameEditText: EditText = findViewById<EditText>(R.id.name_edit_text)
-        val emailEditText: EditText = findViewById<EditText>(R.id.email_edit_text)
-        val passwordEditText: EditText = findViewById<EditText>(R.id.password_edit_text)
-
         findViewById<TextView>(R.id.to_signin).setOnClickListener() {
-            val intent = Intent(this, SigninActivity::class.java)
-            startActivity(intent)
+            finish()
         }
 
         findViewById<Button>(R.id.signup_button).setOnClickListener() {
-            val name: String = nameEditText.text.toString()
-            val email: String = emailEditText.text.toString()
-            val password: String = passwordEditText.text.toString()
+            findViewById<EditText>(R.id.name_edit_text).setEnabled(false)
+            findViewById<EditText>(R.id.email_edit_text).setEnabled(false)
+            findViewById<EditText>(R.id.password_edit_text).setEnabled(false)
+            findViewById<Button>(R.id.signup_button).setEnabled(false)
+            findViewById<TextView>(R.id.to_signin).setEnabled(false)
+
+            val name: String =  findViewById<EditText>(R.id.name_edit_text).text.toString()
+            val email: String = findViewById<EditText>(R.id.email_edit_text).text.toString()
+            val password: String = findViewById<EditText>(R.id.password_edit_text).text.toString()
 
             if (name.isEmpty() || email.isEmpty() || password.isEmpty()) {
                 Toast.makeText(applicationContext, "any field cannot be empty", Toast.LENGTH_LONG).show()
@@ -50,6 +48,12 @@ class SignupActivity : AppCompatActivity() {
 
     fun signUp(name: String, email: String, password: String) {
         firebase.createUserWithEmailAndPassword(email, password).addOnCompleteListener { task: Task<AuthResult> ->
+            findViewById<EditText>(R.id.name_edit_text).setEnabled(true)
+            findViewById<EditText>(R.id.email_edit_text).setEnabled(true)
+            findViewById<EditText>(R.id.password_edit_text).setEnabled(true)
+            findViewById<Button>(R.id.signup_button).setEnabled(true)
+            findViewById<TextView>(R.id.to_signin).setEnabled(true)
+
             if (!task.isSuccessful) {
                 Toast.makeText(applicationContext, "sign up error: ${task.exception?.message}", Toast.LENGTH_LONG).show()
                 return@addOnCompleteListener
