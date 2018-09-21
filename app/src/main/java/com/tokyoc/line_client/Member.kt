@@ -41,9 +41,12 @@ open class Member : RealmObject() {
 
                     fetched.cached = Date()
                     fetched.updateImage()
-                    fetched.isFriend = cache.isFriend ?: Relation.OTHER
-                    fetched.groupJoin = cache.groupJoin ?: 0
-                    realm.insertOrUpdate(fetched)
+                    fetched.isFriend = cache.isFriend
+                    fetched.groupJoin = cache.groupJoin
+
+                    realm.executeTransaction {
+                        realm.insertOrUpdate(fetched)
+                    }
 
                     subscriber.onNext(fetched)
                     subscriber.onCompleted()
@@ -53,6 +56,9 @@ open class Member : RealmObject() {
                     when (cause) {
                         is HttpException -> {
                             Log.d("COMM", "failed to get person: ${cause.response().errorBody().string()}")
+                        }
+                        else -> {
+                            throw cause ?: return@create
                         }
                     }
                 }
