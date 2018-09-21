@@ -13,6 +13,7 @@ import io.realm.OrderedRealmCollection
 import io.realm.Realm
 import io.realm.RealmBaseAdapter
 import io.realm.kotlin.where
+import java.util.*
 
 class MessageListAdapter(data: OrderedRealmCollection<Message>) : RealmBaseAdapter<Message>(data) {
     private  var realm: Realm = Realm.getDefaultInstance()
@@ -33,6 +34,15 @@ class MessageListAdapter(data: OrderedRealmCollection<Message>) : RealmBaseAdapt
         when (convertView) {
             null -> {
                 val inflater = LayoutInflater.from(parent?.context)
+
+//                val rand = Random()
+//                val num = rand.nextInt(2)
+//                if (num == 0) {
+//                    view = inflater.inflate(R.layout.view_message, parent, false)
+//                } else {
+//                    view = inflater.inflate(R.layout.view_message_self, parent, false)
+//                }
+
                 view = inflater.inflate(R.layout.view_message, parent, false)
                 viewHolder = ViewHolder(view)
                 view.tag = viewHolder
