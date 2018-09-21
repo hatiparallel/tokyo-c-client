@@ -12,6 +12,8 @@ import io.realm.RealmBaseAdapter
 
 class MemberListAdapter(data: OrderedRealmCollection<Member>) : RealmBaseAdapter<Member>(data) {
 
+    var members0: MutableList<Member> = data
+
     inner class ViewHolder(cell: View) {
         val username = cell.findViewById<TextView>(R.id.user_name_view)
         val userImage = cell.findViewById<ImageView>(R.id.profile_image_view)

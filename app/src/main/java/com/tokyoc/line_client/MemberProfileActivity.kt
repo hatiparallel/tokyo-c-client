@@ -55,12 +55,21 @@ class MemberProfileActivity : AppCompatActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
         val token = intent.getStringExtra("token")
+        val flag = intent.getIntExtra("flag", 0)
+        Log.d("COMMM", "${flag}")
         val client = Client.build(token)
         when (item?.itemId) {
             android.R.id.home -> {
                 val intent = Intent(this, MemberActivity::class.java)
+                val intent2 = Intent(this, SearchMemberActivity::class.java)
                 intent.putExtra("token", token)
-                startActivity(intent)
+                intent2.putExtra("token", token)
+                if (flag == 0) {
+                    startActivity(intent)
+                } else {
+                    startActivity(intent2)
+                }
+
             }
             R.id.start_talk -> {
                 val newGroup = Group()

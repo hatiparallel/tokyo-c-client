@@ -10,10 +10,10 @@ import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import android.view.KeyEvent
-import android.widget.Button
+import android.view.Menu
+import android.view.MenuItem
 import android.widget.ListView
 import android.widget.Toast
-import com.google.firebase.auth.FirebaseAuth
 import io.realm.Realm
 import io.realm.kotlin.where
 import rx.android.schedulers.AndroidSchedulers
@@ -59,6 +59,8 @@ class MemberActivity : AppCompatActivity() {
             intent = Intent(this, MemberProfileActivity::class.java)
             intent.putExtra("token", token)
             intent.putExtra("memberId", memberChosen.id)
+            val flag = 0
+            intent.putExtra("flag", flag)
             startActivity(intent)
         }
 
@@ -119,6 +121,23 @@ class MemberActivity : AppCompatActivity() {
             intent.putExtra("token", token)
             startActivity(intent)
         }
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.menu_member, menu)
+        return super.onCreateOptionsMenu(menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+        val token = intent.getStringExtra("token")
+        when (item?.itemId) {
+            R.id.search -> {
+                val intent = Intent(this, SearchMemberActivity::class.java)
+                intent.putExtra("token", token)
+                startActivity(intent)
+            }
+        }
+        return super.onOptionsItemSelected(item)
     }
 
     override fun onKeyDown(keyCode: Int, event: KeyEvent): Boolean {
