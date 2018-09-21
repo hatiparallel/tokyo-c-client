@@ -16,9 +16,11 @@ import io.realm.Realm
 import io.realm.RealmResults
 import io.realm.kotlin.createObject
 import io.realm.kotlin.where
+import org.jetbrains.anko.Android
 import rx.android.schedulers.AndroidSchedulers
 import rx.schedulers.Schedulers
 import java.io.IOException
+import java.util.concurrent.TimeUnit
 
 class MessageActivity : RxAppCompatActivity() {
     private lateinit var realm: Realm
@@ -62,7 +64,7 @@ class MessageActivity : RxAppCompatActivity() {
 
         //通信に使うものたちの定義
         val client = Client.build(token)
-        var sinceId = realm.where<Message>().max("id") ?: 0
+        var sinceId = realm.where<Message>().max("id") ?: -1
 
         Log.d("COMM", "token: $token")
         Log.d("COMM", "listening /streams/${group?.id}")
@@ -84,60 +86,59 @@ class MessageActivity : RxAppCompatActivity() {
                         }
                     })
                 }
+                .onBackpressureBuffer()
                 .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
+                .observeOn(Schedulers.computation())
                 .bindToLifecycle(this)
-                .subscribe(
-                        {
-                            val message = it
-                            val author = it.author
-                            Log.d("COMM", "message ID: ${it.id}")
-                            realm.executeTransaction {
-                                realm.insert(message)
-                                Log.d("COMM", "registered: ${message.id}")
-                            }
-                            listView.setSelection(listAdapter.messages0.size)
-                            Log.d("COMM", "received ${message.isEvent}")
+                .subscribe({
+                    val realm = Realm.getDefaultInstance()
+                    val message = it
 
-                            if (message.isEvent == 1) {
-                                if (message.content == "join") {
-                                    Member.lookup(message.author, client)
-                                            .subscribeOn(Schedulers.io())
-                                            .observeOn(AndroidSchedulers.mainThread())
-                                            .subscribe({
-                                                val realm = Realm.getDefaultInstance()
-                                                val memberCome = it
-                                                val group = realm.where<Group>().equalTo("id", groupId).findFirst()
-                                                realm.executeTransaction {
-                                                    group?.members?.add(author)
-                                                    if (memberCome != null) {
-                                                        memberCome.groupJoin += 1
-                                                        realm.insertOrUpdate(memberCome)
-                                                    }
-                                                }
-                                                Log.d("COMM", "now ${group?.members?.size} members")
-                                            }, {
-                                                Log.d("COMM", "Message Acitivity get person failed: ${it}")
-                                            })
-                                } else if (message.content == "leave") {
-                                    val memberLeft: Member? = realm.where<Member>().equalTo("id", message.author)?.findFirst()
-                                    if (memberLeft != null) {
-                                        realm.executeTransaction {
-                                            memberLeft.groupJoin -= 1
-                                        }
-                                        memberLeft.deregister()
-                                    }
-                                    realm.executeTransaction {
-                                        group?.members?.remove(message.author)
-                                    }
-                                    Log.d("COMM", "now ${group?.members?.size} members")
+                    Log.d("COMM", "message ID: ${it.id}")
+
+                    realm.executeTransaction {
+                        realm.insert(message)
+                        Log.d("COMM", "registered: ${message.id}")
+                    }
+
+                    Log.d("COMM", "received ${message.isEvent}")
+
+                    runOnUiThread {
+                        listView.setSelection(listAdapter.messages0.size)
+                    }
+
+                    if (message.isEvent == 1) {
+                        if (message.content == "join") {
+                            val memberCome = Member.lookup(message.author, client).toBlocking().single()
+                                    ?: return@subscribe
+                            val group = realm.where<Group>().equalTo("id", groupId).findFirst()
+
+                            realm.executeTransaction {
+                                group?.members?.add(message.author)
+                                if (memberCome != null) {
+                                    memberCome.groupJoin += 1
+                                    realm.insertOrUpdate(memberCome)
                                 }
                             }
+                            Log.d("COMM", "now ${group?.members?.size} members")
+                        } else if (message.content == "leave") {
+                            val memberLeft: Member? = realm.where<Member>().equalTo("id", message.author)?.findFirst()
+                            if (memberLeft != null) {
+                                realm.executeTransaction {
+                                    memberLeft.groupJoin -= 1
+                                }
+                                memberLeft.deregister()
+                            }
+                            realm.executeTransaction {
+                                group?.members?.remove(message.author)
+                            }
+                            Log.d("COMM", "now ${group?.members?.size} members")
+                        }
+                    }
+                }, {
+                    Log.d("COMM", "receive failed: $it")
+                })
 
-                        },
-                        {
-                            Log.d("COMM", "receive failed: $it")
-                        })
 
         sendButton.setOnLongClickListener {
             if (isImportant) {
