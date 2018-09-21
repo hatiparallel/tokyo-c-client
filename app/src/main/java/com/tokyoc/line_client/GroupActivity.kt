@@ -104,7 +104,17 @@ class GroupActivity : AppCompatActivity() {
                                         Log.d("COMM", "You were the last participant. See you.")
                                         realm.executeTransaction {
                                             Log.d("COMM", "leaving ${groupLeave.id}")
-                                            realm.where<Group>().equalTo("id", groupLeave.id)?.findFirst()?.deleteFromRealm()
+                                            val deleteGroup = realm.where<Group>().equalTo("id", groupLeave.id)?.findFirst()
+                                            if (deleteGroup != null) {
+                                                for (memberId in deleteGroup.members) {
+                                                    val member = realm.where<Member>().equalTo("id", memberId)?.findFirst()
+                                                    if (member != null) {
+                                                        member.groupJoin -= 1
+                                                        realm.copyFromRealm(member).deregister()
+                                                    }
+                                                }
+                                            }
+                                            deleteGroup?.deleteFromRealm()
                                         }
                                     } else {
                                         Log.d("COMM", "delete failed: ${it.message}")

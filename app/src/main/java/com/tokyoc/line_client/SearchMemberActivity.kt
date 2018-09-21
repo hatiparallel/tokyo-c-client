@@ -80,15 +80,6 @@ class SearchMemberActivity : RxAppCompatActivity() {
         return super.onOptionsItemSelected(item)
     }
 
-    override fun onResume() {
-        super.onResume()
-
-        val message = Intent()
-        message.action = "POLLING_CONTROL"
-        message.putExtra("suppress", -1)
-        sendBroadcast(message)
-    }
-
     //Realmインスタンスを破棄
     override fun onDestroy() {
         super.onDestroy()

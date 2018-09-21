@@ -105,7 +105,10 @@ class PollingService : IntentService("polling_service") {
 
                             if (member.isFriend == Relation.FRIEND) {
                                 Log.d("DDDD", "good bye ${member.name}, ${member.isFriend}")
-                                realm.executeTransaction { member.isFriend = Relation.OTHER }
+                                realm.executeTransaction {
+                                    member.isFriend = Relation.OTHER
+                                    realm.copyFromRealm(member).deregister()
+                                }
                             }
                         }
             }
