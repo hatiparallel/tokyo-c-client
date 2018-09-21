@@ -162,7 +162,7 @@ class PollingService : IntentService("polling_service") {
                         val author = Member.lookup(it.author, client).toBlocking().single()
                         var text = ""
 
-                        if (it.isEvent == 0) {
+                        if (it.isEvent != 1) {
                             text = it.content
                         } else if (it.content == "join") {
                             text = "${author.name}が${group.name}に参加しました"
