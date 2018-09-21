@@ -44,28 +44,26 @@ class ProfileActivity : AppCompatActivity() {
         for (i in member1) {
             Log.d("COMM", "${i.isFriend}, ${i.name}")
         }
+
+        findViewById<ImageView>(R.id.photo_view).setOnClickListener() {
+            val intent = Intent(this, ChangeImageActivity::class.java)
+            intent.putExtra("token", token)
+            startActivity(intent)
+        }
+
+        findViewById<TextView>(R.id.name_view).setOnClickListener() {
+            val intent = Intent(this, ChangeNameActivity::class.java)
+            intent.putExtra("token", token)
+            startActivity(intent)
+        }
     }
 
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        menuInflater.inflate(R.menu.menu_profile, menu)
-        return super.onCreateOptionsMenu(menu)
-    }
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
         val token = intent.getStringExtra("token")
         when (item?.itemId) {
             android.R.id.home -> {
                 val intent = Intent(this, SettingActivity::class.java)
-                intent.putExtra("token", token)
-                startActivity(intent)
-            }
-            R.id.change_image -> {
-                val intent = Intent(this, ChangeImageActivity::class.java)
-                intent.putExtra("token", token)
-                startActivity(intent)
-            }
-            R.id.change_name -> {
-                val intent = Intent(this, ChangeNameActivity::class.java)
                 intent.putExtra("token", token)
                 startActivity(intent)
             }
