@@ -34,7 +34,7 @@ class GroupProfileActivity : AppCompatActivity() {
 
         realm = Realm.getDefaultInstance()
         val group = realm.where<Group>().equalTo("id", groupId).findFirst()
-        group?.display(findViewById<TextView>(R.id.name_view), findViewById<ImageView>(R.id.photo_view))
+        group?.display(findViewById<TextView>(R.id.name_view), findViewById<ImageView>(R.id.photo_view), findViewById<TextView>(R.id.group_latest_view))
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {

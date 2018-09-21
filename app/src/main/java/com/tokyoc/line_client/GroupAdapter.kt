@@ -13,6 +13,7 @@ class GroupListAdapter(data: OrderedRealmCollection<Group>) : RealmBaseAdapter<G
     inner class ViewHolder(cell: View) {
         val groupName = cell.findViewById<TextView>(R.id.group_name_view)
         val groupImage = cell.findViewById<ImageView>(R.id.group_image_view)
+        val groupLatest = cell.findViewById<TextView>(R.id.group_latest_view)
     }
 
     override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
@@ -34,7 +35,7 @@ class GroupListAdapter(data: OrderedRealmCollection<Group>) : RealmBaseAdapter<G
 
         adapterData?.run {
             val member = get(position)
-            member.display(viewHolder.groupName, viewHolder.groupImage)
+            member.display(viewHolder.groupName, viewHolder.groupImage, viewHolder.groupLatest)
         }
         return view
     }
