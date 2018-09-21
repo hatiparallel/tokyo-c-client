@@ -5,7 +5,12 @@ import io.realm.annotations.PrimaryKey
 import java.util.*
 
 // MessageデータのFormat
-open class Message: RealmObject() {
+open class Message() : RealmObject() {
+    constructor(channel: Int, content: String) : this() {
+        this.channel = channel
+        this.content = content
+    }
+
     //データを一意に指定するためにidにPrimaryKeyアノテーションを付加
     @PrimaryKey
     var id: Int = 0
