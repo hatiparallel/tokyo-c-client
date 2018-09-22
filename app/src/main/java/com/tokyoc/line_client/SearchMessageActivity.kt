@@ -131,9 +131,13 @@ class SearchMessageActivity : RxAppCompatActivity() {
         listView.setOnItemLongClickListener { adapterView, view, position, id ->
             if (messages[position] != null) {
                 if (messages[position]!!.isEvent < 3) {
-                    messages[position]!!.isEvent += 3
+                    realm.executeTransaction {
+                        messages[position]!!.isEvent += 3
+                    }
                 } else {
-                    messages[position]!!.isEvent -= 3
+                    realm.executeTransaction {
+                        messages[position]!!.isEvent -= 3
+                    }
                 }
             }
             return@setOnItemLongClickListener true
