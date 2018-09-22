@@ -179,6 +179,24 @@ class MessageActivity : RxAppCompatActivity() {
                         Log.d("COMM", "post failed: ${it}")
                     })
         }
+
+        listView.setOnItemLongClickListener { adapterView, view, position, id ->
+            Log.d("UI", "${messages[position]}")
+            if (messages[position] != null) {
+                Log.d("UI", "${messages[position]}")
+                if (messages[position]!!.isEvent < 3) {
+                    Log.d("UI", "${messages[position]}")
+                    realm.executeTransaction {
+                        messages[position]!!.isEvent += 3
+                    }
+                } else {
+                    realm.executeTransaction {
+                        messages[position]!!.isEvent -= 3
+                    }
+                }
+            }
+            return@setOnItemLongClickListener true
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {

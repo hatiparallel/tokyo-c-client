@@ -41,32 +41,34 @@ class SearchMessageActivity : RxAppCompatActivity() {
         radioGroup.check(R.id.radio_all)
         var searchFilter = 0
 
-        radioGroup.setOnCheckedChangeListener { radioGroup, checked ->
+        radioGroup.setOnCheckedChangeListener { _, checked ->
             val radioButton = findViewById<RadioButton>(checked)
             searchFilter = when(radioButton.id) {
                 R.id.radio_all -> 0
                 R.id.radio_notEvent -> 1
-                R.id.radio_onlyImportant -> 2
+                R.id.radio_importantOrFavorite -> 2
+                R.id.radio_onlyFavorite -> 3
                 else -> 0
             }
             if (searchEditText.text.isEmpty()) {
-                if (searchFilter == 0) {
-                    messages = realm.where<Message>().findAll()
-                } else if (searchFilter == 1) {
-                    messages = realm.where<Message>().notEqualTo("isEvent", 1.toInt()).findAll()
-                } else if (searchFilter == 2) {
-                    messages = realm.where<Message>().equalTo("isEvent", 2.toInt()).findAll()
+                messages = when(searchFilter) {
+                    0 -> realm.where<Message>().findAll()
+                    1 -> realm.where<Message>().notEqualTo("isEvent", 1.toInt()).findAll()
+                    2 -> realm.where<Message>().greaterThanOrEqualTo("isEvent", 2.toInt()).findAll()
+                    3 -> realm.where<Message>().greaterThan("isEvent", 2.toInt()).findAll()
+                    else -> realm.where<Message>().findAll()
                 }
             } else {
                 val keyWord = searchEditText.text.toString()
-                if (searchFilter == 0) {
-                    messages = realm.where<Message>().contains("content", keyWord, Case.INSENSITIVE).findAll()
-                } else if (searchFilter == 1) {
-                    messages = realm.where<Message>().notEqualTo("isEvent", 1.toInt())
+                messages = when(searchFilter) {
+                    0 -> realm.where<Message>().contains("content", keyWord, Case.INSENSITIVE).findAll()
+                    1 -> realm.where<Message>().notEqualTo("isEvent", 1.toInt())
                             .contains("content", keyWord, Case.INSENSITIVE).findAll()
-                } else if (searchFilter == 2) {
-                    messages = realm.where<Message>().equalTo("isEvent", 2.toInt())
+                    2 -> realm.where<Message>().greaterThanOrEqualTo("isEvent", 2.toInt())
                             .contains("content", keyWord, Case.INSENSITIVE).findAll()
+                    3 -> realm.where<Message>().greaterThan("isEvent", 2.toInt())
+                            .contains("content", keyWord, Case.INSENSITIVE).findAll()
+                    else -> realm.where<Message>().contains("content", keyWord, Case.INSENSITIVE).findAll()
                 }
             }
             listView.adapter = SearchMessageListAdapter(messages)
@@ -82,23 +84,24 @@ class SearchMessageActivity : RxAppCompatActivity() {
 
         searchButton.setOnClickListener {
             if (searchEditText.text.isEmpty()) {
-                if (searchFilter == 0) {
-                    messages = realm.where<Message>().findAll()
-                } else if (searchFilter == 1) {
-                    messages = realm.where<Message>().notEqualTo("isEvent", 1.toInt()).findAll()
-                } else if (searchFilter == 2) {
-                    messages = realm.where<Message>().equalTo("isEvent", 2.toInt()).findAll()
+                messages = when(searchFilter) {
+                    0 -> realm.where<Message>().findAll()
+                    1 -> realm.where<Message>().notEqualTo("isEvent", 1.toInt()).findAll()
+                    2 -> realm.where<Message>().greaterThanOrEqualTo("isEvent", 2.toInt()).findAll()
+                    3 -> realm.where<Message>().greaterThan("isEvent", 2.toInt()).findAll()
+                    else -> realm.where<Message>().findAll()
                 }
             } else {
                 val keyWord = searchEditText.text.toString()
-                if (searchFilter == 0) {
-                    messages = realm.where<Message>().contains("content", keyWord, Case.INSENSITIVE).findAll()
-                } else if (searchFilter == 1) {
-                    messages = realm.where<Message>().notEqualTo("isEvent", 1.toInt())
+                messages = when(searchFilter) {
+                    0 -> realm.where<Message>().contains("content", keyWord, Case.INSENSITIVE).findAll()
+                    1 -> realm.where<Message>().notEqualTo("isEvent", 1.toInt())
                             .contains("content", keyWord, Case.INSENSITIVE).findAll()
-                } else if (searchFilter == 2) {
-                    messages = realm.where<Message>().equalTo("isEvent", 2.toInt())
+                    2 -> realm.where<Message>().greaterThanOrEqualTo("isEvent", 2.toInt())
                             .contains("content", keyWord, Case.INSENSITIVE).findAll()
+                    3 -> realm.where<Message>().greaterThan("isEvent", 2.toInt())
+                            .contains("content", keyWord, Case.INSENSITIVE).findAll()
+                    else -> realm.where<Message>().contains("content", keyWord, Case.INSENSITIVE).findAll()
                 }
             }
             listView.adapter = SearchMessageListAdapter(messages)
@@ -119,6 +122,21 @@ class SearchMessageActivity : RxAppCompatActivity() {
             intent.putExtra("target", messages[position]?.id)
             intent.putExtra("flag", 1)
             startActivity(intent)
+        }
+
+        listView.setOnItemLongClickListener { adapterView, view, position, id ->
+            if (messages[position] != null) {
+                if (messages[position]!!.isEvent < 3) {
+                    realm.executeTransaction {
+                        messages[position]!!.isEvent += 3
+                    }
+                } else {
+                    realm.executeTransaction {
+                        messages[position]!!.isEvent -= 3
+                    }
+                }
+            }
+            return@setOnItemLongClickListener true
         }
 
     }
