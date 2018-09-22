@@ -1,5 +1,6 @@
 package com.tokyoc.line_client
 
+import android.app.ProgressDialog
 import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
@@ -18,7 +19,7 @@ import io.realm.kotlin.where
 
 class SigninActivity : AppCompatActivity() {
     private lateinit var realm: Realm
-    val firebase: FirebaseAuth = FirebaseAuth.getInstance()
+    private val firebase: FirebaseAuth = FirebaseAuth.getInstance()
 
     override fun onCreate(saveInstanceState: Bundle?) {
         super.onCreate(saveInstanceState)
@@ -26,11 +27,15 @@ class SigninActivity : AppCompatActivity() {
 
         realm = Realm.getDefaultInstance()
 
-        val emailEditText: EditText = findViewById<EditText>(R.id.email_edit_text)
-        val passwordEditText: EditText = findViewById<EditText>(R.id.password_edit_text)
-
         findViewById<Button>(R.id.signin_button).setOnClickListener {
-            signIn(emailEditText.text.toString(), passwordEditText.text.toString())
+            findViewById<EditText>(R.id.email_edit_text).setEnabled(false)
+            findViewById<EditText>(R.id.password_edit_text).setEnabled(false)
+            findViewById<Button>(R.id.signin_button).setEnabled(false)
+            findViewById<TextView>(R.id.to_signup).setEnabled(false)
+
+            signIn(
+                    findViewById<EditText>(R.id.email_edit_text).text.toString(),
+                    findViewById<EditText>(R.id.password_edit_text).text.toString())
         }
 
         findViewById<TextView>(R.id.to_signup).setOnClickListener {
@@ -41,13 +46,17 @@ class SigninActivity : AppCompatActivity() {
 
     fun signIn(email: String, password: String) {
         firebase.signInWithEmailAndPassword(email, password).addOnCompleteListener { task: Task<AuthResult> ->
+            findViewById<EditText>(R.id.email_edit_text).setEnabled(true)
+            findViewById<EditText>(R.id.password_edit_text).setEnabled(true)
+            findViewById<Button>(R.id.signin_button).setEnabled(true)
+            findViewById<TextView>(R.id.to_signup).setEnabled(true)
+
             if (!task.isSuccessful) {
                 Toast.makeText(applicationContext, "sign in error: ${task.exception?.message}", Toast.LENGTH_LONG).show()
                 return@addOnCompleteListener
             }
 
             firebase.currentUser?.getIdToken(true)?.addOnCompleteListener { tokenTask: Task<GetTokenResult> ->
-                firebase.currentUser?.displayName
                 if (!tokenTask.isSuccessful) {
                     Toast.makeText(applicationContext, "sign in token error: ${tokenTask.exception?.message}", Toast.LENGTH_LONG).show()
                     return@addOnCompleteListener
@@ -74,6 +83,7 @@ class SigninActivity : AppCompatActivity() {
                             }
                         }
                         val member1 = realm.where<Member>().findAll()
+
                         for (i in member1) {
                             Log.d("COMM", "sign in: ${i.isFriend}, ${i.name}")
                         }

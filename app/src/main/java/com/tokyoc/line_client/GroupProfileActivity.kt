@@ -28,6 +28,8 @@ class GroupProfileActivity : AppCompatActivity() {
         super.onCreate(saveInstanceState)
         setContentView(R.layout.activity_profile)
 
+        val token = intent.getStringExtra("token")
+
         groupId = intent.getIntExtra("groupId", 0)
         val toolbar = supportActionBar!!
         toolbar.setDisplayHomeAsUpEnabled(true)
@@ -35,11 +37,20 @@ class GroupProfileActivity : AppCompatActivity() {
         realm = Realm.getDefaultInstance()
         val group = realm.where<Group>().equalTo("id", groupId).findFirst()
         group?.display(findViewById<TextView>(R.id.name_view), findViewById<ImageView>(R.id.photo_view))
-    }
 
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        menuInflater.inflate(R.menu.menu_profile, menu)
-        return super.onCreateOptionsMenu(menu)
+        findViewById<ImageView>(R.id.photo_view).setOnClickListener() {
+            val intent = Intent(this, ChangeGroupImageActivity::class.java)
+            intent.putExtra("token", token)
+            intent.putExtra("groupId", groupId)
+            startActivity(intent)
+        }
+
+        findViewById<TextView>(R.id.name_view).setOnClickListener() {
+            val intent = Intent(this, ChangeGroupNameActivity::class.java)
+            intent.putExtra("token", token)
+            intent.putExtra("groupId", groupId)
+            startActivity(intent)
+        }
     }
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
@@ -47,18 +58,6 @@ class GroupProfileActivity : AppCompatActivity() {
         when (item?.itemId) {
             android.R.id.home -> {
                 val intent = Intent(this, MessageActivity::class.java)
-                intent.putExtra("token", token)
-                intent.putExtra("groupId", groupId)
-                startActivity(intent)
-            }
-            R.id.change_image -> {
-                val intent = Intent(this, ChangeGroupImageActivity::class.java)
-                intent.putExtra("token", token)
-                intent.putExtra("groupId", groupId)
-                startActivity(intent)
-            }
-            R.id.change_name -> {
-                val intent = Intent(this, ChangeGroupNameActivity::class.java)
                 intent.putExtra("token", token)
                 intent.putExtra("groupId", groupId)
                 startActivity(intent)
