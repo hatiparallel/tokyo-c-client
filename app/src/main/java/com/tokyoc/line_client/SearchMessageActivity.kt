@@ -84,28 +84,24 @@ class SearchMessageActivity : RxAppCompatActivity() {
 
         searchButton.setOnClickListener {
             if (searchEditText.text.isEmpty()) {
-                if (searchFilter == 0) {
-                    messages = realm.where<Message>().findAll()
-                } else if (searchFilter == 1) {
-                    messages = realm.where<Message>().notEqualTo("isEvent", 1.toInt()).findAll()
-                } else if (searchFilter == 2) {
-                    messages = realm.where<Message>().greaterThanOrEqualTo("isEvent", 2.toInt()).findAll()
-                } else if (searchFilter == 3) {
-                    messages = realm.where<Message>().greaterThan("isEvent", 2.toInt()).findAll()
+                messages = when(searchFilter) {
+                    0 -> realm.where<Message>().findAll()
+                    1 -> realm.where<Message>().notEqualTo("isEvent", 1.toInt()).findAll()
+                    2 -> realm.where<Message>().greaterThanOrEqualTo("isEvent", 2.toInt()).findAll()
+                    3 -> realm.where<Message>().greaterThan("isEvent", 2.toInt()).findAll()
+                    else -> realm.where<Message>().findAll()
                 }
             } else {
                 val keyWord = searchEditText.text.toString()
-                if (searchFilter == 0) {
-                    messages = realm.where<Message>().contains("content", keyWord, Case.INSENSITIVE).findAll()
-                } else if (searchFilter == 1) {
-                    messages = realm.where<Message>().notEqualTo("isEvent", 1.toInt())
+                messages = when(searchFilter) {
+                    0 -> realm.where<Message>().contains("content", keyWord, Case.INSENSITIVE).findAll()
+                    1 -> realm.where<Message>().notEqualTo("isEvent", 1.toInt())
                             .contains("content", keyWord, Case.INSENSITIVE).findAll()
-                } else if (searchFilter == 2) {
-                    messages = realm.where<Message>().greaterThanOrEqualTo("isEvent", 2.toInt())
+                    2 -> realm.where<Message>().greaterThanOrEqualTo("isEvent", 2.toInt())
                             .contains("content", keyWord, Case.INSENSITIVE).findAll()
-                } else if (searchFilter == 3) {
-                    messages = realm.where<Message>().greaterThan("isEvent", 2.toInt())
+                    3 -> realm.where<Message>().greaterThan("isEvent", 2.toInt())
                             .contains("content", keyWord, Case.INSENSITIVE).findAll()
+                    else -> realm.where<Message>().contains("content", keyWord, Case.INSENSITIVE).findAll()
                 }
             }
             listView.adapter = SearchMessageListAdapter(messages)
