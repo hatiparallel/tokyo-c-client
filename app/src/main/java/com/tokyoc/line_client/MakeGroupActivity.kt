@@ -9,10 +9,7 @@ import android.os.Bundle
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
-import android.widget.Button
-import android.widget.EditText
-import android.widget.ImageView
-import android.widget.Toast
+import android.widget.*
 import com.google.firebase.storage.FirebaseStorage
 import com.trello.rxlifecycle.components.support.RxAppCompatActivity
 import io.realm.Realm
@@ -43,7 +40,7 @@ class MakeGroupActivity: RxAppCompatActivity() {
         val toolbar = supportActionBar!!
         toolbar.setDisplayHomeAsUpEnabled(true)
 
-        findViewById<Button>(R.id.get_image_button).setOnClickListener() {
+        findViewById<TextView>(R.id.get_image).setOnClickListener() {
             val intent = Intent(Intent.ACTION_OPEN_DOCUMENT)
             intent.addCategory(Intent.CATEGORY_OPENABLE)
             intent.setType("image/*")
