@@ -5,4 +5,5 @@
     <string name="edit_message">メッセージを入力してください</string>
     <string name="button_send">送信</string>
     <string name="login_mail_adress">メールアドレスを入力してください</string>
+    <string name="got_image">新しい画像はこちらでよろしいですか？\n変更する場合はこちら</string>
 </resources>
