@@ -19,15 +19,12 @@ class GroupView : FrameLayout {
 
     var groupImageView: ImageView
     var groupNameTextView: TextView
+    var groupLatestTextView: TextView
 
     init {
         LayoutInflater.from(context).inflate(R.layout.view_group, this)
         groupImageView = findViewById<ImageView>(R.id.group_image_view)
         groupNameTextView = findViewById<TextView>(R.id.group_name_view)
-    }
-
-    fun setGroup(group: Group) {
-        groupImageView.setImageResource(R.drawable.img001)
-        groupNameTextView.text = group.name
+        groupLatestTextView = findViewById<TextView>(R.id.group_latest_view)
     }
 }

@@ -51,7 +51,7 @@ class SearchMessageListAdapter(data: OrderedRealmCollection<Message>) : RealmBas
 
             viewHolder.messageContent.text = message.content
             viewHolder.messageAuthor.text = author?.name ?: "取得失敗"
-            group?.display(viewHolder.messageGroup, viewHolder.messageImage)
+            group?.display(viewHolder.messageGroup, viewHolder.messageImage, null)
             val messageSendTime = DateFormat.format("yyyy/MM/dd", message.postedAt).toString()
             viewHolder.messagePostedAt.text = messageSendTime
 

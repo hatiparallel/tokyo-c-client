@@ -60,20 +60,22 @@ class PollingService : IntentService("polling_service") {
                 NotificationChannel(CHANNEL_ID, "YODA", NotificationManager.IMPORTANCE_DEFAULT))
 
         while (bound) {
-            Log.d("POLL", "tick suppressing ${suppressedGroup}")
-
             val status = client.getStatus().toBlocking().first() ?: continue
 
             if (lastStatus == null ||
                     lastStatus!!.friendshipCount != status.friendshipCount ||
-                    lastStatus!!.friendshipAddedAt != lastStatus.friendshipAddedAt) {
+                    lastStatus!!.friendshipAddedAt != status.friendshipAddedAt) {
+
+                Log.d("POLL", "friends updated")
 
                 val friends = client.getFriends().toBlocking().single().toTypedArray()
 
                 rx.Observable.from(friends)
-                        .flatMap { return@flatMap Member.lookup(it, client) }
+                        .flatMap { Member.lookup(it, client) }
                         .subscribe {
                             val member = it
+                            val realm = Realm.getDefaultInstance()
+
                             Log.d("DDDDD", "got it ! ${member.name}, ${member.isFriend}")
 
                             if (member.isFriend != Relation.OTHER) {
@@ -113,63 +115,81 @@ class PollingService : IntentService("polling_service") {
                         }
             }
 
-            for (summary in status.latests) {
-                realm.executeTransaction {
-                    var group = realm.where<Group>().equalTo("id", summary.channelId).findFirst()
-                            ?: realm.createObject<Group>(summary.channelId)
+            rx.Observable.from(status.latests)
+                    .flatMap {
+                        lateinit var group: Group
+                        var isModified = false
+                        var summary = it
 
-                    val groupName = group.name
+                        realm.executeTransaction {
+                            group = realm.where<Group>().equalTo("id", summary.channelId).findFirst()
+                                    ?: realm.createObject<Group>(summary.channelId)
 
-                    if (suppressedGroup != group.id && summary.messageId > group.latest) {
-                        client.getMessage(summary.messageId)
-                                .observeOn(Schedulers.io())
-                                .subscribe({
-                                    val author = Member.lookup(it.author, client).toBlocking().single()
-                                    val realm = Realm.getDefaultInstance()
+                            group.name = summary.channelName
+                            isModified = summary.messageId != group.latest
+                            group.latest = summary.messageId
+                        }
 
-                                    realm.executeTransaction {
-                                        realm.insertOrUpdate(author)
-                                    }
+                        if (group.isManaged) {
+                            group = realm.copyFromRealm(group)
+                        }
 
-                                    var text = ""
-
-                                    if (it.isEvent == 0) {
-                                        text = it.content
-                                    } else if (it.content == "join") {
-                                        text = "${author.name}が${groupName}に参加しました"
-                                    } else if (it.content == "leave") {
-                                        text = "${author.name}が${groupName}から退室しました"
-                                    }
-
-                                    Log.d("POLL", "notify ${it.author}")
-
-
-                                    notification_manager.notify(summary.channelId,
-                                            NotificationCompat.Builder(applicationContext, CHANNEL_ID)
-                                                    .setSmallIcon(R.drawable.img001)
-                                                    .setContentTitle(author?.name)
-                                                    .setContentText(text)
-                                                    .setSubText(summary.channelName)
-                                                    .setWhen(it.postedAt.time)
-                                                    .setAutoCancel(true)
-                                                    .build())
-                                }, {
-                                    Log.d("POLL", "notify failed $it")
-                                })
+                        if (isModified) {
+                            return@flatMap rx.Observable.just(group)
+                        } else {
+                            return@flatMap rx.Observable.empty<Group>()
+                        }
                     }
+                    .flatMap { client.getMessage(it.latest).subscribeOn(Schedulers.io()) }
+                    .subscribe({
+                        val message = it
+                        val realm = Realm.getDefaultInstance()
 
-                    group.name = summary.channelName
-                    group.latest = summary.messageId
-                    realm.copyFromRealm(group).updateImage()
-                }
+                        val group = realm.where<Group>().equalTo("id", it.channel).findFirst()
+                                ?: return@subscribe
 
-                lastStatus = status
+                        group.updateImage()
 
-                val deleted = realm.where<Group>().findAll().map { it.id } - status.latests.map { it.channelId }
+                        realm.executeTransaction {
+                            group.latestText = message.content
+                        }
 
-                realm.executeTransaction {
-                    realm.where<Group>().`in`("id", deleted.toTypedArray()).findAll().deleteAllFromRealm()
-                }
+                        if (suppressedGroup == group.id) {
+                            return@subscribe
+                        }
+
+                        val author = Member.lookup(it.author, client).toBlocking().single()
+                        var text = ""
+
+                        if (it.isEvent != 1) {
+                            text = it.content
+                        } else if (it.content == "join") {
+                            text = "${author.name}が${group.name}に参加しました"
+                        } else if (it.content == "leave") {
+                            text = "${author.name}が${group.name}から退室しました"
+                        }
+
+                        Log.d("POLL", "notify ${it.author}")
+
+                        notification_manager.notify(group.id,
+                                NotificationCompat.Builder(applicationContext, CHANNEL_ID)
+                                        .setSmallIcon(R.drawable.img001)
+                                        .setContentTitle(author?.name)
+                                        .setContentText(text)
+                                        .setSubText(group.name)
+                                        .setWhen(it.postedAt.time)
+                                        .setAutoCancel(true)
+                                        .build())
+                    }, {
+                        Log.d("POLL", "notify failed $it")
+                    })
+
+            lastStatus = status
+
+            val deleted = realm.where<Group>().findAll().map { it.id } - status.latests.map { it.channelId }
+
+            realm.executeTransaction {
+                realm.where<Group>().`in`("id", deleted.toTypedArray()).findAll().deleteAllFromRealm()
             }
 
             Thread.sleep(3000)

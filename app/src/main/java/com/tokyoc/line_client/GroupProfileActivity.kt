@@ -36,7 +36,8 @@ class GroupProfileActivity : AppCompatActivity() {
 
         realm = Realm.getDefaultInstance()
         val group = realm.where<Group>().equalTo("id", groupId).findFirst()
-        group?.display(findViewById<TextView>(R.id.name_view), findViewById<ImageView>(R.id.photo_view))
+
+        group?.display(findViewById<TextView>(R.id.name_view), findViewById<ImageView>(R.id.photo_view), null)
 
         findViewById<ImageView>(R.id.photo_view).setOnClickListener() {
             val intent = Intent(this, ChangeGroupImageActivity::class.java)

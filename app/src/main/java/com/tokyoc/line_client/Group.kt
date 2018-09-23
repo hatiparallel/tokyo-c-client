@@ -20,38 +20,49 @@ open class Group() : RealmObject() {
     }
 
     fun updateImage() {
+        val realm = Realm.getDefaultInstance()
+        val copied = realm.copyFromRealm(this)
         val storageRef = FirebaseStorage.getInstance().reference
-        val imageRef = storageRef.child("images/groups/${this.id}.jpg")
+        val imageRef = storageRef.child("images/groups/${copied.id}.jpg")
+
         imageRef.getBytes(20000)
                 .addOnSuccessListener {
                     val realm = Realm.getDefaultInstance()
-                    Log.d("COMM", "${this.name}: get unique ByteArray Success")
                     val ba = it
+                    Log.d("COMM", "${copied.name}: get unique ByteArray Success")
+
                     realm.executeTransaction {
-                        this.image = ba
-                        realm.insertOrUpdate(this)
+                        realm.where<Group>().equalTo("id", copied.id).findAll().forEach {
+                            it.image = ba
+                        }
                     }
                 }
                 .addOnFailureListener {
-                    Log.d("COMM", "${this.name}: get unique ByteArray Failure")
                     val defaultImageRef = storageRef.child("images/groups/yoda_group.jpg")
+                    Log.d("COMM", "${copied.name}: get unique ByteArray Failure")
                     defaultImageRef.getBytes(20000)
                             .addOnSuccessListener {
                                 val realm = Realm.getDefaultInstance()
-                                Log.d("COMM", "${this.name}: get yoda ByteArray Success")
                                 val ba = it
+                                Log.d("COMM", "${copied.name}: get yoda ByteArray Success")
+
                                 realm.executeTransaction {
-                                    this.image = ba
-                                    realm.insertOrUpdate(this)
+                                    realm.where<Group>().equalTo("id", copied.id).findAll().forEach {
+                                        it.image = ba
+                                    }
                                 }
                             }
                             .addOnFailureListener {
-                                Log.d("COMM", "${this.name}: get yoda ByteArray Failure")
+                                Log.d("COMM", "${copied.name}: get yoda ByteArray Failure")
                             }
                 }
     }
 
-    fun display(nameView: TextView, imageView: ImageView) {
+    fun display(nameView: TextView, imageView: ImageView, latestView: TextView?) {
+        if (latestView != null) {
+            latestView.text = this.latestText
+        }
+
         if (this.name.isNotEmpty()) {
             nameView.text = this.name
             imageView.setImageBitmap(BitmapFactory.decodeByteArray(this.image, 0, this.image.size))
@@ -74,5 +85,6 @@ open class Group() : RealmObject() {
     open var name: String = ""
     open var members: RealmList<String> = RealmList()
     open var latest: Int = 0
+    open var latestText: String = ""
     open var image: ByteArray = byteArrayOf()
 }
