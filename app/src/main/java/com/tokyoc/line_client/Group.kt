@@ -69,10 +69,15 @@ open class Group() : RealmObject() {
         } else {
             nameView.setTextColor(Color.DKGRAY)
             val realm = Realm.getDefaultInstance()
-            val member = realm.where<Member>().equalTo("id", this.members[0]).findFirst()
-            if (member != null) {
-                nameView.text = member.name
-                imageView.setImageBitmap(BitmapFactory.decodeByteArray(member.image, 0, member.image.size))
+            if (this.members.isNotEmpty()) {
+                val member = realm.where<Member>().equalTo("id", this.members[0]).findFirst()
+                if (member != null) {
+                    nameView.text = member.name
+                    imageView.setImageBitmap(BitmapFactory.decodeByteArray(member.image, 0, member.image.size))
+                } else {
+                    nameView.text = "取得失敗"
+                    imageView.setImageResource(R.drawable.img001)
+                }
             } else {
                 nameView.text = "取得失敗"
                 imageView.setImageResource(R.drawable.img001)
