@@ -75,7 +75,7 @@ class MemberProfileActivity : AppCompatActivity() {
                 Log.d("CHECK", "check")
                 val newGroup = Group()
                 newGroup.members = RealmList(memberId)
-                
+
                 Log.d("CHECK", "chek")
                 client.makeGroup(newGroup)
                         .subscribeOn(Schedulers.io())

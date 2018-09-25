@@ -32,7 +32,7 @@ class ChangeImageActivity : AppCompatActivity() {
     val image_request_code = 2700
 
     var uri: Uri? = null
-    var ba: ByteArray? = null
+    var ba: ByteArray = byteArrayOf()
 
     private lateinit var realm: Realm
 
@@ -71,10 +71,10 @@ class ChangeImageActivity : AppCompatActivity() {
             }
             R.id.change_image -> {
                 val storageRef: StorageReference = FirebaseStorage.getInstance().reference
-                if (ba == null) {
+                if (ba.isEmpty()) {
                     Toast.makeText(applicationContext, "画像が読み込めていません", Toast.LENGTH_LONG).show()
                     return false
-                } else if (ba!!.size > 20000) {
+                } else if (ba.size > 20000) {
                     Toast.makeText(applicationContext, "画像サイズが大きすぎます", Toast.LENGTH_LONG).show()
                     Log.d("COMM", "the image size is too big")
                     return false
@@ -87,7 +87,7 @@ class ChangeImageActivity : AppCompatActivity() {
                 }
 
                 val imageRef = storageRef.child("images/${self.id}.jpg")
-                imageRef.putBytes(ba!!)
+                imageRef.putBytes(ba)
                         .addOnSuccessListener {
                             Log.d("COMM", "upload success")
                             self.updateImage()
@@ -123,7 +123,7 @@ class ChangeImageActivity : AppCompatActivity() {
                     ba = baos.toByteArray()
                     val self = realm.where<Member>().equalTo("isFriend", Relation.SELF).findFirst()
                     realm.executeTransaction {
-                        self?.image = ba!!
+                        self?.image = ba
                     }
                     findViewById<TextView>(R.id.get_image).setText(R.string.got_image)
                 } catch (e: IOException) {

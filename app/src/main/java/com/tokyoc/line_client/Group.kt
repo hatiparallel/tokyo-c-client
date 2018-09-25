@@ -69,8 +69,12 @@ open class Group() : RealmObject() {
         } else {
             nameView.setTextColor(Color.DKGRAY)
             val realm = Realm.getDefaultInstance()
-            if (this.members.isNotEmpty()) {
-                val member = realm.where<Member>().equalTo("id", this.members[0]).findFirst()
+            if (this.members.size >= 2) {
+                val self = realm.where<Member>().equalTo("isFriend", Relation.SELF).findFirst()
+                var member = realm.where<Member>().equalTo("id", this.members[0]).findFirst()
+                if (self?.id == member?.id) {
+                    member = realm.where<Member>().equalTo("id", this.members[1]).findFirst()
+                }
                 if (member != null) {
                     nameView.text = member.name
                     imageView.setImageBitmap(BitmapFactory.decodeByteArray(member.image, 0, member.image.size))
