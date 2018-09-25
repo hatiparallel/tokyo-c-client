@@ -56,7 +56,7 @@ class MemberProfileActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
         val token = intent.getStringExtra("token")
         val flag = intent.getIntExtra("flag", 0)
-        Log.d("COMMM", "${flag}")
+        Log.d("COMM", "${flag}")
         val client = Client.build(token)
         when (item?.itemId) {
             android.R.id.home -> {
@@ -72,8 +72,11 @@ class MemberProfileActivity : AppCompatActivity() {
 
             }
             R.id.start_talk -> {
+                Log.d("CHECK", "check")
                 val newGroup = Group()
                 newGroup.members = RealmList(memberId)
+
+                Log.d("CHECK", "chek")
                 client.makeGroup(newGroup)
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())

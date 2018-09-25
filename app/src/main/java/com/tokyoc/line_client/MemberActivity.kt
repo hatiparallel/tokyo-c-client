@@ -69,14 +69,15 @@ class MemberActivity : AppCompatActivity() {
             val memberDelete = adapterView.getItemAtPosition(position) as Member
             Log.d("COMM", "Id is ${memberDelete.id}")
             Log.d("COMM", "id is ${memberDelete.id}")
-            client.deleteFriend(memberDelete.id)
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe({
-                        AlertDialog.Builder(this).apply {
-                            setTitle("Delete Friend")
-                            setMessage("Really Delete ${memberDelete.name}?")
-                            setPositiveButton("OK", DialogInterface.OnClickListener { _, _ ->
+
+            AlertDialog.Builder(this).apply {
+                setTitle("Delete Friend")
+                setMessage("Really Delete ${memberDelete.name}?")
+                setPositiveButton("OK", DialogInterface.OnClickListener { _, _ ->
+                    client.deleteFriend(memberDelete.id)
+                            .subscribeOn(Schedulers.io())
+                            .observeOn(AndroidSchedulers.mainThread())
+                            .subscribe({
                                 realm.executeTransaction {
                                     val deleteMember = realm.where<Member>().equalTo("id", memberDelete.id)?.findFirst()
                                     if (deleteMember != null) {
@@ -85,13 +86,13 @@ class MemberActivity : AppCompatActivity() {
                                     }
                                 }
 
+                            }, {
+                                Log.d("COMM", "delete failure, ${it.message}")
                             })
-                            setNegativeButton("Cancel", null)
-                            show()
-                        }
-                    },{
-                        Log.d("COMM", "post failed: ${it}")
-                    })
+                })
+                setNegativeButton("Cancel", null)
+                show()
+            }
             return@setOnItemLongClickListener true
         }
 
@@ -111,11 +112,15 @@ class MemberActivity : AppCompatActivity() {
                     Log.d("COMM", "${it.title}")
                     return@setOnNavigationItemSelectedListener true
                 }
+                else -> {
+                    return@setOnNavigationItemSelectedListener false
+                }
             }
-            false
+            //return@setOnNavigationItemSelectedListener false
         }
 
         //友達追加ボタンを押した時の処理
+
         findViewById<FloatingActionButton>(R.id.add_friend_button).setOnClickListener {
             val intent = Intent(this, SendPinActivity::class.java)
             intent.putExtra("token", token)

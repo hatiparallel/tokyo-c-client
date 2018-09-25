@@ -25,7 +25,7 @@ class MakeGroupActivity: RxAppCompatActivity() {
     val image_request_code = 2900
 
     var uri: Uri? = null
-    var ba: ByteArray? = null
+    var ba: ByteArray = byteArrayOf()
 
 
     private lateinit var realm: Realm
@@ -80,54 +80,44 @@ class MakeGroupActivity: RxAppCompatActivity() {
                         .subscribe({
                             Log.d("COMM", "post done: name is ${it.name}, id is ${it.id}")
                             val group = it
-                            if (ba != null) {
-                                if (ba!!.size <= 0 || ba!!.size > 20000) {
-                                    Toast.makeText(applicationContext, "画像サイズが適用範囲外のため登録されませんでした", Toast.LENGTH_LONG)
-                                            .show()
-                                    group.updateImage()
-                                    realm.executeTransaction {
-                                        realm.insertOrUpdate(group)
-                                    }
-                                    val intent = Intent(this, GroupActivity::class.java)
-                                    intent.putExtra("token", token)
-                                    startActivity(intent)
-                                } else {
-                                    val storageRef = FirebaseStorage.getInstance().reference
-                                    val imageRef = storageRef.child("images/groups/${group.id}.jpg")
-                                    imageRef.putBytes(ba!!)
-                                            .addOnSuccessListener {
-                                                Log.d("COMM", "upload success")
-                                                realm = Realm.getDefaultInstance()
-                                                group.updateImage()
-                                                realm.executeTransaction {
-                                                    realm.insertOrUpdate(group)
-                                                }
-                                                val intent = Intent(this, GroupActivity::class.java)
-                                                intent.putExtra("token", token)
-                                                startActivity(intent)
-                                            }
-                                            .addOnFailureListener {
-                                                realm = Realm.getDefaultInstance()
-                                                Log.d("COMM", "upload failure: ${it.message}")
-                                                Toast.makeText(applicationContext, "画像登録時にエラーが発生しました", Toast.LENGTH_LONG)
-                                                        .show()
-                                                group.updateImage()
-                                                realm.executeTransaction {
-                                                    realm.insertOrUpdate(group)
-                                                }
-                                                val intent = Intent(this, GroupActivity::class.java)
-                                                intent.putExtra("token", token)
-                                                startActivity(intent)
-                                            }
-                                }
-                            } else {
-                                group.updateImage()
+                            if (ba.isEmpty() || ba.size > 20000) {
+                                Toast.makeText(applicationContext, "画像サイズが適用範囲外のため登録されませんでした", Toast.LENGTH_LONG)
+                                        .show()
                                 realm.executeTransaction {
                                     realm.insertOrUpdate(group)
                                 }
+                                realm.where<Group>().equalTo("id", group.id).findFirst()?.updateImage()
                                 val intent = Intent(this, GroupActivity::class.java)
                                 intent.putExtra("token", token)
                                 startActivity(intent)
+                            } else {
+                                val storageRef = FirebaseStorage.getInstance().reference
+                                val imageRef = storageRef.child("images/groups/${group.id}.jpg")
+                                imageRef.putBytes(ba)
+                                        .addOnSuccessListener {
+                                            Log.d("COMM", "upload success")
+                                            realm = Realm.getDefaultInstance()
+                                            realm.executeTransaction {
+                                                realm.insertOrUpdate(group)
+                                            }
+                                            realm.where<Group>().equalTo("id", group.id).findFirst()?.updateImage()
+                                            val intent = Intent(this, GroupActivity::class.java)
+                                            intent.putExtra("token", token)
+                                            startActivity(intent)
+                                        }
+                                        .addOnFailureListener {
+                                            realm = Realm.getDefaultInstance()
+                                            Log.d("COMM", "upload failure: ${it.message}")
+                                            Toast.makeText(applicationContext, "画像登録時にエラーが発生しました", Toast.LENGTH_LONG)
+                                                    .show()
+                                            realm.executeTransaction {
+                                                realm.insertOrUpdate(group)
+                                            }
+                                            realm.where<Group>().equalTo("id", group.id).findFirst()?.updateImage()
+                                            val intent = Intent(this, GroupActivity::class.java)
+                                            intent.putExtra("token", token)
+                                            startActivity(intent)
+                                        }
                             }
                         }, {
                             Log.d("COMM", "post failed: ${it}")

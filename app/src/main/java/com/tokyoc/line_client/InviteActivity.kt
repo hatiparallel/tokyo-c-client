@@ -29,7 +29,7 @@ class InviteActivity : AppCompatActivity() {
 
         val token = intent.getStringExtra("token")
         val groupId: Int = intent.getIntExtra("groupId", 0)
-        val invitable: Array<String>? = intent.getStringArrayExtra("invitable")
+        val invitable: Array<String>? = intent.getStringArrayListExtra("invitable").toTypedArray()
 
         val toolbar = supportActionBar!!
         toolbar.setDisplayHomeAsUpEnabled(true)
@@ -67,7 +67,7 @@ class InviteActivity : AppCompatActivity() {
                                         group?.members?.add(memberInvite.id)
                                     }
                                     intent.putExtra("token", token)
-                                    intent.putExtra("group", groupId)
+                                    intent.putExtra("groupId", groupId)
                                     startActivity(intent)
                                 }, {
                                     Log.d("COMM", "post failed: ${it}")
