@@ -74,6 +74,10 @@ class MemberProfileActivity : AppCompatActivity() {
             R.id.start_talk -> {
                 val newGroup = Group()
                 newGroup.members = RealmList(memberId)
+                val self = realm.where<Member>().equalTo("isFriend", Relation.SELF).findFirst()
+                if (self != null) {
+                    newGroup.members.add(self.id)
+                }
                 client.makeGroup(newGroup)
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
