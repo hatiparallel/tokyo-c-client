@@ -68,7 +68,7 @@ open class Member : RealmObject() {
 
     fun deregister() {
         val realm = Realm.getDefaultInstance()
-        if (this.isFriend == Relation.OTHER && this.groupJoin <= 0) {
+        if (this.isValid == true && this.isFriend == Relation.OTHER && this.groupJoin <= 0) {
             realm.executeTransaction {
                 realm.where<Member>().equalTo("id", this.id).findFirst()?.deleteFromRealm()
             }
