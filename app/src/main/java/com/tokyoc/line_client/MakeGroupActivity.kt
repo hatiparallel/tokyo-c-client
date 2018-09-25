@@ -84,10 +84,10 @@ class MakeGroupActivity: RxAppCompatActivity() {
                                 if (ba!!.size <= 0 || ba!!.size > 20000) {
                                     Toast.makeText(applicationContext, "画像サイズが適用範囲外のため登録されませんでした", Toast.LENGTH_LONG)
                                             .show()
-                                    group.updateImage()
                                     realm.executeTransaction {
                                         realm.insertOrUpdate(group)
                                     }
+                                    realm.where<Group>().equalTo("id", group.id).findFirst()?.updateImage()
                                     val intent = Intent(this, GroupActivity::class.java)
                                     intent.putExtra("token", token)
                                     startActivity(intent)
@@ -98,10 +98,10 @@ class MakeGroupActivity: RxAppCompatActivity() {
                                             .addOnSuccessListener {
                                                 Log.d("COMM", "upload success")
                                                 realm = Realm.getDefaultInstance()
-                                                group.updateImage()
                                                 realm.executeTransaction {
                                                     realm.insertOrUpdate(group)
                                                 }
+                                                realm.where<Group>().equalTo("id", group.id).findFirst()?.updateImage()
                                                 val intent = Intent(this, GroupActivity::class.java)
                                                 intent.putExtra("token", token)
                                                 startActivity(intent)
@@ -111,20 +111,20 @@ class MakeGroupActivity: RxAppCompatActivity() {
                                                 Log.d("COMM", "upload failure: ${it.message}")
                                                 Toast.makeText(applicationContext, "画像登録時にエラーが発生しました", Toast.LENGTH_LONG)
                                                         .show()
-                                                group.updateImage()
                                                 realm.executeTransaction {
                                                     realm.insertOrUpdate(group)
                                                 }
+                                                realm.where<Group>().equalTo("id", group.id).findFirst()?.updateImage()
                                                 val intent = Intent(this, GroupActivity::class.java)
                                                 intent.putExtra("token", token)
                                                 startActivity(intent)
                                             }
                                 }
                             } else {
-                                group.updateImage()
                                 realm.executeTransaction {
                                     realm.insertOrUpdate(group)
                                 }
+                                realm.where<Group>().equalTo("id", group.id).findFirst()?.updateImage()
                                 val intent = Intent(this, GroupActivity::class.java)
                                 intent.putExtra("token", token)
                                 startActivity(intent)

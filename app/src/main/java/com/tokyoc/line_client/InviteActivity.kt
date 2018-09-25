@@ -67,7 +67,7 @@ class InviteActivity : AppCompatActivity() {
                                         group?.members?.add(memberInvite.id)
                                     }
                                     intent.putExtra("token", token)
-                                    intent.putExtra("group", groupId)
+                                    intent.putExtra("groupId", groupId)
                                     startActivity(intent)
                                 }, {
                                     Log.d("COMM", "post failed: ${it}")
